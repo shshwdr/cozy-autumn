@@ -1,3 +1,9 @@
 ﻿cards,triggerRound
 empty:4|nut:3,0
 snake:2|trap:2|empty:3|nut:1,1
+fire:1|nut:1,2
+weasel:2|nut:1|empty:2,3
+branch:3|ice:2,4
+shop:1,5
+owl:2|nut:1|empty:2,6
+fox:2|nut:1,7
