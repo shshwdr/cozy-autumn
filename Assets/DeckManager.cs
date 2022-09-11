@@ -11,6 +11,7 @@ public class StageInfo {
 
 public class DeckManager : Singleton<DeckManager>
 {
+    public bool wouldShuffle = true;
     List<string> fullDeck = new List<string>();
     List<string> currentDeck = new List<string>();
     List<StageInfo> stageInfos;
@@ -41,7 +42,11 @@ public class DeckManager : Singleton<DeckManager>
 
         initCurrentDeck();
 
-        currentDeck.Shuffle();
+        if (wouldShuffle)
+        {
+
+            currentDeck.Shuffle();
+        }
 
         round++;
         Debug.Log("start deck round " + round);

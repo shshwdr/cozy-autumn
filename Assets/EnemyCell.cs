@@ -8,7 +8,7 @@ public class EnemyCell : MonoBehaviour
 {
 
     public int attackPerStep = 1;
-    public int attack = 3;
+    public int attack = 5;
     public int hp = 1;
     bool isDead = false;
 

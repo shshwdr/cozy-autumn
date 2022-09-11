@@ -4,11 +4,29 @@ using UnityEngine;
 
 public class GridCell : MonoBehaviour
 {
-   public int index;
+    public int index;
+    public SpriteRenderer renderer;
 
-    public  void init(int i)
+    public GameObject bk;
+
+    public CellInfo cellInfo;
+
+    public string type;
+
+    public  void init(string _type,int i)
     {
+        type = _type;
+        cellInfo = CellManager.Instance.getInfo(type);
+        renderer.sprite = Resources.Load<Sprite>("cell/" + type);
         index = i;
+        bk.SetActive(cellInfo.isCell());
+
+        if (cellInfo.isEnemy())
+        {
+
+            gameObject. AddComponent<EnemyCell>();
+            bk.GetComponent<SpriteRenderer>().color = Color.red;
+        }
     }
     // Start is called before the first frame update
     void Start()
