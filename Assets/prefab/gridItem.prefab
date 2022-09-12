@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 1766114458741427110}
   - component: {fileID: -7557795742805977661}
   - component: {fileID: 3708797635242164441}
+  - component: {fileID: 5185084260773715149}
   m_Layer: 0
   m_Name: gridItem
   m_TagString: Untagged
@@ -76,6 +77,17 @@ MonoBehaviour:
   renderer: {fileID: 1766114459308562573}
   bk: {fileID: 1766114459899678835}
   type: 
+--- !u!210 &5185084260773715149
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1766114458741427111}
+  m_Enabled: 1
+  m_SortingLayerID: 1006497223
+  m_SortingLayer: 2
+  m_SortingOrder: 0
 --- !u!1 &1766114459308562575
 GameObject:
   m_ObjectHideFlags: 0

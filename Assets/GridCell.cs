@@ -41,15 +41,16 @@ public class GridCell : MonoBehaviour
     }
     private void OnMouseDown()
     {
-        if (GetComponent<PlayerCell>())
-        {
-            ResourceManager.Instance.consumeResource("nut", 1);
-        }
-       index = GridController.Instance.moveCellToEmpty(this);
-        if(index == -1)
-        {
-            Destroy(gameObject);
-        }
+        //if (GetComponent<PlayerCell>())
+        //{
+        //    ResourceManager.Instance.consumeResource("nut", 1);
+        //}
+        GridController.Instance.moveCell(this);
+      //index = GridController.Instance.moveCellToEmpty(this);
+      //  if(index == -1)
+      //  {
+      //      Destroy(gameObject);
+      //  }
     }
 
 }

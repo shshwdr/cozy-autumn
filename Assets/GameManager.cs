@@ -15,7 +15,10 @@ public class GameManager : Singleton<GameManager>
     // Update is called once per frame
     void Update()
     {
-        
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            restartGame();
+        }
     }
 
     public void restartGame()
