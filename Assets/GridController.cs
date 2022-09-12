@@ -55,7 +55,8 @@ public class GridController : Singleton<GridController>
                 {
                     //var child = Instantiate(Resources.Load<GameObject>("cell/player"), cellParents[index].position, Quaternion.identity, cellParents[index]);
                     //child.GetComponent<GridCell>().init(index);
-                    generateCell(index, "player");
+                    playerCell = generateCell(index, "player").GetComponent<GridCell>();
+                    
                 }
                 else
                 {
@@ -94,7 +95,7 @@ public class GridController : Singleton<GridController>
 
     public Transform getPlayerTransform()
     {
-        return cellParents[playerCellIndex];
+        return playerCell.transform;
     }
 
     GameObject generateCell(int index, string type)
@@ -173,6 +174,7 @@ public class GridController : Singleton<GridController>
 
         //draw a card
         var card = DeckManager.Instance.drawCard();
+        Debug.Log("draw card " + card);
         var cardInfo = CellManager.Instance.getInfo(card);
 
         // if it is cell card, don't move it, but destroy and replace it to the cell card
@@ -211,239 +213,111 @@ public class GridController : Singleton<GridController>
         var emptyPosition = cellParents[originEmptyIndex].position;
         //cell.GetComponent<SortingGroup>().sortingOrder = 100;
         cell.transform.DOMove(emptyPosition, 0.3f);
+        generate(movingCellIndex, card);
         yield return new  WaitForSeconds(0.3f);
 
 
         cell.transform.parent = cellParents[originEmptyIndex];
         cell.index = originEmptyIndex;
 
-        //calculate combination result
         var targetCell = cellParents[originEmptyIndex].GetComponentInChildren<GridItem>();
         var cell1String = cell.type;
         var cell2String = targetCell ? targetCell.type : "empty";
-        var combination = CombinationManager.Instance.getCombinationResult(cell1String, cell2String);
-        if (combination != null)
+        if (cell.GetComponent<GridCell>().cellInfo.isPlayer())
         {
-            foreach (var pair in combination.result)
+            if (targetCell)
             {
-                switch (pair.Key)
+                if (targetCell.cellInfo.isResource())
                 {
-                    case "resource":
-
-                        var resource = new List<PairInfo<int>>() { };
-                        resource.Add(new PairInfo<int>(cell2String, int.Parse(pair.Value)));
-                        CollectionManager.Instance.AddCoins(transform.position, resource);
-                        break;
-                    case "destroy1":
-                        addEmpty(movingCellIndex);
-                        //addEmpty(cell.index);
-                        destroy(cell.gameObject);
-                        break;
-                    case "destroy2":
-                        destroy(targetCell.gameObject);
-                        break;
-
-
-                    case "generate":
-                        //generate new item in target position, generate empty in origin position
-                        generateCell(emptyCell, pair.Value);
-                        break;
-                    default:
-                        Debug.LogError("not support combination restul " + pair.Key);
-                        break;
+                    var resource = new List<PairInfo<int>>() { };
+                    resource.Add(new PairInfo<int>(cell2String, targetCell.cellInfo.categoryValue));
+                    CollectionManager.Instance.AddCoins(targetCell.transform.position, resource);
+                    destroy(targetCell.gameObject);
+                }
+                else if (targetCell.cellInfo.isWeapon())
+                {
+                    cell.GetComponent<GridCell>().equip(cell2String);
+                    destroy(targetCell.gameObject);
                 }
             }
+            emptyCell = movingCellIndex;
         }
+        else
+        {
+            //calculate combination result
+            var combination = CombinationManager.Instance.getCombinationResult(cell1String, cell2String);
+            if (combination != null)
+            {
+                foreach (var pair in combination.result)
+                {
+                    switch (pair.Key)
+                    {
+                        case "resource":
+
+                            var resource = new List<PairInfo<int>>() { };
+                            resource.Add(new PairInfo<int>(cell2String, int.Parse(pair.Value)));
+                            CollectionManager.Instance.AddCoins(transform.position, resource);
+                            break;
+                        case "destroy1":
+                            addEmpty(originEmptyIndex);
+                            destroy(cell.gameObject);
+                            break;
+                        case "destroy2":
+                            destroy(targetCell.gameObject);
+                            break;
+
+
+                        case "generate":
+                            //generate new item in target position, generate empty in origin position
+                            addEmpty(movingCellIndex);
+                            destroy(cell.gameObject);
+                            generateCell(emptyCell, pair.Value);
+                            break;
+                        default:
+                            Debug.LogError("not support combination restul " + pair.Key);
+                            break;
+                    }
+                }
+            }
+
+            // if generate new item, don't update emptyCell
+            if (combination != null && combination.result.ContainsKey("generate"))
+            {
+                //return cell.index;
+            }
+            else
+            {
+
+                //cell.transform.parent = cellParents[originEmptyIndex];
+                //cell.transform.position = cellParents[originEmptyIndex].position;
+
+
+
+                emptyCell = movingCellIndex;
+                //generate(emptyCell, card);
+
+
+                //if (cell.GetComponent<GridCell>().cellInfo.isPlayer())
+                //{
+                //    playerCell = originEmptyIndex;
+                //}
+                //StartCoroutine(test(originEmptyIndex, cell));
+                //return originEmptyIndex;
+            }
+        }
+
+           
 
         yield return new WaitForSeconds(animTime);
         EventPool.Trigger("moveAStep");
 
-        // if generate new item, don't update emptyCell
-        if (combination != null && combination.result.ContainsKey("generate"))
-        {
-            //return cell.index;
-        }
-        else
-        {
-
-            //cell.transform.parent = cellParents[originEmptyIndex];
-            //cell.transform.position = cellParents[originEmptyIndex].position;
-
-
-
-            emptyCell = movingCellIndex;
-            //generate(emptyCell, card);
-
-
-            //if (cell.GetComponent<GridCell>().cellInfo.isPlayer())
-            //{
-            //    playerCell = originEmptyIndex;
-            //}
-            //StartCoroutine(test(originEmptyIndex, cell));
-            //return originEmptyIndex;
-        }
-        generate(emptyCell, card);
         finishMove();
     }
 
 
-    //public int moveCellToEmpty(GridCell cell)
-    //{
-
-    //    moveCount++;
-
-    //    //draw a card
-    //    var card = DeckManager.Instance.drawCard();
-
-    //    var cardInfo = CellManager.Instance.getInfo(card);
-    //    if (cardInfo.isCell())
-    //    {
-    //        //generate enemy
-    //        if (cell.cellInfo.isEmpty())
-    //        {
-    //            Debug.Log("generate "+ card);
-    //            //generate a snake
-    //            generateCell(cell.index, card);
-
-    //            //foreach (var item in cellParents[cell.index].GetComponentsInChildren<GridItem>())
-    //            //{
-    //            //    Destroy(item.gameObject);
-    //            //}
-
-    //            EventPool.Trigger("moveAStep");
-    //            return -1;
-    //        }
-    //        else
-    //        {
-    //            DeckManager.Instance.addCardToDeck(card);
-    //        }
-    //    }
 
 
-
-
-    //    var originEmptyIndex = emptyCell;
-
-
-    //    var cell2 = cellParents[originEmptyIndex].GetComponentInChildren<GridItem>();
-    //    var cell1String = cell.type;
-    //    var cell2String = cell2 ? cell2.type : "empty";
-    //    var combination = CombinationManager.Instance.getCombinationResult(cell1String, cell2String);
-    //    if (combination != null)
-    //    {
-    //        foreach (var pair in combination.result)
-    //        {
-    //            switch (pair.Key)
-    //            {
-    //                case "resource":
-
-    //                    var resource = new List<PairInfo<int>>() { };
-    //                    resource.Add(new PairInfo<int>(cell2String, int.Parse(pair.Value)));
-    //                    CollectionManager.Instance.AddCoins(transform.position, resource);
-    //                    break;
-    //                case "destroy1":
-    //                    addEmpty(cell.index);
-    //                    Destroy(cell.gameObject);
-    //                    break;
-    //                case "destroy2":
-    //                    Destroy(cell2.gameObject);
-    //                    break;
-
-
-    //                case "generate":
-    //                    generateCell(emptyCell, pair.Value);
-    //                    break;
-    //                default:
-    //                    Debug.LogError("not support combination restul " + pair.Key);
-    //                    break;
-    //            }
-    //        }
-    //    }
-
-    //    EventPool.Trigger("moveAStep");
-
-    //    if (combination!=null &&combination.result.ContainsKey("generate"))
-    //    {
-    //        return cell.index;
-    //    }
-    //    else
-    //    {
-
-    //        cell.transform.parent = cellParents[originEmptyIndex];
-    //        cell.transform.position = cellParents[originEmptyIndex].position;
-
-
-
-    //        emptyCell = cell.index;
-    //        generate(emptyCell, card);
-
-
-    //        if (cell.GetComponent<GridCell>().cellInfo.isPlayer())
-    //        {
-    //            //playerCellIndex = originEmptyIndex;
-    //        }
-    //        //StartCoroutine(test(originEmptyIndex, cell));
-    //        return originEmptyIndex;
-    //    }
-
-
-    //}
-
-
-
-    IEnumerator test(int originEmptyIndex, GridCell cell)
-    {
-        //yield return new WaitForSeconds(0.1f);
-        //trigger event if there is item on cell
-
-        yield return new WaitForSeconds(0.1f);
-
-        var cell2 = cellParents[originEmptyIndex].GetComponentInChildren<GridItem>();
-        var cell1String = cell.type;
-        var cell2String = cell2 ? cell2.type : "empty";
-        var combination = CombinationManager.Instance.getCombinationResult(cell1String, cell2String);
-        if (combination!=null)
-        {
-            foreach(var pair in combination.result)
-            {
-                switch (pair.Key)
-                {
-                    case "resource":
-
-                        var resource = new List<PairInfo<int>>() { };
-                        resource.Add(new PairInfo<int>(cell2String, int.Parse(pair.Value)));
-                        CollectionManager.Instance.AddCoins(transform.position, resource);
-                        break;
-                    case "destroy1":
-                        addEmpty(cell.index);
-                        Destroy(cell.gameObject);
-                        break;
-                    case "destroy2":
-                        Destroy(cell2.gameObject);
-                        break;
-
-
-                    case "generate":
-                        generateCell(emptyCell, pair.Value);
-                        break;
-                    default:
-                        Debug.LogError("not support combination restul " + pair.Key);
-                        break;
-                }
-            }
-        }
-        //if (cellParents[originEmptyIndex].GetComponentInChildren<GridItem>())
-        //{
-        //    cellParents[originEmptyIndex].GetComponentInChildren<GridItemAction>().act(cell);
-        //}
-
-
-
-
-        //yield return new WaitForSeconds(0.1f);
-        EventPool.Trigger("moveAStep");
-        yield return new WaitForSeconds(0.1f);
-    }
+    
 
     void generate(int index, string card)
     {
@@ -458,7 +332,8 @@ public class GridController : Singleton<GridController>
         switch (card)
         {
             case "nut":
-                generateCell(index, "nut");
+            case "bat":
+                generateCell(index, card);
                 break;
             case "trap":
 
@@ -467,6 +342,7 @@ public class GridController : Singleton<GridController>
                     generateCell(index, "trap");
                 }
                 break;
+                
 
         }
     }

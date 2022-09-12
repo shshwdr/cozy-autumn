@@ -23,8 +23,8 @@ public class EnemyCell : MonoBehaviour
         GridController.Instance.addEmpty(GetComponent<GridCell>().index);
         GetComponent<Collider2D>().enabled = false;
         isDead = true;
-        transform.DOShakeScale(0.4f,0.4f);
-        Destroy(gameObject,0.4f);
+        transform.DOShakeScale(0.3f,0.3f);
+        Destroy(gameObject,0.3f);
     }
     void stepAttack()
     {
@@ -35,8 +35,19 @@ public class EnemyCell : MonoBehaviour
         //if player nearby, attack and destroy
         if (GridController.Instance.isPlayerAround(GetComponent<GridCell>().index))
         {
-            Instantiate(Resources.Load("effect/attack"), GridController.Instance.getPlayerTransform().position, Quaternion.identity);
-            ResourceManager.Instance.consumeResource("nut", attack);
+            //if player has weapon, unequip weapon and die
+            var player = GridController.Instance.getPlayerTransform().GetComponent<GridCell>();
+            if (player.hasEquipment())
+            {
+                player.unequip(transform);
+            }
+            else
+            {
+
+                Instantiate(Resources.Load("effect/attack"), GridController.Instance.getPlayerTransform().position, Quaternion.identity);
+                ResourceManager.Instance.consumeResource("nut", attack);
+            }
+
             getDamage(1);
         }
         else

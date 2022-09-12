@@ -11,6 +11,10 @@ public class CellInfo {
     public bool isEnemy() { return categoryType == "enemy"; }
     public bool isEmpty() { return categoryType == "empty"; }
     public bool isPlayer() { return categoryType == "player"; }
+    public bool isResource() { return categoryType == "resource"; }
+    public bool isWeapon() { return categoryType == "weapon"; }
+
+    public int categoryValue;
 
 }
 
