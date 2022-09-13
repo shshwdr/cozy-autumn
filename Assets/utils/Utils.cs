@@ -22,6 +22,16 @@ public class Utils : MonoBehaviour
     {
         return line_start + Vector3.Project(point - line_start, line_end - line_start);
     }
+
+    static public T randomList<T>(List<T> a)
+    {
+        if(a.Count == 0)
+        {
+            return default(T);
+        }
+        return a[Random.Range(0, a.Count)];
+    }
+
     static public bool ListEqual<T>(List<T> a, List<T> b)
     {
         if (a.Count != b.Count)

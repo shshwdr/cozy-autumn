@@ -1,5 +1,5 @@
 ﻿cards,triggerRound
-empty:2|nut:2,0
+fire:1|ice:1,0
 snake:2|trap:1|empty:1|nut:1,1
 branch:2|nut:1,2
 weasel:2|nut:1|empty:1,3

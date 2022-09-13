@@ -16,6 +16,20 @@ public class GridCell : MonoBehaviour
 
     string equipment = null;
     public SpriteRenderer equipRenderer;
+    public GameObject ice;
+
+    public bool isFreezed = false;
+
+    public void freeze()
+    {
+        isFreezed = true;
+        ice.SetActive(true);
+    }
+    public void thaw()
+    {
+        isFreezed = false;
+        ice.SetActive(false);
+    }
 
     public  void init(string _type,int i)
     {
@@ -29,6 +43,11 @@ public class GridCell : MonoBehaviour
         {
 
             gameObject. AddComponent<EnemyCell>();
+            bk.GetComponent<SpriteRenderer>().color = Color.black;
+        }
+        if(cellInfo.type == "fire")
+        {
+            gameObject.AddComponent<FireCell>();
             bk.GetComponent<SpriteRenderer>().color = Color.red;
         }
     }

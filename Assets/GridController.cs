@@ -88,6 +88,72 @@ public class GridController : Singleton<GridController>
         return false;
     }
 
+    void addIndices(List<int>  indices, int x, int y)
+    {
+        if(x>=0&&x< cellCountX && y >= 0 && y < cellCountY)
+        {
+            indices.Add(x * cellCountX + y);
+        }
+    }
+
+    public List<GridCell> adjacentType(int i,string type)
+    {
+        List<GridCell> res = new List<GridCell>();
+        var ix = i / cellCountX;
+        var iy = i % cellCountY;
+        List<int> indices = new List<int>();
+        addIndices(indices, ix - 1, iy);
+        addIndices(indices, ix + 1, iy);
+        addIndices(indices, ix, iy - 1);
+        addIndices(indices, ix, iy + 1);
+        foreach (var cell in FindObjectsOfType<GridCell>())
+        {
+            if (indices.Contains(cell.index) && isType(cell, type))
+            {
+                res.Add(cell);
+            }
+        }
+        return res;
+    }
+
+    bool isType(GridCell cell, string type)
+    {
+        if(type == "ice")
+        {
+            return cell.isFreezed;
+        }
+        return cell.cellInfo.type == "type";
+    }
+
+    bool isAdjacentToType(int i, string type)
+    {
+
+        var ix = i / cellCountX;
+        var iy = i % cellCountY;
+        List<int> indices = new List<int>();
+        addIndices(indices, ix - 1, iy);
+        addIndices(indices, ix + 1, iy);
+        addIndices(indices, ix, iy - 1);
+        addIndices(indices, ix, iy + 1);
+        foreach (var cell in FindObjectsOfType<GridCell>())
+        {
+            if (indices.Contains(cell.index) && isType(cell,type))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+    bool isAdjacentToIce(int i)
+    {
+        return isAdjacentToType(i, "ice");
+    }
+
+    bool isAdjacentToFire(int i)
+    {
+        return isAdjacentToType(i, "fire");
+    }
+
     public bool isPlayerAround(int index)
     {
         return isTwoIndexCrossAdjacent(index, playerCellIndex);
@@ -132,7 +198,18 @@ public class GridController : Singleton<GridController>
     }
     bool isMoving = false;
 
-
+    int freezeCount()
+    {
+        int res = 0;
+        foreach (var c in GameObject.FindObjectsOfType<GridCell>())
+        {
+            if (c.isFreezed)
+            {
+                res++;
+            }
+        }
+        return res;
+    }
 
     public void moveCell(GridCell cell)
     {
@@ -172,10 +249,48 @@ public class GridController : Singleton<GridController>
             ResourceManager.Instance.consumeResource("nut", 1);
         }
 
+
         //draw a card
         var card = DeckManager.Instance.drawCard();
         Debug.Log("draw card " + card);
         var cardInfo = CellManager.Instance.getInfo(card);
+        var freezedCellCount = freezeCount();
+        if (cardInfo.type == "ice")
+        {
+            //if has ice, don't add
+            if (freezedCellCount == 0)
+            {
+                List<GridCell> canFreezeCells = new List<GridCell>();
+                foreach(var c in GameObject.FindObjectsOfType<GridCell>())
+                {
+                    if(c.cellInfo.type!="fire" && !isAdjacentToFire(c.index))
+                    {
+                        canFreezeCells.Add(c);
+                    }
+                }
+
+                if (canFreezeCells.Count > 0)
+                {
+                    var freeCell = Utils.randomList(canFreezeCells);
+                    freeCell.freeze();
+                }
+            }
+        }else if (GameObject.FindObjectsOfType<GridCell>().Length > 0)
+        {
+            foreach (var c in GameObject.FindObjectsOfType<GridCell>())
+            {
+                if (c.cellInfo.type != "fire" && !isAdjacentToFire(c.index) && c.cellInfo.type!="ice"&& isAdjacentToIce(c.index))
+                {
+                    c.freeze();
+                    //if freezed everything, game over
+                    if (freezedCellCount >= 8)
+                    {
+
+                        GameManager.Instance.gameover();
+                    }
+                }
+            }
+        }
 
         // if it is cell card, don't move it, but destroy and replace it to the cell card
         // empty position not change.
@@ -312,6 +427,14 @@ public class GridController : Singleton<GridController>
         EventPool.Trigger("moveAStep");
 
         finishMove();
+
+
+
+
+        if (cell.cellInfo.type == "fire")
+        {
+            cell.GetComponent<FireCell>().getDamage(1);
+        }
     }
 
 
