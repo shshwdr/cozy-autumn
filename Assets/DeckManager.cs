@@ -67,10 +67,27 @@ public class DeckManager : Singleton<DeckManager>
     {
         foreach(var pair in dict)
         {
-            for (int i = 0; i < pair.Value; i++)
+            if (pair.Value > 0)
             {
-                addCardToDeck(pair.Key);
+
+                for (int i = 0; i < pair.Value; i++)
+                {
+                    addCardToDeck(pair.Key);
+                }
             }
+            else
+            {
+                removeAllCardFromDeck(pair.Key);
+            }
+        }
+    }
+
+    public void removeAllCardFromDeck(string n)
+    {
+        while (fullDeck.Contains(n))
+        {
+            fullDeck.Remove(n);
+
         }
     }
 

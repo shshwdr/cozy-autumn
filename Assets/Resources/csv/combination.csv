@@ -1,12 +1,12 @@
 ﻿type1,type2,result,generation
-branch,stone,,axe
+branch,stone,generate1:axe|destroy2:0,axe
 branch,empty,generate1:stick,stick
 branch,nut,generate1:birdTrap|destroy2:0,birdTrap
 branch,stick,generate1:bat|destroy2:0,bat
-boulder,nut,,edibleNut
-boulder,stick,,axe
-boulder,empty,,stone
-boulder,stone,,trap
+boulder,nut,generate1:openedNut|destroy2:0,edibleNut
+boulder,stick,generate1:axe|destroy2:0,axe
+boulder,empty,generate1:stone,stone
+boulder,stone,generate1:trap|destroy2:0,trap
 fire,nut,addHot:1|generate2:cookedNut|destroy2:0,edibleNut
 fire,stick,addHot:1|increaseObjectHP:3|destroy2:0,
 fire,empty,addHot:1|increaseObjectHP:-1,
@@ -17,3 +17,9 @@ snake,trap,destroy1:0|destroy2:0,
 snake,birdTrap,destroy1:0|destroy2:0,
 weasel,trap,destroy1:0|destroy2:0,
 weasel,birdTrap,destroy1:0|destroy2:0,
+owl,trap,destroy1:0|destroy2:0,
+owl,birdTrap,destroy1:0|destroy2:0,
+fox,trap,destroy1:0|destroy2:0,
+fox,birdTrap,destroy1:0|destroy2:0,
+bear,trap,destroy1:0|destroy2:0,
+bear,birdTrap,destroy1:0|destroy2:0,

@@ -104,7 +104,7 @@ public class GridCell : MonoBehaviour
     {
         
     }
-    private void OnMouseDown()
+    public virtual void OnMouseDown()
     {
         //if (GetComponent<PlayerCell>())
         //{

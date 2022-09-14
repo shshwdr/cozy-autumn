@@ -41,6 +41,12 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: decoration
+    uniqueID: 196507757
+    locked: 0
+  - name: board
+    uniqueID: 1746707923
+    locked: 0
   - name: item
     uniqueID: 4128372829
     locked: 0

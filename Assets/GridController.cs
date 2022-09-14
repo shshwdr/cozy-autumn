@@ -216,6 +216,19 @@ public class GridController : Singleton<GridController>
         return res;
     }
 
+    int itemCount(string type)
+    {
+        int res = 0;
+        foreach (var c in GameObject.FindObjectsOfType<GridCell>())
+        {
+            if (c.cellInfo.type == type)
+            {
+                res++;
+            }
+        }
+        return res;
+    }
+
     public void moveCell(GridCell cell)
     {
 
@@ -496,12 +509,19 @@ public class GridController : Singleton<GridController>
                 break;
             case "trap":
 
-                if (GameObject.FindObjectsOfType<TrapItem>().Length < 3)
+                if (itemCount(card) < 3)
                 {
                     generateCell(index, "trap");
                 }
                 break;
-                
+            case "shop":
+
+                if (itemCount(card) < 1)
+                {
+                    generateCell(index, "shop");
+                }
+                break;
+
 
         }
     }

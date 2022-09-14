@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GridItem : GridCell
+public class DecorationItem : MonoBehaviour
 {
     // Start is called before the first frame update
     void Start()
@@ -14,10 +14,5 @@ public class GridItem : GridCell
     void Update()
     {
         
-    }
-
-    public override void OnMouseDown()
-    {
-      
     }
 }

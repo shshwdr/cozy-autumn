@@ -17,7 +17,7 @@ public class ResourceMenu : MonoBehaviour
             case "stick":
                 return cells[1].transform;
                 break;
-            case "metal":
+            case "stone":
                 return cells[2].transform;
                 break;
 

@@ -8,6 +8,7 @@ public class GridBackground : MonoBehaviour
     public bool isHot;
     SpriteRenderer bk;
     public Color fireColor;
+    public Color normalColor;
     public void heat()
     {
         isHot = true;
@@ -17,7 +18,7 @@ public class GridBackground : MonoBehaviour
     public void unheat()
     {
         isHot = false;
-        bk.color = new Color(0, 0, 0, 0f);
+        bk.color = normalColor;
     }
 
     int hp = 2;
@@ -26,6 +27,7 @@ public class GridBackground : MonoBehaviour
     {
         bk = GetComponentInChildren<SpriteRenderer>();
         EventPool.OptIn("moveAStep", stepAttack);
+        bk.color = normalColor;
     }
 
     void stepAttack()
