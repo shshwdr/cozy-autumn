@@ -21,5 +21,5 @@ stone,,,,
 trapOnFire,,,,
 ice,,,,
 hot,,,,
-openedNut,,resource,2,nut
-cookedNut,,resource,2,nut
+openedNut,,resource,4,nut
+cookedNut,,resource,4,nut

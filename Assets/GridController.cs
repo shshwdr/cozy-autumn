@@ -364,7 +364,7 @@ public class GridController : Singleton<GridController>
                 if (targetCell.cellInfo.isResource())
                 {
                     var resource = new List<PairInfo<int>>() { };
-                    resource.Add(new PairInfo<int>(cell2String, targetCell.cellInfo.categoryValue));
+                    resource.Add(new PairInfo<int>(targetCell.cellInfo.categoryDetail, targetCell.cellInfo.categoryValue));
                     CollectionManager.Instance.AddCoins(targetCell.transform.position, resource);
                     destroy(targetCell.gameObject);
                 }
@@ -386,14 +386,14 @@ public class GridController : Singleton<GridController>
                 {
                     switch (pair.Key)
                     {
-                        case "resource":
+                        //case "resource":
 
-                            var resource = new List<PairInfo<int>>() { };
-                            CellInfo info = CellManager.Instance.getInfo(cell2String);
+                        //    var resource = new List<PairInfo<int>>() { };
+                        //    CellInfo info = CellManager.Instance.getInfo(cell2String);
 
-                            resource.Add(new PairInfo<int>(info.categoryDetail, int.Parse(pair.Value)));
-                            CollectionManager.Instance.AddCoins(transform.position, resource);
-                            break;
+                        //    resource.Add(new PairInfo<int>(info.categoryDetail, int.Parse(pair.Value)));
+                        //    CollectionManager.Instance.AddCoins(transform.position, resource);
+                        //    break;
                         case "destroy1":
                             addEmpty(originEmptyIndex);
                             destroy(cell.gameObject);
