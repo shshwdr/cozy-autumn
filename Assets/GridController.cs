@@ -26,6 +26,11 @@ public class GridController : Singleton<GridController>
 
     public GameObject cellPrefab;
     public GameObject itemPrefab;
+    public GameObject bkPrefab;
+
+    public Transform mainBoard;
+
+    public GameObject fireVFX;
 
     // Start is called before the first frame update
     void Start()
@@ -40,7 +45,7 @@ public class GridController : Singleton<GridController>
             float yPosition = yStartPosiiton;
             for (int j = 0; j < cellCountY; j++)
             {
-                var go = new GameObject();
+                var go = Instantiate(bkPrefab, mainBoard);
                 cellParents.Add(go.transform);
                 go.transform.position = new Vector3(xPosition, yPosition, 0);
                 yPosition += cellSize;
@@ -279,7 +284,7 @@ public class GridController : Singleton<GridController>
         {
             foreach (var c in GameObject.FindObjectsOfType<GridCell>())
             {
-                if (c.cellInfo.type != "fire" && !isAdjacentToFire(c.index) && c.cellInfo.type!="ice"&& isAdjacentToIce(c.index))
+                if (!c.GetComponent<GridItem>() &&  c.cellInfo.type != "fire" && !isAdjacentToFire(c.index) && c.cellInfo.type!="ice"&& isAdjacentToIce(c.index))
                 {
                     c.freeze();
                     //if freezed everything, game over
@@ -288,6 +293,7 @@ public class GridController : Singleton<GridController>
 
                         GameManager.Instance.gameover();
                     }
+                    break;
                 }
             }
         }
@@ -370,7 +376,9 @@ public class GridController : Singleton<GridController>
                         case "resource":
 
                             var resource = new List<PairInfo<int>>() { };
-                            resource.Add(new PairInfo<int>(cell2String, int.Parse(pair.Value)));
+                            CellInfo info = CellManager.Instance.getInfo(cell2String);
+
+                            resource.Add(new PairInfo<int>(info.categoryDetail, int.Parse(pair.Value)));
                             CollectionManager.Instance.AddCoins(transform.position, resource);
                             break;
                         case "destroy1":
@@ -380,13 +388,25 @@ public class GridController : Singleton<GridController>
                         case "destroy2":
                             destroy(targetCell.gameObject);
                             break;
+                        case "addHot":
+                            cellParents[movingCellIndex].GetComponent<GridBackground>().heat();
+                            Instantiate(fireVFX, cellParents[movingCellIndex].position, Quaternion.identity);
+                            break;
 
-
-                        case "generate":
+                        case "generate1":
                             //generate new item in target position, generate empty in origin position
                             addEmpty(movingCellIndex);
                             destroy(cell.gameObject);
                             generateCell(emptyCell, pair.Value);
+                            break;
+                        case "generate2":
+                            //generate new item in original position
+                            //addEmpty(originEmptyIndex);
+                            //destroy(cell.gameObject);
+                            generateCell(movingCellIndex, pair.Value);
+                            break;
+                        case "increaseObjectHP":
+                            cell.GetComponent<FireCell>().addHp(int.Parse(pair.Value));
                             break;
                         default:
                             Debug.LogError("not support combination restul " + pair.Key);
@@ -395,33 +415,49 @@ public class GridController : Singleton<GridController>
                 }
             }
 
-            // if generate new item, don't update emptyCell
-            if (combination != null && combination.result.ContainsKey("generate"))
+            // if generate new item on new position, don't update emptyCell
+            if (combination != null && combination.result.ContainsKey("generate1"))
             {
-                //return cell.index;
+
             }
             else
             {
-
-                //cell.transform.parent = cellParents[originEmptyIndex];
-                //cell.transform.position = cellParents[originEmptyIndex].position;
-
-
-
                 emptyCell = movingCellIndex;
-                //generate(emptyCell, card);
 
-
-                //if (cell.GetComponent<GridCell>().cellInfo.isPlayer())
-                //{
-                //    playerCell = originEmptyIndex;
-                //}
-                //StartCoroutine(test(originEmptyIndex, cell));
-                //return originEmptyIndex;
             }
+
+
         }
 
-           
+
+        //check if cell is on hot cell
+        if (cell && cellParents[cell.index].GetComponent<GridBackground>().isHot)
+        {
+            if (cell.GetComponent<GridCell>().cellInfo.isPlayer())
+            {
+
+                ResourceManager.Instance.consumeResource("nut", 3);
+
+                Instantiate(fireVFX, cellParents[cell.index].position, Quaternion.identity);
+            }
+            if (cell.GetComponent<GridCell>().cellInfo.isEnemy())
+            {
+                cell.GetComponent<EnemyCell>().getDamage(5);
+                Instantiate(fireVFX, cellParents[cell.index].position, Quaternion.identity);
+            }
+
+            if (cell.GetComponent<GridCell>().cellInfo.type == "branch")
+            {
+                //generate a fire
+                generateCell(cell.index, "fire");
+                destroy(cell.gameObject);
+                Instantiate(fireVFX, cellParents[cell.index].position, Quaternion.identity);
+
+            }
+
+
+        }
+
 
         yield return new WaitForSeconds(animTime);
         EventPool.Trigger("moveAStep");

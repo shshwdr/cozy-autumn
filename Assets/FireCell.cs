@@ -16,11 +16,20 @@ public class FireCell : MonoBehaviour
         cell = GetComponent<GridCell>();
         EventPool.OptIn("moveAStep", stepAttack);
         stepAttack();
+        cell.updateHp(hp);
+    }
+
+    public void addHp(int x)
+    {
+        hp += x;
+
+        cell.updateHp(hp);
     }
 
     public void getDamage(int x)
     {
         hp -= 1;
+        cell.updateHp(hp);
         if (hp <= 0)
         {
             GridController.Instance.addEmpty(GetComponent<GridCell>().index);
@@ -41,7 +50,7 @@ public class FireCell : MonoBehaviour
         foreach(var c in iceAround)
         {
             c.thaw();
-            getDamage(1);
+            //getDamage(1);
         }
     }
 

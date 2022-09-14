@@ -7,6 +7,7 @@ public class CellInfo {
     public string type;
     public int cellType;
     public string categoryType;
+    public string categoryDetail;
     public bool isCell() { return cellType == 1; }
     public bool isEnemy() { return categoryType == "enemy"; }
     public bool isEmpty() { return categoryType == "empty"; }
