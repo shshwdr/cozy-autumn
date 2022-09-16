@@ -1,6 +1,8 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ShopCell : GridCell
 {
@@ -10,6 +12,7 @@ public class ShopCell : GridCell
     public bool isShop;
     public void init(string _type, int i, bool s)
     {
+
         costCell = GetComponentsInChildren<ResourceCell>();
         isShop = s;
         type = _type;
@@ -17,6 +20,8 @@ public class ShopCell : GridCell
         {
             cellInfo = ShopManager.Instance.getInfo(type);
             renderer.sprite = Resources.Load<Sprite>("decoration/" + type);
+
+            explainText.text = cellInfo.description;
         }
         else
         {
@@ -52,6 +57,25 @@ public class ShopCell : GridCell
     bool canAfford()
     {
         return true;
+    }
+
+    public CanvasGroup explainPanel;
+   public Text explainText;
+
+    private void OnMouseEnter()
+    {
+        if (isShop)
+            DOTween.To(() => explainPanel.alpha, x => explainPanel.alpha = x, 1, 0.3f);
+
+        //explainPanel.SetActive(true);
+
+    }
+
+    private void OnMouseExit()
+    {
+        DOTween.To(() => explainPanel.alpha, x => explainPanel.alpha = x, 0, 0.3f);
+
+        //explainPanel.SetActive(false);
     }
 
     public override void OnMouseDown()

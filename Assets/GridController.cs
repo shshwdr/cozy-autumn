@@ -34,7 +34,7 @@ public class GridController : Singleton<GridController>
 
 
     float animTime = 0.3f;
-    bool isMoving = false;
+   public  bool isMoving = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -45,7 +45,7 @@ public class GridController : Singleton<GridController>
 
     void initMainBoard()
     {
-
+        isMoving = true;
         float xStartPosiiton = -cellSize * (cellCountX / 2);
         float yStartPosiiton = -cellSize * (cellCountY / 2);
         // set up cell position
@@ -78,6 +78,8 @@ public class GridController : Singleton<GridController>
             }
             xPosition += cellSize;
         }
+
+        StartCoroutine(showCells());
     }
 
     
@@ -123,16 +125,20 @@ public class GridController : Singleton<GridController>
         return res;
     }
 
-    void getIntoShop()
+    public IEnumerator getIntoShop()
     {
-        mainBoard.gameObject.SetActive(false);
-        ShopGridController.Instance.getIntoShop();
+
+        yield return StartCoroutine(hideCells());
+
+       // mainBoard.gameObject.SetActive(false);
+        StartCoroutine( ShopGridController.Instance.getIntoShop());
     }
 
 
-    public void leaveShop()
+    public IEnumerator leaveShop()
     {
-        mainBoard.gameObject.SetActive(true);
+        // mainBoard.gameObject.SetActive(true);
+        yield return StartCoroutine(showCells());
     }
 
         bool isType(GridCell cell, string type)
@@ -307,7 +313,7 @@ public class GridController : Singleton<GridController>
         {
             foreach (var c in GameObject.FindObjectsOfType<GridCell>())
             {
-                if (!c.GetComponent<GridItem>() &&  c.cellInfo.type != "fire" && !isAdjacentToFire(c.index) && c.cellInfo.type!="ice"&& isAdjacentToIce(c.index))
+                if (!c.GetComponent<GridItem>()&&!c.GetComponent<ShopCell>() && c.cellInfo.type != "fire" && !isAdjacentToFire(c.index) && c.cellInfo.type!="ice"&& isAdjacentToIce(c.index))
                 {
                     c.freeze();
                     //if freezed everything, game over
@@ -384,7 +390,7 @@ public class GridController : Singleton<GridController>
                     destroy(targetCell.gameObject);
                 }else if (targetCell.cellInfo.type == "shop")
                 {
-                    getIntoShop();
+                    StartCoroutine( getIntoShop());
                 }
             }
             emptyCell = movingCellIndex;
@@ -500,10 +506,43 @@ public class GridController : Singleton<GridController>
 
     }
 
+    float cellAnimInterval = 0.05f;
+    IEnumerator showCells()
+    {
+        foreach (var cell in cellParents)
+        {
+            cell.transform.localScale = Vector3.zero;
+                }
+
+        foreach (var cell in cellParents)
+        {
+            yield return new WaitForSeconds(cellAnimInterval);
+
+            cell.transform.DOScale(Vector3.one, animTime);
+        }
+
+        yield return new WaitForSeconds(animTime);
+        isMoving = false;
+    }
+
+    IEnumerator hideCells()
+    {
+        foreach (var cell in cellParents)
+        {
+            cell.transform.localScale = Vector3.one;
+        }
+
+        foreach (var cell in cellParents)
+        {
+            yield return new WaitForSeconds(cellAnimInterval);
+
+            cell.transform.DOScale(Vector3.zero, animTime);
+        }
+
+        yield return new WaitForSeconds(animTime);
+    }
 
 
-
-    
 
     void generate(int index, string card)
     {

@@ -4394,6 +4394,7 @@ MonoBehaviour:
   bkPrefab: {fileID: 1766114458741427111, guid: a879331f14f374049b986354d94b82cc, type: 3}
   mainBoard: {fileID: 1378126795}
   fireVFX: {fileID: 985483039366664255, guid: c0722e3b4810a2c4b96ebd30c8d522f1, type: 3}
+  isMoving: 0
 --- !u!1 &2073926362
 GameObject:
   m_ObjectHideFlags: 0
@@ -4601,6 +4602,7 @@ MonoBehaviour:
   shopBoard: {fileID: 1002066186}
   shopCellPrefab: {fileID: 1766114458741427111, guid: efbf300d63ac9344dab8599e35b14990, type: 3}
   bkPrefab: {fileID: 1766114458741427111, guid: a879331f14f374049b986354d94b82cc, type: 3}
+  isMoving: 0
 --- !u!1 &2127101588
 GameObject:
   m_ObjectHideFlags: 0
@@ -4654,6 +4656,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2143746176}
   - component: {fileID: 2143746177}
+  - component: {fileID: 2143746178}
   m_Layer: 0
   m_Name: shopItems
   m_TagString: Untagged
@@ -4698,6 +4701,18 @@ MonoBehaviour:
   shopItems: {fileID: 2143746176}
   unPurchasedShopInfos: []
   purchasedShopInfos: []
+--- !u!114 &2143746178
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2143746175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d339ab407de3b2746b82e2b9b5d9332e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &2600562442901607698
 PrefabInstance:
   m_ObjectHideFlags: 0

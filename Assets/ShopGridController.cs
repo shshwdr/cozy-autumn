@@ -20,24 +20,62 @@ public class ShopGridController : Singleton<ShopGridController>
 
 
     float animTime = 0.3f;
-    bool isMoving = false;
+   public  bool isMoving = false;
     int playerCellIndex { get { return playerCell.index; } }
     int originalPlayerCell = 5;
 
-    public void getIntoShop()
+
+    public IEnumerator getIntoShop()
     {
+        yield return StartCoroutine(showCells());
+    }
+
+    public IEnumerator leaveShop()
+    {
+        yield return StartCoroutine(hideCells());
+        StartCoroutine(GridController.Instance.leaveShop());
+
+    }
+
+    float cellAnimInterval = 0.05f;
+    IEnumerator showCells()
+    {
+        foreach (var cell in cellParents)
+        {
+            cell.transform.localScale = Vector3.zero;
+        }
         shopBoard.gameObject.SetActive(true);
+        foreach (var cell in cellParents)
+        {
+            yield return new WaitForSeconds(cellAnimInterval);
+
+            cell.transform.DOScale(Vector3.one, animTime);
+        }
+
+        yield return new WaitForSeconds(animTime);
     }
 
-    public void leaveShop()
+    IEnumerator hideCells()
     {
-        shopBoard.gameObject.SetActive(false);
-        GridController.Instance.leaveShop();
+        foreach (var cell in cellParents)
+        {
+            cell.transform.localScale = Vector3.one;
+        }
 
+        foreach (var cell in cellParents)
+        {
+            yield return new WaitForSeconds(cellAnimInterval);
+
+            cell.transform.DOScale(Vector3.zero, animTime);
+        }
+
+        yield return new WaitForSeconds(animTime);
+
+        shopBoard.gameObject.SetActive(false);
     }
 
-        // Start is called before the first frame update
-        void Start()
+    // Start is called before the first frame update
+    void Start()
     {
 
         // initMainBoard();
@@ -109,7 +147,7 @@ public class ShopGridController : Singleton<ShopGridController>
     public void moveCell(ShopCell cell)
     {
 
-        if (isMoving)
+        if (isMoving || GridController.Instance.isMoving)
         {
 
             return;
@@ -145,7 +183,7 @@ public class ShopGridController : Singleton<ShopGridController>
         if(cell == playerCell)
         {
             //leave shop
-            leaveShop();
+            StartCoroutine( leaveShop());
         }else if (cell.isShop)
         {
             //buy it
