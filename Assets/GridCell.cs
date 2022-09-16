@@ -45,6 +45,7 @@ public class GridCell : MonoBehaviour
 
     public  void init(string _type,int i)
     {
+        hp.text = "";
         type = _type;
         cellInfo = CellManager.Instance.getInfo(type);
         renderer.sprite = Resources.Load<Sprite>("cell/" + type);
@@ -96,7 +97,6 @@ public class GridCell : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        hp.text = "";
     }
 
     // Update is called once per frame
@@ -110,12 +110,24 @@ public class GridCell : MonoBehaviour
         //{
         //    ResourceManager.Instance.consumeResource("nut", 1);
         //}
+        if (isFreezed)
+        {
+            failedToMove();
+            return;
+        }
+
         GridController.Instance.moveCell(this);
       //index = GridController.Instance.moveCellToEmpty(this);
       //  if(index == -1)
       //  {
       //      Destroy(gameObject);
       //  }
+    }
+
+    public void failedToMove()
+    {
+
+        transform.DOShakePosition(0.3f, 0.3f, 20);
     }
 
 }

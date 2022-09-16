@@ -1,6 +1,7 @@
-﻿type,cost
-kitchen,stick:1
-tv,stick:1
-sofa,stick:1
-fire,stick:1
-table,stick:1
+﻿type,cost,description
+calendar,nut:1,When will spring come?
+tv,nut:1,useless
+sofa,nut:1,"3S - super soft sofa. (if you don't move for 5 rounds, you get an acron)"
+fire,nut:1,ice spread a little slower
+box,nut:1,useless
+sprout,nut:1,get a acrone every 10 days

@@ -32,9 +32,20 @@ public class GridController : Singleton<GridController>
 
     public GameObject fireVFX;
 
+
+    float animTime = 0.3f;
+    bool isMoving = false;
     // Start is called before the first frame update
     void Start()
     {
+        // initMainBoard();
+       // initMainBoard();
+
+    }
+
+    void initMainBoard()
+    {
+
         float xStartPosiiton = -cellSize * (cellCountX / 2);
         float yStartPosiiton = -cellSize * (cellCountY / 2);
         // set up cell position
@@ -50,35 +61,26 @@ public class GridController : Singleton<GridController>
                 go.transform.position = new Vector3(xPosition, yPosition, 0);
                 yPosition += cellSize;
 
-
-
                 if (emptyCell == index)
                 {
 
                 }
                 else if (originalPlayerCell == index)
                 {
-                    //var child = Instantiate(Resources.Load<GameObject>("cell/player"), cellParents[index].position, Quaternion.identity, cellParents[index]);
-                    //child.GetComponent<GridCell>().init(index);
                     playerCell = generateCell(index, "player").GetComponent<GridCell>();
-                    
+
                 }
                 else
                 {
-                    //var child = Instantiate(Resources.Load<GameObject>("cell/empty"), cellParents[index].position, Quaternion.identity, cellParents[index]);
-                    //child.GetComponent<GridCell>().init(index);
-
-
                     generateCell(index, "leaf");
                 }
                 index++;
-
-
             }
             xPosition += cellSize;
         }
     }
 
+    
     bool isTwoIndexCrossAdjacent(int i, int j)
     {
         var ix = i / cellCountX;
@@ -168,7 +170,6 @@ public class GridController : Singleton<GridController>
     {
         return playerCell.transform;
     }
-
     GameObject generateCell(int index, string type)
     {
         GameObject res;
@@ -201,7 +202,6 @@ public class GridController : Singleton<GridController>
     {
         generateCell(index, "leaf");
     }
-    bool isMoving = false;
 
     int freezeCount()
     {
@@ -246,8 +246,6 @@ public class GridController : Singleton<GridController>
         isMoving = false;
         Debug.Log("empty index " + emptyCell);
     }
-
-    float animTime = 0.3f;
 
     void destroy(GameObject go)
     {

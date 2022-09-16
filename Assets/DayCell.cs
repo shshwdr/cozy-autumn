@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class DayCell : MonoBehaviour
 {
-    int day = 1;
+    int day = 180;
     public Text dayText;
     // Start is called before the first frame update
     void Start()
@@ -16,8 +16,8 @@ public class DayCell : MonoBehaviour
 
     void moveStep()
     {
-        day++;
-        dayText.text = day.ToString();
+        day--;
+        dayText.text = day.ToString() +" Day";
     }
 
     // Update is called once per frame

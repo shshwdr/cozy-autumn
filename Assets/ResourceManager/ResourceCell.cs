@@ -8,9 +8,18 @@ public class ResourceCell : MonoBehaviour
     public Image icon;
     public Text text;
 
-    public void init(string type, int amount)
+    public void init(string type, int amount,bool isShop = false)
     {
-        icon.sprite = Resources.Load<Sprite>("resource/" + type);
+        //if (isShop)
+        //{
+        //    icon.sprite = Resources.Load<Sprite>("shop/" + type);
+
+        //}
+        //else
+        {
+            icon.sprite = Resources.Load<Sprite>("resource/" + type);
+
+        }
         text.text = amount.ToString();
     }
     // Start is called before the first frame update
