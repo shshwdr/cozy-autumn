@@ -45,7 +45,11 @@ public class GridCell : MonoBehaviour
 
     public  void init(string _type,int i)
     {
-        hp.text = "";
+        if (hp)
+        {
+
+            hp.text = "";
+        }
         type = _type;
         cellInfo = CellManager.Instance.getInfo(type);
         renderer.sprite = Resources.Load<Sprite>("cell/" + type);

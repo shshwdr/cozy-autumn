@@ -73,4 +73,6 @@ public class ShopCell : GridCell
         //      Destroy(gameObject);
         //  }
     }
+
+     
 }

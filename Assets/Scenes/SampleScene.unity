@@ -2131,7 +2131,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1002066186
 Transform:
   m_ObjectHideFlags: 0
@@ -2314,7 +2314,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1201305438
 Transform:
   m_ObjectHideFlags: 0
@@ -4653,6 +4653,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2143746176}
+  - component: {fileID: 2143746177}
   m_Layer: 0
   m_Name: shopItems
   m_TagString: Untagged
@@ -4682,6 +4683,21 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2143746177
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2143746175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23fa63805b214f34b801c212e5b4bd07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shopItems: {fileID: 2143746176}
+  unPurchasedShopInfos: []
+  purchasedShopInfos: []
 --- !u!1001 &2600562442901607698
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -23,8 +23,21 @@ public class ShopGridController : Singleton<ShopGridController>
     bool isMoving = false;
     int playerCellIndex { get { return playerCell.index; } }
     int originalPlayerCell = 5;
-    // Start is called before the first frame update
-    void Start()
+
+    public void getIntoShop()
+    {
+        shopBoard.gameObject.SetActive(true);
+    }
+
+    public void leaveShop()
+    {
+        shopBoard.gameObject.SetActive(false);
+        GridController.Instance.leaveShop();
+
+    }
+
+        // Start is called before the first frame update
+        void Start()
     {
 
         // initMainBoard();
@@ -132,6 +145,7 @@ public class ShopGridController : Singleton<ShopGridController>
         if(cell == playerCell)
         {
             //leave shop
+            leaveShop();
         }else if (cell.isShop)
         {
             //buy it

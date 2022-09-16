@@ -39,7 +39,7 @@ public class GridController : Singleton<GridController>
     void Start()
     {
         // initMainBoard();
-       // initMainBoard();
+        initMainBoard();
 
     }
 
@@ -123,7 +123,19 @@ public class GridController : Singleton<GridController>
         return res;
     }
 
-    bool isType(GridCell cell, string type)
+    void getIntoShop()
+    {
+        mainBoard.gameObject.SetActive(false);
+        ShopGridController.Instance.getIntoShop();
+    }
+
+
+    public void leaveShop()
+    {
+        mainBoard.gameObject.SetActive(true);
+    }
+
+        bool isType(GridCell cell, string type)
     {
         if(type == "ice")
         {
@@ -370,6 +382,9 @@ public class GridController : Singleton<GridController>
                 {
                     cell.GetComponent<GridCell>().equip(cell2String);
                     destroy(targetCell.gameObject);
+                }else if (targetCell.cellInfo.type == "shop")
+                {
+                    getIntoShop();
                 }
             }
             emptyCell = movingCellIndex;
@@ -482,6 +497,7 @@ public class GridController : Singleton<GridController>
         {
             cell.GetComponent<FireCell>().getDamage(1);
         }
+
     }
 
 
