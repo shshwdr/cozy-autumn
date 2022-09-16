@@ -11,6 +11,15 @@ public class DayCell : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        dayText.text = day.ToString() + " Day";
+        EventPool.OptIn("moveAStep", moveStep);
+    }
+
+    public void Reset()
+    {
+        day = 180;
+
+        dayText.text = day.ToString() + " Day";
         EventPool.OptIn("moveAStep", moveStep);
     }
 
