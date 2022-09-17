@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class DayCell : MonoBehaviour
+public class DayCell : MonoBehaviour,CanReset
 {
     int day = 180;
     public Text dayText;

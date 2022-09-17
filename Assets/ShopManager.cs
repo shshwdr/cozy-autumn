@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 public class ShopInfo {
     public string type;
+    public int isLocked;
     public Dictionary<string,int> cost;
         public string description;
 
@@ -17,6 +18,11 @@ public class ShopManager : Singleton<ShopManager>
     public List<string> unPurchasedShopInfos = new List<string>();
 
     public List<string> purchasedShopInfos = new List<string>();
+
+    public bool hasPurchased(string str)
+    {
+        return purchasedShopInfos.Contains(str);
+    }
     // Start is called before the first frame update
     void Start()
     {
@@ -24,8 +30,12 @@ public class ShopManager : Singleton<ShopManager>
         shopInfos = CsvUtil.LoadObjects<ShopInfo>("shop");
         foreach (var info in shopInfos)
         {
-            shopDict[info.type] = info;
-            unPurchasedShopInfos.Add(info.type);
+            if(info.isLocked != 1)
+            {
+
+                shopDict[info.type] = info;
+                unPurchasedShopInfos.Add(info.type);
+            }
         }
     }
 

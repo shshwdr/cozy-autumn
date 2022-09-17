@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -9,7 +10,11 @@ public class GameManager : Singleton<GameManager>
     // Start is called before the first frame update
     void Start()
     {
-        GameObject.FindObjectOfType<DayCell>(true).Reset();
+        
+        foreach (var re in FindObjectsOfType<MonoBehaviour>().OfType<CanReset>())
+        {
+            re.Reset();
+        }
     }
 
     // Update is called once per frame

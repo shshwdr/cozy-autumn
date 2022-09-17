@@ -63,6 +63,18 @@ public class DeckManager : Singleton<DeckManager>
         return firstCard;
     }
 
+    public string peekCard()
+    {
+
+        if (currentDeck.Count == 0)
+        {
+            createAndShuffleCards();
+        }
+
+        var firstCard = currentDeck[0];
+        return firstCard;
+    }
+
     public void addDictionaryToDeck(Dictionary<string, int> dict)
     {
         foreach(var pair in dict)

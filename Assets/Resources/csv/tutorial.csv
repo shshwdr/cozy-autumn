@@ -1,0 +1,5 @@
+﻿type,words
+playerMove,"[player][move]any, [nut]-1"
+playerToNut,"[player][move][nut], [nut]+2"
+playerNextToSnake,"[player]next to [snake], [nut]-5 [snake] run away"
+snakeToTrap,"[snake][move][trap], [snake] run away"

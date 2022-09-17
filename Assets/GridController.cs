@@ -264,7 +264,7 @@ public class GridController : Singleton<GridController>
         isMoving = false;
         Debug.Log("empty index " + emptyCell);
     }
-
+    public bool hasPlayerMoved = false;
     void destroy(GameObject go)
     {
         go.transform.DOScale(Vector3.zero, animTime);
@@ -311,19 +311,28 @@ public class GridController : Singleton<GridController>
             }
         }else if (GameObject.FindObjectsOfType<GridCell>().Length > 0)
         {
-            foreach (var c in GameObject.FindObjectsOfType<GridCell>())
-            {
-                if (!c.GetComponent<GridItem>()&&!c.GetComponent<ShopCell>() && c.cellInfo.type != "fire" && !isAdjacentToFire(c.index) && c.cellInfo.type!="ice"&& isAdjacentToIce(c.index))
-                {
-                    c.freeze();
-                    //if freezed everything, game over
-                    if (freezedCellCount >= 8)
-                    {
+            //ice spread
 
-                        GameManager.Instance.gameover();
+            if (ShopManager.Instance.hasPurchased("fire") && Random.Range(0, 2) > 0)
+            {
+            }
+            else
+            {
+                foreach (var c in GameObject.FindObjectsOfType<GridCell>())
+                {
+                    if (!c.GetComponent<GridItem>() && !c.GetComponent<ShopCell>() && c.cellInfo.type != "fire" && !isAdjacentToFire(c.index) && c.cellInfo.type != "ice" && isAdjacentToIce(c.index))
+                    {
+                        c.freeze();
+                        //if freezed everything, game over
+                        if (freezedCellCount >= 8)
+                        {
+
+                            GameManager.Instance.gameover();
+                        }
+                        break;
                     }
-                    break;
                 }
+
             }
         }
 
@@ -375,6 +384,7 @@ public class GridController : Singleton<GridController>
         var cell2String = targetCell ? targetCell.type : "empty";
         if (cell.GetComponent<GridCell>().cellInfo.isPlayer())
         {
+            hasPlayerMoved = true;
             if (targetCell)
             {
                 if (targetCell.cellInfo.isResource())
@@ -397,6 +407,8 @@ public class GridController : Singleton<GridController>
         }
         else
         {
+
+            hasPlayerMoved = false;
             //calculate combination result
             var combination = CombinationManager.Instance.getCombinationResult(cell1String, cell2String);
             if (combination != null)
