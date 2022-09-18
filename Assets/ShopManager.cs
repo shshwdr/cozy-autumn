@@ -49,7 +49,7 @@ public class ShopManager : Singleton<ShopManager>
         return shopDict[type];
     }
 
-    public bool canAffort(string type)
+    public bool canAfford(string type)
     {
         foreach(var pair in getInfo(type).cost)
         {

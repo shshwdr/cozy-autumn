@@ -17,6 +17,12 @@ public class CellInfo {
 
     public int categoryValue;
 
+
+    public string requireResourcePerStep;
+    public string requireResource;
+    public int attackPerStep; public int attack; public int fallbackAttackPerStep;  public int fallbackAttack; public int moveMode;   public int destoryOthers;
+
+
 }
 
 

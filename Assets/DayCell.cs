@@ -27,6 +27,11 @@ public class DayCell : MonoBehaviour,CanReset
     {
         day--;
         dayText.text = day.ToString() +" Day";
+
+        if (day <= 0)
+        {
+            
+        }
     }
 
     // Update is called once per frame

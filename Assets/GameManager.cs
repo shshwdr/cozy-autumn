@@ -41,4 +41,17 @@ public class GameManager : Singleton<GameManager>
 
         PopupManager.Instance.showEvent("Game Over", () => { restartGame(); }, "Restart");
     }
+
+    public void win()
+    {
+
+        if (isGameOver)
+        {
+            return;
+        }
+        isGameOver = true;
+
+        FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement(4);
+        PopupManager.Instance.showEvent("You survive! It's spring!", () => { restartGame(); }, "Restart");
+    }
 }

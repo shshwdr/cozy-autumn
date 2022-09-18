@@ -56,7 +56,11 @@ public class ShopCell : GridCell
 
     bool canAfford()
     {
-        return true;
+        if (!isShop)
+        {
+            return true;
+        }
+        return ShopManager.Instance.canAfford(type);
     }
 
     public CanvasGroup explainPanel;

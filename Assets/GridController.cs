@@ -273,7 +273,7 @@ public class GridController : Singleton<GridController>
     }
     IEnumerator moveCellAnim(GridCell cell) 
     {
-
+        //FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement(0);
         yield return null;
         moveCount++;
 
@@ -281,6 +281,7 @@ public class GridController : Singleton<GridController>
         if(cell.cellInfo.isPlayer())
         {
             ResourceManager.Instance.consumeResource("nut", 1);
+            RulePopupManager.Instance.showRule("playerMove");
         }
 
 
@@ -294,6 +295,7 @@ public class GridController : Singleton<GridController>
             //if has ice, don't add
             if (freezedCellCount == 0)
             {
+                RulePopupManager.Instance.showRule("ice");
                 List<GridCell> canFreezeCells = new List<GridCell>();
                 foreach(var c in GameObject.FindObjectsOfType<GridCell>())
                 {
@@ -323,6 +325,8 @@ public class GridController : Singleton<GridController>
                     if (!c.GetComponent<GridItem>() && !c.GetComponent<ShopCell>() && c.cellInfo.type != "fire" && !isAdjacentToFire(c.index) && c.cellInfo.type != "ice" && isAdjacentToIce(c.index))
                     {
                         c.freeze();
+
+                        RulePopupManager.Instance.showRule("iceSpread");
                         //if freezed everything, game over
                         if (freezedCellCount >= 8)
                         {
@@ -371,9 +375,9 @@ public class GridController : Singleton<GridController>
         var movingCellIndex = cell.index;
         var emptyPosition = cellParents[originEmptyIndex].position;
         //cell.GetComponent<SortingGroup>().sortingOrder = 100;
-        cell.transform.DOMove(emptyPosition, 0.3f);
+        cell.transform.DOMove(emptyPosition, animTime);
         generate(movingCellIndex, card);
-        yield return new  WaitForSeconds(0.3f);
+        yield return new  WaitForSeconds(animTime);
 
 
         cell.transform.parent = cellParents[originEmptyIndex];
@@ -393,6 +397,20 @@ public class GridController : Singleton<GridController>
                     resource.Add(new PairInfo<int>(targetCell.cellInfo.categoryDetail, targetCell.cellInfo.categoryValue));
                     CollectionManager.Instance.AddCoins(targetCell.transform.position, resource);
                     destroy(targetCell.gameObject);
+
+                    switch (targetCell.type)
+                    {
+                        case "nut":
+
+                            RulePopupManager.Instance.showRule("playerToNut");
+                            break;
+                        case "cookedNut":
+                            RulePopupManager.Instance.showRule("eatHotNut");
+                            break;
+                            
+
+                    }
+
                 }
                 else if (targetCell.cellInfo.isWeapon())
                 {
@@ -400,6 +418,8 @@ public class GridController : Singleton<GridController>
                     destroy(targetCell.gameObject);
                 }else if (targetCell.cellInfo.type == "shop")
                 {
+
+                    destroy(targetCell.gameObject);
                     StartCoroutine( getIntoShop());
                 }
             }
@@ -413,6 +433,11 @@ public class GridController : Singleton<GridController>
             var combination = CombinationManager.Instance.getCombinationResult(cell1String, cell2String);
             if (combination != null)
             {
+                if(combination.rules!=null && combination.rules.Length > 0)
+                {
+
+                    RulePopupManager.Instance.showRule(combination.rules);
+                }
                 foreach (var pair in combination.result)
                 {
                     switch (pair.Key)
@@ -447,10 +472,22 @@ public class GridController : Singleton<GridController>
                             //generate new item in original position
                             //addEmpty(originEmptyIndex);
                             //destroy(cell.gameObject);
+
+                            if (cellParents[movingCellIndex].GetComponentInChildren<GridItem>())
+                            {
+                                destroy( cellParents[movingCellIndex].GetComponentInChildren<GridItem>().gameObject);
+                                //DeckManager.Instance.addCardToDeck(card);
+                            }
+
                             generateCell(movingCellIndex, pair.Value);
                             break;
                         case "increaseObjectHP":
                             cell.GetComponent<FireCell>().addHp(int.Parse(pair.Value));
+                            break;
+                        case "trap":
+
+                            RulePopupManager.Instance.showRule("snakeToTrap");
+                            FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement(1);
                             break;
                         default:
                             Debug.LogError("not support combination restul " + pair.Key);
@@ -480,12 +517,14 @@ public class GridController : Singleton<GridController>
             if (cell.GetComponent<GridCell>().cellInfo.isPlayer())
             {
 
+                RulePopupManager.Instance.showRule("playerOnHot");
                 ResourceManager.Instance.consumeResource("nut", 3);
 
                 Instantiate(fireVFX, cellParents[cell.index].position, Quaternion.identity);
             }
             if (cell.GetComponent<GridCell>().cellInfo.isEnemy())
             {
+                RulePopupManager.Instance.showRule("enemyOnHot");
                 cell.GetComponent<EnemyCell>().getDamage(5);
                 Instantiate(fireVFX, cellParents[cell.index].position, Quaternion.identity);
             }
@@ -504,7 +543,12 @@ public class GridController : Singleton<GridController>
 
 
         yield return new WaitForSeconds(animTime);
-        EventPool.Trigger("moveAStep");
+
+        if (targetCell &&  targetCell.cellInfo.type != "shop")
+        {
+
+            EventPool.Trigger("moveAStep");
+        }
 
         finishMove();
 
@@ -514,8 +558,57 @@ public class GridController : Singleton<GridController>
         if (cell.cellInfo.type == "fire")
         {
             cell.GetComponent<FireCell>().getDamage(1);
+            RulePopupManager.Instance.showRule("fireMove");
         }
 
+    }
+
+
+    public int getTargetIndexToPlayer(int index)
+    {
+        if(index == playerCellIndex)
+        {
+            Debug.LogError("on the same position as player " + index);
+        }
+
+        int x = index / cellCountX;
+        int y = index % cellCountY;
+        int px = playerCellIndex / cellCountX;
+        int py = playerCellIndex / cellCountY;
+        if(x== px)
+        {
+            y = (int)(Mathf.Sign(py - y)) + y;
+        }
+        else
+        {
+
+            x = (int)(Mathf.Sign(px - x)) + x;
+        }
+
+        return x * cellCountX + y;
+    }
+
+    public IEnumerator exchangeCard(GridCell cell1, int cell2Index)
+    {
+        isMoving = true;
+        if (cell1.index == cell2Index)
+        {
+            Debug.Log("that's not correct "+ cell2Index);
+        }
+
+        var cell1Index = cell1.index;
+        var cell2 = cellParents[cell2Index].GetComponentInChildren<GridCell>();
+        var cell1Position = cellParents[cell1Index].position;
+        var cell2Position = cellParents[cell2Index].position;
+        //cell.GetComponent<SortingGroup>().sortingOrder = 100;
+        cell1.transform.DOMove(cell2Position, animTime);
+        cell2.transform.DOMove(cell1Position, animTime);
+        cell1.index = cell2Index;
+        cell2.index = cell1Index;
+        Debug.Log("cell1 " + cell2Index + " cell2 " + cell1Index);
+        yield return new WaitForSeconds(animTime);
+
+        isMoving = false;
     }
 
     float cellAnimInterval = 0.05f;

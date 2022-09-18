@@ -17,6 +17,7 @@ public class ShopGridController : Singleton<ShopGridController>
 
     int emptyCell = 0;
     GridCell playerCell;
+    GameObject counterCell;
 
 
     float animTime = 0.3f;
@@ -40,6 +41,8 @@ public class ShopGridController : Singleton<ShopGridController>
     float cellAnimInterval = 0.05f;
     IEnumerator showCells()
     {
+        playerCell.transform.position = cellParents[playerCellIndex].position;
+
         foreach (var cell in cellParents)
         {
             cell.transform.localScale = Vector3.zero;
@@ -79,6 +82,7 @@ public class ShopGridController : Singleton<ShopGridController>
     {
 
         // initMainBoard();
+        Utils.destroyAllChildren(shopBoard);
         initShopBoard();
 
     }
@@ -109,7 +113,7 @@ public class ShopGridController : Singleton<ShopGridController>
                 }
                 else if (emptyCell == index)
                 {
-                    generateShopCell(index, "counter", false);
+                    counterCell = generateShopCell(index, "counter", false);
                 }
                 else if (shopIndex < ShopManager.Instance.unPurchasedShopInfos.Count)
                 {
@@ -183,6 +187,10 @@ public class ShopGridController : Singleton<ShopGridController>
         if(cell == playerCell)
         {
             //leave shop
+            emptyCell = movingCellIndex;
+            cell.index = originEmptyIndex;
+            Destroy(counterCell);
+            counterCell = generateShopCell(emptyCell, "counter", false);
             StartCoroutine( leaveShop());
         }else if (cell.isShop)
         {

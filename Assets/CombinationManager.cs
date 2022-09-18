@@ -8,6 +8,8 @@ public class CombinationInfo
     public string type1;
     public string type2;
     public Dictionary<string,string> result;
+    public string rules;
+    public string achievement;
 }
 
 

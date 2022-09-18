@@ -50,6 +50,9 @@ public class FireCell : MonoBehaviour
         foreach(var c in iceAround)
         {
             c.thaw();
+
+            RulePopupManager.Instance.showRule("iceThaw");
+            FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement(3);
             //getDamage(1);
         }
     }

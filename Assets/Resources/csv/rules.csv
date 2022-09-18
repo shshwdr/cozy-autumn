@@ -1,5 +1,24 @@
-﻿type,words
-playerMove,"[player][move]any, [nut]-1"
-playerToNut,"[player][move][nut], [nut]+2"
-playerNextToSnake,"[player]next to [snake], [nut]-5 [snake] run away"
-snakeToTrap,"[snake][move][trap], [snake] run away"
+﻿type,words1,words2
+playerMove,"[player][move]any place, [nut] - 1",Stay still to reduce consumption
+playerToNut,"[player][move][nut], [nut] + 2",Collect acrons are important!
+playerNextToSnake,"[player]next to [snake], [nut]-5, [snake][run]",Bad Snake stole my acrons!
+snakeToTrap,"[snake][move][trap], [snake][run]",Poor snake fell into the trap
+branchToStick,"[branch][move]empty, get [stick]",Chop branches into sticks
+branch+Stick,"[branch][move][stick], get [bat]",Blunt but hurt!
+branch+nut,"[branch][move][nut], get [birdTrap]",Would work on small animals
+fire+nut,"[fire][move][nut], get [cookedNut]",Yummy Yummy!
+branch+stone,"[branch][move][stone], get [axe]",Sharp and really hurt!
+Boulder+nut,"[boulder][move][nut], get [openedNut]",Yummy Yummy!
+boulder+stick,"[boulder][move][stick], get [axe]",Sharp and really hurt!
+boulder+empty,"[boulder][move]empty, get [stone]",Break the boulder into small pieces
+boulder+stone,"[boulder][move][stone], get [trap]",Not that hard to make
+fire+stone,"[fire][move][stone], [fire] life -3",Stone can put out the fire
+fire+birdTrap,"[fire][move][birdTrap], [fire] life +5",It's burnning hotter!!
+fire+stick,"[fire][move][stick], [fire] life +3",It's burnning hotter
+ice,[ice] can not move,Winter is coming!
+iceThaw,"[ice] next to [fire], [melting]",Keep home warm!
+fireMove,"[fire][move]any place, [fire] life - 1, get [hot]",Hot Hot Hot!!!
+iceSpread,[ice] would expand,Where is the fire?!
+playerOnHot,"[player][move][hot], [nut] - 3",Hot place is dangerous
+enemyOnHot,"[snake][move][hot], [snake][run]",Hot place is dangerous
+eatHotNut,"[player][move][cookedNut], [nut] + 4",Yummy Yummy!

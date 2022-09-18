@@ -31,6 +31,7 @@ public class ResourceManager : Singleton<ResourceManager>
         changeAmount(type, -value);
         if (!hasEnoughAmount(type,0))
         {
+            FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement(0);
             GameManager.Instance.gameover();
         }
     }

@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Doozy.Examples
 {
-    public class E12PopupManagerScript : MonoBehaviour
+    public class E12PopupManagerScript : Singleton<E12PopupManagerScript>
     {
         [Header("Popup Settings")]
         public string PopupName = "AchievementPopup";
@@ -14,9 +14,17 @@ namespace Doozy.Examples
         public List<AchievementData> Achievements = new List<AchievementData>();
 
         private UIPopup m_popup;
-
+        Dictionary<int, bool> visited = new Dictionary<int, bool>();
         public void ShowAchievement(int achievementId)
         {
+            if (visited.ContainsKey(achievementId))
+            {
+                return;
+            }
+            else
+            {
+                visited[achievementId] = true;
+            }
             //make sure the achievement we want to show has been defined in the Achievements list
             //the achievementId is actually the index of the achievement as it has been defined in the list
             if (Achievements == null || achievementId < 0 || achievementId > Achievements.Count - 1) return;

@@ -10,6 +10,17 @@ public class PopupManager : Singleton<PopupManager>
     public bool playTest = false;
     private void Start()
     {
+        getCanvas();
+        if (playTest)
+        {
+
+            StartCoroutine(test());
+        }
+    }
+
+    void getCanvas()
+    {
+
         if (!mainCanvas)
         {
             mainCanvas = GameObject.Find("MainCanvas").GetComponent<Canvas>();
@@ -18,11 +29,6 @@ public class PopupManager : Singleton<PopupManager>
                 Debug.LogError("no main canvas found!");
                 mainCanvas = GetComponent<Canvas>();
             }
-        }
-        if (playTest)
-        {
-
-            StartCoroutine(test());
         }
     }
 
@@ -57,6 +63,7 @@ public class PopupManager : Singleton<PopupManager>
 
     public void showEvent(string t, string button1Text = "OK")
     {
+        getCanvas();
         // only show one text and can close it.
         var go = Instantiate(EventMenuPrefab, mainCanvas.transform);
 
@@ -67,6 +74,7 @@ public class PopupManager : Singleton<PopupManager>
     }
     public void showEvent(string t, Action action,string button1Text = "OK")
     {
+        getCanvas();
         // only show one text and can close it.
         var go = Instantiate(EventMenuPrefab, mainCanvas.transform);
 
@@ -78,6 +86,7 @@ public class PopupManager : Singleton<PopupManager>
 
     public void showEvent(List<string> t, string button1Text = "OK")
     {
+        getCanvas();
         List<EventButtonInfo> eventButtons = new List<EventButtonInfo>();
         int index = 0;
         //eventButtons.Add(new EventButtonInfo(t[index], button1Text, () => { }));
@@ -86,11 +95,13 @@ public class PopupManager : Singleton<PopupManager>
 
     public void showEvent(string t, List<EventButtonInfo> bf, Sprite image = null)
     {
+        getCanvas();
         showEvent(new List<string>() { t }, bf, image);
     }
 
     public void showEvent(List<string> t, List<EventButtonInfo> bf, Sprite image = null)
     {
+        getCanvas();
         var go = Instantiate(EventMenuPrefab, mainCanvas.transform);
         go.GetComponent<PopupMenu>().Init(t, bf, image);
         go.GetComponent<PopupMenu>().showView();
@@ -100,6 +111,7 @@ public class PopupManager : Singleton<PopupManager>
     public void showEventImageString(List<string> t, List<EventButtonInfo> bf, string image = null)
     {
 
+        getCanvas();
         if (image != null)
         {
             var sprite = Resources.Load<Sprite>("icons/" + image);
