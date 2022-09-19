@@ -13,6 +13,7 @@ public class GridCell : MonoBehaviour
 
     public CellInfo cellInfo;
 
+   public  GameObject countDownObject;
     public string type;
 
     string equipment = null;

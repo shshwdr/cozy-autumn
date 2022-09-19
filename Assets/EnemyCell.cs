@@ -3,6 +3,7 @@ using Pool;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class EnemyCell : MonoBehaviour
 {
@@ -12,6 +13,12 @@ public class EnemyCell : MonoBehaviour
     GridCell cell;
     CellInfo info;
     bool isFirst = true;
+
+    int attackCountDown = 10000;
+
+    GameObject countDownObject;
+   Text countDownText;
+
     public void init(string type)
     {
         info = CellManager.Instance.getInfo(type);
@@ -21,7 +28,15 @@ public class EnemyCell : MonoBehaviour
     void Start()
     {
         cell = GetComponent<GridCell>();
-       // EventPool.OptIn("moveAStep", stepAttack);
+        countDownObject = cell.countDownObject;
+        countDownText = countDownObject.GetComponentInChildren<Text>(true);
+        if (info.moveMode < 0)
+        {
+            attackCountDown = -info.moveMode;
+            countDownObject.SetActive(true);
+            countDownText.text = attackCountDown.ToString();
+        }
+        // EventPool.OptIn("moveAStep", stepAttack);
     }
 
     public void getDamage(int x)
@@ -50,9 +65,9 @@ public class EnemyCell : MonoBehaviour
         //}
         //else
         {
+            attackCountDown -= 1;
 
-
-            if (GridController.Instance.isPlayerAround(GetComponent<GridCell>().index))
+            if (GridController.Instance.isPlayerAround(GetComponent<GridCell>().index) || attackCountDown == 0)
             {
                 //if player has weapon, unequip weapon and die
                 var player = GridController.Instance.getPlayerTransform().GetComponent<GridCell>();
@@ -70,19 +85,30 @@ public class EnemyCell : MonoBehaviour
 
 
                     takeResource(info.requireResource, info.attack);
-                    //ResourceManager.Instance.consumeResource("nut", attack);
                 }
 
-                getDamage(1);
+                if(attackCountDown == 0)
+                {
+                    attackCountDown = -info.moveMode;
+                }
+                if (info.moveMode >= 0)
+                {
+                    getDamage(1);
+                }
             }
             else
             {
-                transform.DOShakeScale(0.2f, 0.2f);
+                if (info.attackPerStep > 0)
+                {
+
+                    transform.DOShakeScale(0.2f, 0.2f);
 
 
-                takeResource(info.requireResourcePerStep, info.attackPerStep);
-                //ResourceManager.Instance.consumeResource("nut", attackPerStep);
+                    takeResource(info.requireResourcePerStep, info.attackPerStep);
+                }
             }
+
+            countDownText.text = attackCountDown.ToString();
         }
 
     }
