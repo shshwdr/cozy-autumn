@@ -13,13 +13,3 @@ fire,empty,addHot:1|increaseObjectHP:-1,,
 fire,stone,addHot:1|increaseObjectHP:-3|destroy2:0,,fire+stone
 fire,birdTrap,addHot:1|increaseObjectHP:5|destroy2:0,,fire+birdTrap
 fire,trap,addHot:1,,
-snake,trap,destroy1:0|destroy2:0|trap:1,,
-snake,birdTrap,destroy1:0|destroy2:0|trap:1,,
-weasel,trap,destroy1:0|destroy2:0|trap:1,,
-weasel,birdTrap,destroy1:0|destroy2:0|trap:1,,
-owl,trap,destroy1:0|destroy2:0|trap:1,,
-owl,birdTrap,destroy1:0|destroy2:0|trap:1,,
-fox,trap,destroy1:0|destroy2:0|trap:1,,
-fox,birdTrap,destroy1:0|destroy2:0|trap:1,,
-bear,trap,destroy1:0|destroy2:0|trap:1,,
-bear,birdTrap,destroy1:0|destroy2:0|trap:1,,

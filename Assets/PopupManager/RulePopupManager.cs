@@ -39,8 +39,12 @@ public class RulePopupManager : Singleton<RulePopupManager>
     IEnumerator closePopup(GameObject go)
     {
         yield return new WaitForSeconds(5);
-        go.GetComponent<UIView>().Hide();
-        isShowing = false;
+        if (go)
+        {
+            go.GetComponent<UIView>().Hide();
+            isShowing = false;
+
+        }
     }
 
     private void Update()
