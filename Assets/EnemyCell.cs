@@ -48,6 +48,15 @@ public class EnemyCell : MonoBehaviour
         Destroy(gameObject, 0.3f);
     }
 
+    void playAttackEffect()
+    {
+
+       var go =  Instantiate(Resources.Load<GameObject>("effect/fangAttackEffect"), transform.position, Quaternion.identity);
+        go.transform.DOMove(GridController.Instance.getPlayerTransform().position,0.3f);
+        go.transform.DOPunchRotation(Vector3.zero, 0.3f, 100);
+        Destroy(go, 1f);
+    }
+
 
     public IEnumerator startAttack()
     {
@@ -80,8 +89,9 @@ public class EnemyCell : MonoBehaviour
                 else
                 {
 
+                    playAttackEffect();
                     RulePopupManager.Instance.showRule("playerNextToSnake");
-                    Instantiate(Resources.Load("effect/attack"), GridController.Instance.getPlayerTransform().position, Quaternion.identity);
+                    //Instantiate(Resources.Load("effect/attack"), GridController.Instance.getPlayerTransform().position, Quaternion.identity);
 
 
                     takeResource(info.requireResource, info.attack);

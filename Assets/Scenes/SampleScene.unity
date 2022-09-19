@@ -1663,6 +1663,7 @@ MonoBehaviour:
   index: 0
   renderer: {fileID: 841729841}
   bk: {fileID: 670241979}
+  countDownObject: {fileID: 0}
   type: 
   equipRenderer: {fileID: 1863671512}
   ice: {fileID: 1213093012}
@@ -3839,6 +3840,7 @@ MonoBehaviour:
   index: 0
   renderer: {fileID: 956709339}
   bk: {fileID: 698936085}
+  countDownObject: {fileID: 0}
   type: 
   equipRenderer: {fileID: 2073926364}
   ice: {fileID: 39756146}
@@ -5812,12 +5814,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a18d300840f89a744b17e0770694e8e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  requireResourcePerStep: nut
-  requireResource: 
-  attackPerStep: 1
-  attack: 5
-  fallbackAttackPerStep: 2
-  fallbackAttack: 10
   hp: 1
 --- !u!210 &1964936551
 SortingGroup:
@@ -5871,6 +5867,7 @@ MonoBehaviour:
   index: 0
   renderer: {fileID: 1344535758}
   bk: {fileID: 1578990302}
+  countDownObject: {fileID: 0}
   type: 
   equipRenderer: {fileID: 1534818026}
   ice: {fileID: 1618634564}
@@ -6895,6 +6892,7 @@ MonoBehaviour:
   index: 0
   renderer: {fileID: 0}
   bk: {fileID: 0}
+  countDownObject: {fileID: 0}
   type: 
   equipRenderer: {fileID: 0}
   ice: {fileID: 0}
