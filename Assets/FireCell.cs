@@ -17,6 +17,8 @@ public class FireCell : MonoBehaviour
         EventPool.OptIn("moveAStep", stepAttack);
         stepAttack();
         cell.updateHp(hp);
+
+        SFXManager.Instance.play("fire");
     }
 
     public void addHp(int x)
@@ -35,8 +37,8 @@ public class FireCell : MonoBehaviour
             GridController.Instance.addEmpty(GetComponent<GridCell>().index);
             GetComponent<Collider2D>().enabled = false;
             isDead = true;
-            transform.DOShakeScale(0.3f, 0.3f);
-            Destroy(gameObject, 0.3f);
+            transform.DOShakeScale(0.3f, GridController.Instance.animTime);
+            Destroy(gameObject, GridController.Instance.animTime);
         }
     }
     void stepAttack()
@@ -52,7 +54,8 @@ public class FireCell : MonoBehaviour
             c.thaw();
 
             RulePopupManager.Instance.showRule("iceThaw");
-            FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement(3);
+            SFXManager.Instance.play("icemelt");
+            FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("melt");
             //getDamage(1);
         }
     }

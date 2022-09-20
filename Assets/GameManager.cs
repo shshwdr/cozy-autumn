@@ -40,6 +40,8 @@ public class GameManager : Singleton<GameManager>
         isGameOver = true;
 
         PopupManager.Instance.showEvent("Game Over", () => { restartGame(); }, "Restart");
+
+        SFXManager.Instance.play("gameover");
     }
 
     public void win()
@@ -51,7 +53,8 @@ public class GameManager : Singleton<GameManager>
         }
         isGameOver = true;
 
-        FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement(4);
+        FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("spring");
         PopupManager.Instance.showEvent("You survive! It's spring!", () => { restartGame(); }, "Restart");
+        SFXManager.Instance.play("win");
     }
 }

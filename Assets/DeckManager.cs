@@ -85,6 +85,12 @@ public class DeckManager : Singleton<DeckManager>
                 for (int i = 0; i < pair.Value; i++)
                 {
                     addCardToDeck(pair.Key);
+
+                    if(pair.Key == "ice")
+                    {
+
+                        FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("winter");
+                    }
                 }
             }
             else

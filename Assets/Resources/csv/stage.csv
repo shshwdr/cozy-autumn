@@ -1,5 +1,5 @@
 ﻿cards,triggerRound
-fox:1,0
+trap:1|bat:1|snake:1,0
 snake:1|trap:1|empty:1|shop:1,1
 branch:2|nut:1,2
 weasel:1|nut:1|empty:1|fire:1|trap:-1,3

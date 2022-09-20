@@ -35,6 +35,8 @@ public class RulePopupManager : Singleton<RulePopupManager>
         var go = Instantiate(popupPrefab, mainCanvas.transform);
         StartCoroutine(go.GetComponentInChildren<HintCell>().init(type));
         StartCoroutine(closePopup(go));
+
+        SFXManager.Instance.play("unlocknewrule");
     }
     IEnumerator closePopup(GameObject go)
     {

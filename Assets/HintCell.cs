@@ -24,7 +24,7 @@ public class HintCell : MonoBehaviour
 
     public IEnumerator init(string type)
     {
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSecondsRealtime(0.1f);
         var ruleInfo = RuleManager.Instance.getInfo(type);
         var splitResult1 = Regex.Split(ruleInfo.words1, @"(?<=[\[\]])");
 
@@ -61,13 +61,17 @@ public class HintCell : MonoBehaviour
         addText(string2, ruleInfo.words2);
         //string1.gameObject.SetActive(false); 
         Canvas.ForceUpdateCanvases();
-        LayoutRebuilder.ForceRebuildLayoutImmediate(GetComponent<RectTransform>());
-        string1.GetComponent<HorizontalLayoutGroup>().enabled = false;
-        yield return new WaitForSeconds(0.1f);
-        Canvas.ForceUpdateCanvases();
-        LayoutRebuilder.ForceRebuildLayoutImmediate(GetComponent<RectTransform>());
-       // string1.gameObject.SetActive(true);
-        string1.GetComponent<HorizontalLayoutGroup>().enabled = true;
+        if (this && gameObject)
+        {
+
+            LayoutRebuilder.ForceRebuildLayoutImmediate(GetComponent<RectTransform>());
+            string1.GetComponent<HorizontalLayoutGroup>().enabled = false;
+            yield return new WaitForSeconds(0.1f);
+            Canvas.ForceUpdateCanvases();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(GetComponent<RectTransform>());
+            // string1.gameObject.SetActive(true);
+            string1.GetComponent<HorizontalLayoutGroup>().enabled = true;
+        }
     }
     void addImage(Transform parent, string type)
     {

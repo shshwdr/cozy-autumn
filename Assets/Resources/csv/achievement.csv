@@ -1,7 +1,13 @@
-﻿type,description,title
-Starving,Starved to death...,
-trapped,Drive away the enemy with traps,
-slash,Drive away the enemy with weapons,
-Melting,The bonfire melts the ice,
-spring,Survive the game!,Spring is coming
-hiddenTrap,,
+﻿type,description,title,amount,clearReason
+starving,Starved to death...,Starving,,
+trapped,Drive away the enemy with traps,Trapped!,,
+slash,Drive away the enemy with weapons,Slash!,,
+melt,The bonfire melts ice in one round,Melting,2,round
+spring,Survive the game!,Spring is coming,,
+hiddenTrap,Drive away enemy with trap covered by leaves,Surprise!,,
+winter,It's getting harder to survive…,Winter is coming,,
+allFurniture,Collected all funitures,Cozy Home,,
+allRules,Collected all rules,Omniscient,,
+notMoving,Haven't moved for 10 rounds,Couch potato,10,move
+allAchievement,Unlock all achievements,Platinum,,
+harvest,Collect item at home,Harvest,20,

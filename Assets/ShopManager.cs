@@ -72,6 +72,12 @@ public class ShopManager : Singleton<ShopManager>
 
         shopItems.Find(type).gameObject.SetActive(true);
 
+        if(unPurchasedShopInfos.Count == 0)
+        {
+
+            FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("allFurniture");
+        }
+
     }
 
 

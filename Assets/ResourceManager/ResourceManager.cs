@@ -29,10 +29,17 @@ public class ResourceManager : Singleton<ResourceManager>
     public void consumeResource(string type, int value)
     {
         changeAmount(type, -value);
-        if (!hasEnoughAmount(type,0))
+        if (!hasEnoughAmount(type,0) && type == "nut")
         {
-            FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement(0);
-            GameManager.Instance.gameover();
+
+            FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("starving");
+
+            if (!CheatManager.Instance.wontDie)
+
+            {
+
+                GameManager.Instance.gameover();
+            }
         }
     }
     public void addResource(string type, int value)

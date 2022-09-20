@@ -94,6 +94,7 @@ public class ShopCell : GridCell
             return;
         }
 
+        SFXManager.Instance.play("makepurchase");
         ShopGridController.Instance.moveCell(this);
         //index = GridController.Instance.moveCellToEmpty(this);
         //  if(index == -1)

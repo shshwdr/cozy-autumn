@@ -1,36 +1,62 @@
 using System;
 using System.Collections.Generic;
 using Doozy.Engine.UI;
+using Sinbad;
 using UnityEngine;
 
 namespace Doozy.Examples
 {
+    public class AchievementInfo
+    {
+        public string type;
+        public string description;
+        public string title;
+
+    }
     public class E12PopupManagerScript : Singleton<E12PopupManagerScript>
     {
         [Header("Popup Settings")]
         public string PopupName = "AchievementPopup";
 
-        [Header("Achievements")]
-        public List<AchievementData> Achievements = new List<AchievementData>();
 
         private UIPopup m_popup;
-        Dictionary<int, bool> visited = new Dictionary<int, bool>();
-        public void ShowAchievement(int achievementId)
+
+        HashSet<string> visited = new HashSet<string>();
+        Dictionary<string, AchievementInfo> acDict = new Dictionary<string, AchievementInfo>();
+        // Start is called before the first frame update
+        void Start()
         {
-            if (visited.ContainsKey(achievementId))
+
+            var acInfos = CsvUtil.LoadObjects<AchievementInfo>("achievement");
+            foreach (var info in acInfos)
+            {
+                acDict[info.type] = info;
+            }
+        }
+
+        public void addRule(string type)
+        {
+            if (!acDict.ContainsKey(type))
+            {
+                Debug.LogError("no key for " + type);
+            }
+            visited.Add(type);
+            if (visited.Count == acDict.Count-1)
+            {
+
+                FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("allAchievement");
+            }
+        }
+
+        public void ShowAchievement(string achievementType)
+        {
+            if (visited.Contains(achievementType))
             {
                 return;
             }
-            else
-            {
-                visited[achievementId] = true;
-            }
-            //make sure the achievement we want to show has been defined in the Achievements list
-            //the achievementId is actually the index of the achievement as it has been defined in the list
-            if (Achievements == null || achievementId < 0 || achievementId > Achievements.Count - 1) return;
-
+            addRule(achievementType);
             //get the achievement from the list
-            AchievementData achievement = Achievements[achievementId];
+            AchievementInfo achievement = acDict[achievementType];
 
             //make sure we got an achievement and that the entry was not null
             if (achievement == null) return;
@@ -43,9 +69,14 @@ namespace Doozy.Examples
                 return;
 
             //set the achievement icon
-            m_popup.Data.SetImagesSprites(achievement.Icon);
+            var icon = Resources.Load<Sprite>("achievement/" + achievement.type);
+            if (!icon)
+            {
+                Debug.LogError("no icon for " + icon);
+            }
+            m_popup.Data.SetImagesSprites(icon);
             //set the achievement title and message
-            m_popup.Data.SetLabelsTexts(achievement.Achievement, achievement.Description);
+            m_popup.Data.SetLabelsTexts(achievement.title, achievement.description);
 
             //show the popup
             UIPopupManager.ShowPopup(m_popup, m_popup.AddToPopupQueue, false);

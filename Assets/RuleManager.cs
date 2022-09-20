@@ -30,6 +30,11 @@ public class RuleManager : Singleton<RuleManager>
     {
 
         visited.Add(type);
+        if(visited.Count == ruleDict.Count)
+        {
+
+            FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("allRules");
+        }
     }
     public RuleInfo getInfo(string type)
     {

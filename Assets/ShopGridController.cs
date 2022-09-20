@@ -19,8 +19,6 @@ public class ShopGridController : Singleton<ShopGridController>
     GridCell playerCell;
     GameObject counterCell;
 
-
-    float animTime = 0.3f;
    public  bool isMoving = false;
     int playerCellIndex { get { return playerCell.index; } }
     int originalPlayerCell = 5;
@@ -28,11 +26,14 @@ public class ShopGridController : Singleton<ShopGridController>
 
     public IEnumerator getIntoShop()
     {
+        SFXManager.Instance.play("shopappear");
         yield return StartCoroutine(showCells());
+
     }
 
     public IEnumerator leaveShop()
     {
+        SFXManager.Instance.play("shopdisappear");
         yield return StartCoroutine(hideCells());
         StartCoroutine(GridController.Instance.leaveShop());
 
@@ -52,10 +53,10 @@ public class ShopGridController : Singleton<ShopGridController>
         {
             yield return new WaitForSeconds(cellAnimInterval);
 
-            cell.transform.DOScale(Vector3.one, animTime);
+            cell.transform.DOScale(Vector3.one, GridController.Instance.animTime);
         }
 
-        yield return new WaitForSeconds(animTime);
+        yield return new WaitForSeconds(GridController.Instance.animTime);
     }
 
     IEnumerator hideCells()
@@ -69,10 +70,10 @@ public class ShopGridController : Singleton<ShopGridController>
         {
             yield return new WaitForSeconds(cellAnimInterval);
 
-            cell.transform.DOScale(Vector3.zero, animTime);
+            cell.transform.DOScale(Vector3.zero, GridController.Instance.animTime);
         }
 
-        yield return new WaitForSeconds(animTime);
+        yield return new WaitForSeconds(GridController.Instance.animTime);
 
         shopBoard.gameObject.SetActive(false);
     }
@@ -138,7 +139,7 @@ public class ShopGridController : Singleton<ShopGridController>
         res = Instantiate(shopCellPrefab, cellParents[index].position, Quaternion.identity, cellParents[index]);
 
         //  res.transform.localScale = Vector3.one;
-        res.transform.DOPunchScale(Vector3.one, animTime);
+        res.transform.DOPunchScale(Vector3.one, GridController.Instance.animTime);
 
         res.GetComponent<ShopCell>().init(type, index, isShop);
         return res;
@@ -162,9 +163,9 @@ public class ShopGridController : Singleton<ShopGridController>
 
     void destroy(GameObject go)
     {
-        go.transform.DOScale(Vector3.zero, animTime);
-        go.transform.DOLocalMoveY(1, animTime);
-        Destroy(go, animTime);
+        go.transform.DOScale(Vector3.zero, GridController.Instance.animTime);
+        go.transform.DOLocalMoveY(1, GridController.Instance.animTime);
+        Destroy(go, GridController.Instance.animTime);
     }
     IEnumerator moveCellAnim(ShopCell cell)
     {
@@ -178,11 +179,11 @@ public class ShopGridController : Singleton<ShopGridController>
         var movingCellIndex = cell.index;
         var emptyPosition = cellParents[originEmptyIndex].position;
         //cell.GetComponent<SortingGroup>().sortingOrder = 100;
-        cell.transform.DOMove(emptyPosition, 0.3f);
+        cell.transform.DOMove(emptyPosition, GridController.Instance.animTime);
 
        // generateShopCell(movingCellIndex, "counter", false);
 
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(GridController.Instance.animTime);
 
         if(cell == playerCell)
         {
@@ -210,7 +211,7 @@ public class ShopGridController : Singleton<ShopGridController>
         var cell2String = targetCell ? targetCell.type : "empty";
         
 
-        yield return new WaitForSeconds(animTime);
+        yield return new WaitForSeconds(GridController.Instance.animTime);
         //EventPool.Trigger("moveAStep");
 
         finishMove();

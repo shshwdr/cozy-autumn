@@ -9,7 +9,7 @@ public class EnemyCell : MonoBehaviour
 {
 
     public int hp = 1;
-    bool isDead = false;
+    public bool isDead = false;
     GridCell cell;
     CellInfo info;
     bool isFirst = true;
@@ -22,6 +22,8 @@ public class EnemyCell : MonoBehaviour
     public void init(string type)
     {
         info = CellManager.Instance.getInfo(type);
+
+        SFXManager.Instance.play(type+"show");
     }
 
     // Start is called before the first frame update
@@ -36,7 +38,13 @@ public class EnemyCell : MonoBehaviour
             countDownObject.SetActive(true);
             countDownText.text = attackCountDown.ToString();
         }
-        // EventPool.OptIn("moveAStep", stepAttack);
+         EventPool.OptIn("moveAStep", stepAttack);
+    }
+
+    void stepAttack()
+    {
+        Debug.Log("step attack");
+        isFirst = false;
     }
 
     public void getDamage(int x)
@@ -44,22 +52,58 @@ public class EnemyCell : MonoBehaviour
         GridController.Instance.addEmpty(GetComponent<GridCell>().index);
         GetComponent<Collider2D>().enabled = false;
         isDead = true;
-        transform.DOShakeScale(0.3f, 0.3f);
-        Destroy(gameObject, 0.3f);
+        transform.DOShakeScale(0.3f, GridController.Instance.animTime);
+        Destroy(gameObject, GridController.Instance.animTime+0.1f);
+
+        SFXManager.Instance.play("animalLose");
     }
 
     void playAttackEffect()
     {
 
        var go =  Instantiate(Resources.Load<GameObject>("effect/fangAttackEffect"), transform.position, Quaternion.identity);
-        go.transform.DOMove(GridController.Instance.getPlayerTransform().position,0.3f);
-        go.transform.DOPunchRotation(Vector3.zero, 0.3f, 100);
+        go.transform.DOMove(GridController.Instance.getPlayerTransform().position, GridController.Instance.animTime+0.1f);
         Destroy(go, 1f);
     }
 
+    public IEnumerator activeAttack()
+    {
+
+        //if player has weapon, unequip weapon and die
+        var player = GridController.Instance.getPlayerTransform().GetComponent<GridCell>();
+        if (player.hasEquipment())
+        {
+            player.unequip(transform);
+
+            FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("slash");
+        }
+        else
+        {
+            SFXManager.Instance.play("attack");
+            playAttackEffect();
+            RulePopupManager.Instance.showRule("playerNextToSnake");
+            //Instantiate(Resources.Load("effect/attack"), GridController.Instance.getPlayerTransform().position, Quaternion.identity);
+
+
+            takeResource(info.requireResource, info.attack);
+        }
+
+        if (attackCountDown == 0)
+        {
+            attackCountDown = -info.moveMode;
+        }
+        if (info.moveMode >= 0)
+        {
+            getDamage(1);
+        }
+        yield return new WaitForSeconds(GridController.Instance.animTime);
+
+        hasAttacked = true;
+    }
 
     public IEnumerator startAttack()
     {
+        hasAttacked = false;
         yield return null;
         if (isFirst || isDead)
         {
@@ -78,33 +122,7 @@ public class EnemyCell : MonoBehaviour
 
             if (GridController.Instance.isPlayerAround(GetComponent<GridCell>().index) || attackCountDown == 0)
             {
-                //if player has weapon, unequip weapon and die
-                var player = GridController.Instance.getPlayerTransform().GetComponent<GridCell>();
-                if (player.hasEquipment())
-                {
-                    player.unequip(transform);
-
-                    FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement(2);
-                }
-                else
-                {
-
-                    playAttackEffect();
-                    RulePopupManager.Instance.showRule("playerNextToSnake");
-                    //Instantiate(Resources.Load("effect/attack"), GridController.Instance.getPlayerTransform().position, Quaternion.identity);
-
-
-                    takeResource(info.requireResource, info.attack);
-                }
-
-                if(attackCountDown == 0)
-                {
-                    attackCountDown = -info.moveMode;
-                }
-                if (info.moveMode >= 0)
-                {
-                    getDamage(1);
-                }
+                yield return StartCoroutine(activeAttack());
             }
             else
             {
@@ -140,59 +158,38 @@ public class EnemyCell : MonoBehaviour
             ResourceManager.Instance.consumeResource("nut", (value - resValue)*2);
         }
     }
-
+    bool hasAttacked = false;
     public IEnumerator startMove()
     {
         yield return null;
         if (isFirst)
         {
-            isFirst = false;
             yield break;
         }
         if (isDead)
         {
             yield break;
         }
+        if (hasAttacked)
+        {
 
+            yield break;
+        }
+
+
+        if (GridController.Instance.isPlayerAround(GetComponent<GridCell>().index) || attackCountDown == 0)
+        {
+            yield return StartCoroutine(activeAttack());
+            yield break;
+        }
+        hasAttacked = true;
         if (info.moveMode == 1 || info.moveMode == 2)
         {
             //this enemy would chase player, and only attack infront of it.
             var target = GridController.Instance.getTargetIndexToPlayer(cell.index);
-            StartCoroutine(GridController.Instance.exchangeCard(cell, target));
+            yield return  StartCoroutine(GridController.Instance.exchangeCard(cell, target));
 
 
-        }
-        else
-        {
-            //if(info.)
-
-            //if player nearby, attack and destroy
-            //if (GridController.Instance.isPlayerAround(GetComponent<GridCell>().index))
-            //{
-            //    //if player has weapon, unequip weapon and die
-            //    var player = GridController.Instance.getPlayerTransform().GetComponent<GridCell>();
-            //    if (player.hasEquipment())
-            //    {
-            //        player.unequip(transform);
-
-            //        FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement(2);
-            //    }
-            //    else
-            //    {
-
-            //        RulePopupManager.Instance.showRule("playerNextToSnake");
-            //        Instantiate(Resources.Load("effect/attack"), GridController.Instance.getPlayerTransform().position, Quaternion.identity);
-            //        ResourceManager.Instance.consumeResource("nut", attack);
-            //    }
-
-            //    getDamage(1);
-            //}
-            //else
-            //{
-            //    transform.DOShakeScale(0.2f, 0.2f);
-
-            //    ResourceManager.Instance.consumeResource("nut", attackPerStep);
-            //}
         }
 
 

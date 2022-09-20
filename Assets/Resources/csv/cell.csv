@@ -14,7 +14,7 @@ weasel,1,enemy,,,nut,nut,0,5,1,
 snake,1,enemy,,,nut,nut,1,5,,
 owl,1,enemy,,,stick,stick,1,5,,
 fox,1,enemy,,,nut,nut,0,5,-5,
-bear,1,enemy,,,stone,stone,,,2,1
+bear,1,enemy,,,stone,stone,0,5,1,1
 bat,,weapon,1,,,,,,,
 boulder,1,,,,,,,,,
 axe,,weapon,,,,,,,,

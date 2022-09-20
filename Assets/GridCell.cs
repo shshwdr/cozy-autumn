@@ -75,7 +75,7 @@ public class GridCell : MonoBehaviour
         equipment = e;
         equipRenderer.sprite = Resources.Load<Sprite>("cell/" + equipment);
 
-        equipRenderer.transform.DOPunchScale(equipRenderer.transform.localScale*2, 0.3f);
+        equipRenderer.transform.DOPunchScale(equipRenderer.transform.localScale*2, GridController.Instance.animTime);
     }
 
     public bool hasEquipment()
