@@ -6504,6 +6504,7 @@ MonoBehaviour:
   cellCountY: 3
   cellSize: 2.1
   moveCountToLeaf: 050000003c0000005a00000078000000aa000000
+  moveCount: 0
   snakeChance: 13
   nutChance: 30
   trapChance: 10

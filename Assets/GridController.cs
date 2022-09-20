@@ -15,7 +15,7 @@ public class GridController : Singleton<GridController>
     public List<int> moveCountToLeaf;
     int currentLeafIndex = 0;
 
-    int moveCount = 0;
+   public  int moveCount = 0;
 
     List<Transform> cellParents = new List<Transform>();
 
@@ -347,7 +347,8 @@ public class GridController : Singleton<GridController>
     {
         yield return null;
         var trap = cell.transform.parent.GetComponentInChildren<GridItem>();
-        if (cell && cell.cellInfo.isEnemy() && trap && trap.cellInfo.type.Contains("trap"))
+        bool combination = cell!=null && cell.cellInfo.isEnemy() && trap!=null && (trap.cellInfo.type.Contains("trap") || trap.cellInfo.type.Contains("Trap"));
+        if (combination)
         {
             cell.GetComponent<EnemyCell>().getDamage(1);
             destroy(trap.gameObject);
@@ -481,7 +482,7 @@ public class GridController : Singleton<GridController>
 
 
         //draw a card
-        var card = DeckManager.Instance.drawCard();
+        var card = DeckManager.Instance.drawCard(cell.cellInfo.isEmpty());
         Debug.Log("draw card " + card);
         var cardInfo = CellManager.Instance.getInfo(card);
         var freezedCellCount = freezeCount();
@@ -579,7 +580,7 @@ public class GridController : Singleton<GridController>
             }
             else
             {
-                DeckManager.Instance.addCardToDeck(card);
+                DeckManager.Instance.waitingCards(card);
             }
         }
 
@@ -697,7 +698,6 @@ public class GridController : Singleton<GridController>
                             if (cellParents[movingCellIndex].GetComponentInChildren<GridItem>())
                             {
                                 destroy( cellParents[movingCellIndex].GetComponentInChildren<GridItem>().gameObject);
-                                //DeckManager.Instance.addCardToDeck(card);
                             }
 
                             generateCell(movingCellIndex, pair.Value);

@@ -13,6 +13,7 @@ public class DeckManager : Singleton<DeckManager>
 {
     public bool wouldShuffle = true;
     List<string> fullDeck = new List<string>();
+    List<string> waitDeck = new List<string>();
     List<string> currentDeck = new List<string>();
     List<StageInfo> stageInfos;
     int round = -1;
@@ -38,6 +39,10 @@ public class DeckManager : Singleton<DeckManager>
 
     public void createAndShuffleCards()
     {
+        round++;
+        Debug.Log("start deck round " + round);
+        addDeckByRound();
+
         currentDeck.Clear();
 
         initCurrentDeck();
@@ -48,17 +53,22 @@ public class DeckManager : Singleton<DeckManager>
             currentDeck.Shuffle();
         }
 
-        round++;
-        Debug.Log("start deck round " + round);
-        addDeckByRound();
     }
-    public string drawCard()
+    public string drawCard(bool canDrawWaitingDeck)
     {
         if (currentDeck.Count == 0)
         {
             createAndShuffleCards();
         }
+
         var firstCard = currentDeck[0];
+        if (canDrawWaitingDeck && waitDeck.Count > 0)
+        {
+
+           firstCard = waitDeck[0];
+            waitDeck.RemoveAt(0);
+            return firstCard;
+        }
         currentDeck.RemoveAt(0);
         return firstCard;
     }
@@ -74,6 +84,8 @@ public class DeckManager : Singleton<DeckManager>
         var firstCard = currentDeck[0];
         return firstCard;
     }
+
+
 
     public void addDictionaryToDeck(Dictionary<string, int> dict)
     {
@@ -108,7 +120,10 @@ public class DeckManager : Singleton<DeckManager>
 
         }
     }
-
+    public void waitingCards(string n)
+    {
+        waitDeck.Add(n);
+    }
     public void addCardToDeck(string n)
     {
 
@@ -138,10 +153,11 @@ public class DeckManager : Singleton<DeckManager>
             if (round >= stageInfo.triggerRound)
             {
                 addStageCards(stageInfo);
+                stageInfos.Remove(stageInfo);
                 Debug.Log("add deck by round " + round);
             }
         }
-        stageInfos = temp;
+        //stageInfos = temp;
     }
 
     // Update is called once per frame

@@ -35,6 +35,7 @@ public class GridCell : MonoBehaviour
         if (!ice)
         {
             Debug.Log("??");
+            return;
         }
         ice.SetActive(true);
     }
