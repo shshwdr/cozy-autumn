@@ -399,6 +399,7 @@ public class GridController : Singleton<GridController>
 
     IEnumerator attackAndMove()
     {
+       // yield break;
         //  cellParents[cell.index].GetComponentsInChildren<GridItem>()
         //calculate hot place
         for (int i = 0; i < cellParents.Count; i++)
@@ -549,7 +550,6 @@ public class GridController : Singleton<GridController>
                 Debug.Log("generate " + card);
                 //generate a snake
                 var go = generateCell(cell.index, card);
-                //go.transform.DOShakeScale(0.3f);
                 destroy(cell.gameObject);
 
 
