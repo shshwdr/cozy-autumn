@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class RuleMenu : MonoBehaviour
 {
+    HintCell[] hintCells;
     // Start is called before the first frame update
     void Start()
     {
@@ -14,8 +15,12 @@ public class RuleMenu : MonoBehaviour
     {
 
         int i = 0; 
+        if (hintCells == null)
+        {
+
+            hintCells = GetComponentsInChildren<HintCell>(true);
+        }
         GetComponentInChildren< ScrollRect>().verticalNormalizedPosition =1f;
-        var hintCells = GetComponentsInChildren<HintCell>();
 
         for (; i < RuleManager.Instance.visitedList.Count; i++)
         {

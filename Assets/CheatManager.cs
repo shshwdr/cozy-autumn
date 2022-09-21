@@ -1,3 +1,4 @@
+using Doozy.Examples;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -47,6 +48,10 @@ public class CheatManager : Singleton<CheatManager>
             if (Input.GetKeyDown(KeyCode.K))
             {
                 RuleManager.Instance.unlockAll();
+            }
+            if (Input.GetKeyDown(KeyCode.J))
+            {
+                E12PopupManagerScript.Instance.unlockAll();
             }
         }
     }

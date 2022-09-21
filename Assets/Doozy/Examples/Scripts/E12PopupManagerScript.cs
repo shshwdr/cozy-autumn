@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Doozy.Engine.UI;
+using Pool;
 using Sinbad;
 using UnityEngine;
 
@@ -22,30 +23,52 @@ namespace Doozy.Examples
         private UIPopup m_popup;
 
         HashSet<string> visited = new HashSet<string>();
-        Dictionary<string, AchievementInfo> acDict = new Dictionary<string, AchievementInfo>();
+        public List<string> visitedList = new List<string>();
+        public List<string> unvisitedList = new List<string>();
+        Dictionary<string, AchievementInfo> ruleDict = new Dictionary<string, AchievementInfo>();
+        public List<AchievementInfo> ruleList = new List<AchievementInfo>();
         // Start is called before the first frame update
         void Start()
         {
 
-            var acInfos = CsvUtil.LoadObjects<AchievementInfo>("achievement");
-            foreach (var info in acInfos)
+            ruleList = CsvUtil.LoadObjects<AchievementInfo>("achievement");
+            foreach (var info in ruleList)
             {
-                acDict[info.type] = info;
+                unvisitedList.Add(info.type);
+                ruleDict[info.type] = info;
             }
         }
-
+        public void unlockAll()
+        {
+            foreach (var rule in ruleList)
+            {
+                addRule(rule.type);
+            }
+        }
         public void addRule(string type)
         {
-            if (!acDict.ContainsKey(type))
+            if (!visited.Contains(type))
+            {
+                visitedList.Add(type);
+                unvisitedList.Remove(type);
+                //EventPool.Trigger("unlockRule");
+            }
+            visited.Add(type);
+
+        }
+
+        public bool isUnlocked(string type)
+        {
+            return visited.Contains(type);
+        }
+        public AchievementInfo getInfo(string type)
+        {
+
+            if (!ruleDict.ContainsKey(type))
             {
                 Debug.LogError("no key for " + type);
             }
-            visited.Add(type);
-            if (visited.Count == acDict.Count-1)
-            {
-
-                FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("allAchievement");
-            }
+            return ruleDict[type];
         }
 
         public void ShowAchievement(string achievementType)
@@ -56,7 +79,7 @@ namespace Doozy.Examples
             }
             addRule(achievementType);
             //get the achievement from the list
-            AchievementInfo achievement = acDict[achievementType];
+            AchievementInfo achievement = ruleDict[achievementType];
 
             //make sure we got an achievement and that the entry was not null
             if (achievement == null) return;
