@@ -26,14 +26,14 @@ public class ShopGridController : Singleton<ShopGridController>
 
     public IEnumerator getIntoShop()
     {
-        SFXManager.Instance.play("shopappear");
+       // SFXManager.Instance.play("shopappear");
         yield return StartCoroutine(showCells());
 
     }
 
     public IEnumerator leaveShop()
     {
-        SFXManager.Instance.play("shopdisappear");
+       // SFXManager.Instance.play("shopdisappear");
         yield return StartCoroutine(hideCells());
         StartCoroutine(GridController.Instance.leaveShop());
 
@@ -54,6 +54,7 @@ public class ShopGridController : Singleton<ShopGridController>
             yield return new WaitForSeconds(cellAnimInterval);
 
             cell.transform.DOScale(Vector3.one, GridController.Instance.animTime);
+            SFXManager.Instance.play("cardshow");
         }
 
         yield return new WaitForSeconds(GridController.Instance.animTime);
@@ -71,6 +72,7 @@ public class ShopGridController : Singleton<ShopGridController>
             yield return new WaitForSeconds(cellAnimInterval);
 
             cell.transform.DOScale(Vector3.zero, GridController.Instance.animTime);
+            SFXManager.Instance.play("cardgone");
         }
 
         yield return new WaitForSeconds(GridController.Instance.animTime);

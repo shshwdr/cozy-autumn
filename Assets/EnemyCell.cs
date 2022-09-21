@@ -101,6 +101,19 @@ public class EnemyCell : MonoBehaviour
         hasAttacked = true;
     }
 
+    public bool willAttack()
+    {
+        if (isFirst || isDead)
+        {
+            return false;
+        }
+        if (GridController.Instance.isPlayerAround(GetComponent<GridCell>().index) || attackCountDown == 0)
+        {
+            return true;
+        }
+        return false;
+
+    }
     public IEnumerator startAttack()
     {
         hasAttacked = false;
@@ -159,6 +172,20 @@ public class EnemyCell : MonoBehaviour
         }
     }
     bool hasAttacked = false;
+
+    public bool willMove()
+    {
+        if (isFirst|| isDead|| hasAttacked)
+        {
+            return false;
+        }
+        if(info.moveMode == 1 || info.moveMode == 2)
+        {
+            return true;
+        }
+        return false;
+
+    }
     public IEnumerator startMove()
     {
         yield return null;
@@ -177,14 +204,18 @@ public class EnemyCell : MonoBehaviour
         }
 
 
-        if (GridController.Instance.isPlayerAround(GetComponent<GridCell>().index) || attackCountDown == 0)
-        {
-            yield return StartCoroutine(activeAttack());
-            yield break;
-        }
-        hasAttacked = true;
         if (info.moveMode == 1 || info.moveMode == 2)
         {
+
+
+            if (GridController.Instance.isPlayerAround(GetComponent<GridCell>().index) || attackCountDown == 0)
+            {
+                yield return StartCoroutine(activeAttack());
+                yield break;
+            }
+            hasAttacked = true;
+
+
             //this enemy would chase player, and only attack infront of it.
             var target = GridController.Instance.getTargetIndexToPlayer(cell.index);
             yield return  StartCoroutine(GridController.Instance.exchangeCard(cell, target));

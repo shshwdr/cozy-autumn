@@ -466,9 +466,9 @@ MonoBehaviour:
           m_Calls: []
       GameEvents: []
       SoundData:
-        SoundSource: 1
-        DatabaseName: General
-        SoundName: 
+        SoundSource: 0
+        DatabaseName: Example Slides
+        SoundName: Pops Down
         AudioClip: {fileID: 0}
         OutputAudioMixerGroup: {fileID: 0}
     PresetCategory: Organic
@@ -902,9 +902,9 @@ MonoBehaviour:
           m_Calls: []
       GameEvents: []
       SoundData:
-        SoundSource: 1
-        DatabaseName: General
-        SoundName: 
+        SoundSource: 0
+        DatabaseName: Example Slides
+        SoundName: Pops Up
         AudioClip: {fileID: 0}
         OutputAudioMixerGroup: {fileID: 0}
     PresetCategory: Organic

@@ -1,3 +1,4 @@
+using Pool;
 using Sinbad;
 using System.Collections;
 using System.Collections.Generic;
@@ -14,27 +15,48 @@ public class RuleInfo {
 public class RuleManager : Singleton<RuleManager>
 {
     HashSet<string> visited = new HashSet<string>();
+    public List<string> visitedList = new List<string>();
+    public List<string> unvisitedList = new List<string>();
     Dictionary<string, RuleInfo> ruleDict = new Dictionary<string, RuleInfo>();
+    public List<RuleInfo> ruleList = new List<RuleInfo>();
     // Start is called before the first frame update
     void Start()
     {
 
-        var ruleInfos = CsvUtil.LoadObjects<RuleInfo>("rules");
-        foreach(var info in ruleInfos)
+        ruleList = CsvUtil.LoadObjects<RuleInfo>("rules");
+        foreach(var info in ruleList)
         {
+            unvisitedList.Add(info.type);
             ruleDict[info.type] = info;
         }
     }
-
+    public void unlockAll()
+    {
+        foreach(var rule in ruleList)
+        {
+            addRule(rule.type);
+        }
+    }
     public void addRule(string type)
     {
-
+        if (!visited.Contains(type))
+        {
+            visitedList.Add(type);
+            unvisitedList.Remove(type);
+            EventPool.Trigger("unlockRule");
+        }
         visited.Add(type);
-        if(visited.Count == ruleDict.Count)
+        
+        if (visited.Count == ruleDict.Count)
         {
 
             FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("allRules");
         }
+    }
+
+    public bool isUnlocked(string type)
+    {
+        return visited.Contains(type);
     }
     public RuleInfo getInfo(string type)
     {

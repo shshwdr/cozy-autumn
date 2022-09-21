@@ -93,6 +93,8 @@ public class GridController : Singleton<GridController>
                     generateCell(index, "leaf"+ currentLeafIndex);
                 }
                 index++;
+
+                SFXManager.Instance.play("cardshow");
             }
             xPosition += cellSize;
         }
@@ -343,14 +345,13 @@ public class GridController : Singleton<GridController>
         Destroy(go, animTime);
     }
 
-    IEnumerator trapCellCalculation(GridCell cell)
+    IEnumerator trapCellCalculation(GridCell cell, GridItem trap)
     {
         yield return null;
-        var trap = cell.transform.parent.GetComponentInChildren<GridItem>();
-        bool combination = cell!=null && cell.cellInfo.isEnemy() && trap!=null && (trap.cellInfo.type.Contains("trap") || trap.cellInfo.type.Contains("Trap"));
-        if (combination)
         {
             cell.GetComponent<EnemyCell>().getDamage(1);
+            var trapNmae = trap.type;
+            SFXManager.Instance.play(trapNmae);
             destroy(trap.gameObject);
 
             var go = Instantiate(Resources.Load<GameObject>("effect/trapEffect"), cell.transform.parent.position, Quaternion.identity);
@@ -359,12 +360,15 @@ public class GridController : Singleton<GridController>
             yield return new WaitForSeconds(animTime);
         }
     }
+    bool canBeHeated(GridCell cell)
+    {
+        return cell.GetComponent<GridCell>().cellInfo.isPlayer() || cell.GetComponent<GridCell>().cellInfo.isEnemy() || cell.GetComponent<GridCell>().cellInfo.type == "branch"
+            || cell.GetComponent<GridCell>().cellInfo.type == "nut";
 
+    }
     IEnumerator hotCellCalculation(GridCell cell)
     {
         yield return null;
-        //check if cell is on hot cell
-        if (cell && cellParents[cell.index].GetComponent<GridBackground>().isHot)
         {
             if (cell.GetComponent<GridCell>().cellInfo.isPlayer())
             {
@@ -372,25 +376,37 @@ public class GridController : Singleton<GridController>
                 RulePopupManager.Instance.showRule("playerOnHot");
                 ResourceManager.Instance.consumeResource("nut", 3);
 
+                SFXManager.Instance.play("shortburn");
+
                 Instantiate(fireVFX, cellParents[cell.index].position, Quaternion.identity);
                 yield return new WaitForSeconds(animTime);
             }
-            if (cell.GetComponent<GridCell>().cellInfo.isEnemy())
+            else if (cell.GetComponent<GridCell>().cellInfo.isEnemy())
             {
                 RulePopupManager.Instance.showRule("enemyOnHot");
                 cell.GetComponent<EnemyCell>().getDamage(5);
+                SFXManager.Instance.play("shortburn");
                 Instantiate(fireVFX, cellParents[cell.index].position, Quaternion.identity);
                 yield return new WaitForSeconds(animTime);
             }
 
-            if (cell.GetComponent<GridCell>().cellInfo.type == "branch")
+            else if (cell.GetComponent<GridCell>().cellInfo.type == "branch")
             {
                 //generate a fire
                 generateCell(cell.index, "fire");
+                SFXManager.Instance.play("shortburn");
                 destroy(cell.gameObject);
                 Instantiate(fireVFX, cellParents[cell.index].position, Quaternion.identity);
                 yield return new WaitForSeconds(animTime);
 
+            }
+            else if (cell.GetComponent<GridCell>().cellInfo.type == "nut")
+            {
+                generateCell(cell.index, "cookednut");
+                SFXManager.Instance.play("shortburn");
+                destroy(cell.gameObject);
+                Instantiate(fireVFX, cellParents[cell.index].position, Quaternion.identity);
+                yield return new WaitForSeconds(animTime);
             }
 
 
@@ -406,7 +422,12 @@ public class GridController : Singleton<GridController>
         {
             foreach(var cell in cellParents[i].GetComponentsInChildren<GridCell>())
             {
-                yield return StartCoroutine( hotCellCalculation(cell));
+
+                //check if cell is on hot cell
+                if (cell && cellParents[cell.index].GetComponent<GridBackground>().isHot && canBeHeated(cell))
+                {
+                    yield return StartCoroutine(hotCellCalculation(cell));
+                }
             }
         }
 
@@ -415,7 +436,12 @@ public class GridController : Singleton<GridController>
         {
             foreach (var cell in cellParents[i].GetComponentsInChildren<GridCell>())
             {
-                yield return StartCoroutine(trapCellCalculation(cell));
+                var trap = cell.transform.parent.GetComponentInChildren<GridItem>();
+                bool combination = cell != null && cell.cellInfo.isEnemy() && trap != null && (trap.cellInfo.type.Contains("trap") || trap.cellInfo.type.Contains("Trap"));
+                if (combination)
+                {
+                    yield return StartCoroutine(trapCellCalculation(cell, trap));
+                }
             }
         }
 
@@ -430,6 +456,11 @@ public class GridController : Singleton<GridController>
 
                     cell.GetComponent<EnemyCell>().getDamage(1);
                     attackWithWeapon = true;
+                    if (playerCell.equipment!=null)
+                    {
+
+                        SFXManager.Instance.play("hit" + playerCell.equipment); 
+                    }
                     yield return new WaitForSeconds(animTime);
                 }
             }
@@ -446,7 +477,7 @@ public class GridController : Singleton<GridController>
         {
             foreach (var cell in cellParents[i].GetComponentsInChildren<GridCell>())
             {
-                if (cell.cellInfo.isEnemy())
+                if (cell.cellInfo.isEnemy() && cell.GetComponent<EnemyCell>().willAttack())
                 {
 
                     yield return StartCoroutine(cell.GetComponent<EnemyCell>().startAttack());
@@ -461,10 +492,25 @@ public class GridController : Singleton<GridController>
             
             foreach (var cell in cellParents[i].GetComponentsInChildren<GridCell>())
             {
-                if (cell.cellInfo.isEnemy() && !cell.isFreezed)
+                if (cell.cellInfo.isEnemy() && !cell.isFreezed && cell.GetComponent<EnemyCell>().willMove())
                 {
 
                     yield return StartCoroutine(cell.GetComponent<EnemyCell>().startMove());
+                }
+            }
+        }
+
+        //re calculate fire
+
+        for (int i = 0; i < cellParents.Count; i++)
+        {
+            foreach (var cell in cellParents[i].GetComponentsInChildren<GridCell>())
+            {
+
+                //check if cell is on hot cell
+                if (cell && cellParents[cell.index].GetComponent<GridBackground>().isHot && cell.cellInfo.isEnemy())
+                {
+                    yield return StartCoroutine(hotCellCalculation(cell));
                 }
             }
         }
@@ -798,6 +844,7 @@ public class GridController : Singleton<GridController>
     void moveCard(GridCell cell, int index)
     {
 
+        SFXManager.Instance.play("cardmove");
         cell.index = index;
         cell.transform.parent = cellParents[index];
 
@@ -807,6 +854,7 @@ public class GridController : Singleton<GridController>
 
     public IEnumerator exchangeCard(GridCell cell1, int cell2Index)
     {
+        SFXManager.Instance.play("cardmove");
         var originalIsMoving = isMoving;
         isMoving = true;
         if (cell1.index == cell2Index)
@@ -865,6 +913,9 @@ public class GridController : Singleton<GridController>
             yield return new WaitForSeconds(cellAnimInterval);
 
             cell.transform.DOScale(Vector3.one, animTime);
+
+
+            SFXManager.Instance.play("cardshow");
         }
 
         yield return new WaitForSeconds(animTime);
@@ -884,6 +935,8 @@ public class GridController : Singleton<GridController>
             yield return new WaitForSeconds(cellAnimInterval);
 
             cell.transform.DOScale(Vector3.zero, animTime);
+
+            SFXManager.Instance.play("cardgone");
         }
 
         yield return new WaitForSeconds(animTime);

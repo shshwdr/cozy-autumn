@@ -1,3 +1,4 @@
+using Pool;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -10,6 +11,8 @@ public class HintCell : MonoBehaviour
     public GameObject hintTextPrefab;
     public Transform string1;
     public Transform string2;
+    string type;
+    public GameObject lockedGo;
     private void Start()
     {
         //init("playerToNut");
@@ -22,12 +25,14 @@ public class HintCell : MonoBehaviour
     //    //  equipRenderer.sprite = Resources.Load<Sprite>("cell/" + equipment);
     //}
 
-    public IEnumerator init(string type)
+    public IEnumerator init(string _type, bool inBook = false)
     {
+        type = _type;
         yield return new WaitForSecondsRealtime(0.1f);
         var ruleInfo = RuleManager.Instance.getInfo(type);
         var splitResult1 = Regex.Split(ruleInfo.words1, @"(?<=[\[\]])");
-
+        Utils.destroyAllChildren(string1);
+        Utils.destroyAllChildren(string2);
         for (int i = 0; i < splitResult1.Length; i++)
         {
             var text = splitResult1[i];
@@ -72,7 +77,27 @@ public class HintCell : MonoBehaviour
             // string1.gameObject.SetActive(true);
             string1.GetComponent<HorizontalLayoutGroup>().enabled = true;
         }
+
+        if (lockedGo)
+        {
+
+            if (inBook)
+            {
+                lockedGo.SetActive(true);
+
+                //unlockRule();
+                //EventPool.OptIn("unlockRule", unlockRule);
+            }
+            else
+            {
+                lockedGo.SetActive(false);
+
+            }
+        }
     }
+
+
+
     void addImage(Transform parent, string type)
     {
 

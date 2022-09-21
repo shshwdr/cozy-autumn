@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 public class GridCell : MonoBehaviour
 {
@@ -16,7 +17,7 @@ public class GridCell : MonoBehaviour
    public  GameObject countDownObject;
     public string type;
 
-    string equipment = null;
+    public string equipment = null;
     public SpriteRenderer equipRenderer;
     public GameObject ice;
 
@@ -77,11 +78,13 @@ public class GridCell : MonoBehaviour
         equipRenderer.sprite = Resources.Load<Sprite>("cell/" + equipment);
 
         equipRenderer.transform.DOPunchScale(equipRenderer.transform.localScale*2, GridController.Instance.animTime);
+
+        SFXManager.Instance.play("equipweapon");
     }
 
     public bool hasEquipment()
     {
-        return equipment != null;
+        return equipment != null && equipment!="";
     }
 
 
@@ -112,28 +115,34 @@ public class GridCell : MonoBehaviour
     }
     public virtual void OnMouseDown()
     {
-        //if (GetComponent<PlayerCell>())
-        //{
-        //    ResourceManager.Instance.consumeResource("nut", 1);
-        //}
-        if (isFreezed)
+        if (!EventSystem.current.IsPointerOverGameObject())
         {
-            failedToMove();
-            return;
-        }
 
-        GridController.Instance.moveCell(this);
-      //index = GridController.Instance.moveCellToEmpty(this);
-      //  if(index == -1)
-      //  {
-      //      Destroy(gameObject);
-      //  }
+            //if (GetComponent<PlayerCell>())
+            //{
+            //    ResourceManager.Instance.consumeResource("nut", 1);
+            //}
+            if (isFreezed)
+            {
+                failedToMove();
+                return;
+            }
+
+            GridController.Instance.moveCell(this);
+            //index = GridController.Instance.moveCellToEmpty(this);
+            //  if(index == -1)
+            //  {
+            //      Destroy(gameObject);
+            //  }
+        }
     }
 
     public void failedToMove()
     {
 
         transform.DOShakePosition(0.3f, 0.3f, 20);
+
+        SFXManager.Instance.play("negative");
     }
 
 }

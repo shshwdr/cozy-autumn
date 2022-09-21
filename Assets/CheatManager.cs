@@ -44,6 +44,10 @@ public class CheatManager : Singleton<CheatManager>
             {
                 _wontDie = true;
             }
+            if (Input.GetKeyDown(KeyCode.K))
+            {
+                RuleManager.Instance.unlockAll();
+            }
         }
     }
 }
