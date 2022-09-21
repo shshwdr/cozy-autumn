@@ -54,7 +54,10 @@ public class EnemyCell : MonoBehaviour
         isDead = true;
         transform.DOShakeScale(0.3f, GridController.Instance.animTime);
         Destroy(gameObject, GridController.Instance.animTime+0.1f);
-
+        foreach(var render in GetComponentsInChildren<SpriteRenderer>())
+        {
+            render.sortingOrder = 100000;
+        }
         SFXManager.Instance.play("animalLose");
     }
 

@@ -459,8 +459,20 @@ public class GridController : Singleton<GridController>
                     if (playerCell.equipment!=null)
                     {
 
-                        SFXManager.Instance.play("hit" + playerCell.equipment); 
+                        SFXManager.Instance.play("hit" + playerCell.equipment);
                     }
+
+                    var go = Instantiate(Resources.Load<GameObject>("effect/attack"), cellParents[ playerCell.index].transform.position, Quaternion.identity);
+                    go.transform.DOMove(cellParents[cell.index].transform.position, GridController.Instance.animTime + 0.1f);
+                    Destroy(go, 1f);
+
+
+                    var go2 = Instantiate(Resources.Load<GameObject>("effect/attack"), cellParents[playerCell.index].transform.position, Quaternion.identity);
+                    go2.transform.DOMove(cellParents[cell.index].transform.position, GridController.Instance.animTime + 0.1f);
+                    go2.GetComponentInChildren<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/" + playerCell. equipment);
+                    go2.GetComponentInChildren<SpriteRenderer>().sortingOrder = 1;
+                    Destroy(go2, 1f);
+
                     yield return new WaitForSeconds(animTime);
                 }
             }
