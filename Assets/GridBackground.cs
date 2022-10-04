@@ -1,3 +1,4 @@
+using DG.Tweening;
 using Pool;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,6 +10,21 @@ public class GridBackground : MonoBehaviour
     SpriteRenderer bk;
     public Color fireColor;
     public Color normalColor;
+
+    public SpriteRenderer dangeousOverlay;
+
+    public void addDangerous(string dangerName)
+    {
+
+
+        dangeousOverlay.color = new Color(255, 0, 0, 0);
+            DOTween.To(() => dangeousOverlay.color, x => dangeousOverlay.color = x, new Color(255, 0, 0,0.5f), 1).SetLoops(-1,LoopType.Yoyo);
+    }
+    public void removeDangerous(string dangerName)
+    {
+        dangeousOverlay.DOKill();
+        dangeousOverlay.color = new Color(255, 0, 0, 0);
+    }
     public void heat()
     {
         isHot = true;

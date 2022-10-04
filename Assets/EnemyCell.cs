@@ -16,14 +16,95 @@ public class EnemyCell : MonoBehaviour
 
     int attackCountDown = 10000;
 
-    GameObject countDownObject;
-   Text countDownText;
-
+    CounterDown countDownObject;
+    CanvasGroup explainPanel;
+    bool hasUpdatedDescription = false;
     public void init(string type)
     {
         info = CellManager.Instance.getInfo(type);
 
-        SFXManager.Instance.play(type+"show");
+        SFXManager.Instance.play(type + "show");
+        explainPanel = GetComponentInChildren<CanvasGroup>();
+        updateDescription();
+    }
+
+    private void OnDestroy()
+    {
+        explainPanel.DOKill();
+    }
+    void updateDescription()
+    {
+        HintCell.generateHintText(explainPanel.transform.Find("attackWhenNext"), "Steal " + info.attack + " [" + info.requireResource + "] if next to [player]");
+        if (info.moveMode >= 0)
+        {
+
+            HintCell.generateHintText(explainPanel.transform.Find("Move2"), "Run away after attack.");
+        }
+        if (info.attackPerStep > 0)
+        {
+            HintCell.generateHintText(explainPanel.transform.Find("attackPerRound"), "Otherwise steal " + info.attackPerStep + " [" + info.requireResourcePerStep + "] per round");
+        }
+        else
+        {
+            explainPanel.transform.Find("attackPerRound").gameObject.SetActive(false);
+        }
+
+        if (info.moveMode < 0)
+        {
+
+            HintCell.generateHintText(explainPanel.transform.Find("Move"), "Attack every " + (-info.moveMode) + " round");
+            HintCell.generateHintText(explainPanel.transform.Find("Move2"), "Won't run away after attack.");
+        }
+
+        if (info.requireResource != "nut")
+        {
+
+            HintCell.generateHintText(explainPanel.transform.Find("notNut"), "If [" + info.requireResourcePerStep + "] is not enough, steal 2x [nut]");
+        }
+        else
+        {
+
+            explainPanel.transform.Find("notNut").gameObject.SetActive(false);
+        }
+
+        if (info.moveMode > 0)
+        {
+            HintCell.generateHintText(explainPanel.transform.Find("Move"), "Move to [player]");
+        }
+        if (info.moveMode == 0)
+        {
+            explainPanel.transform.Find("Move").gameObject.SetActive(false);
+        }
+
+        StartCoroutine(test());
+    }
+
+    IEnumerator test()
+    {
+        yield return new WaitForSeconds(0.01f);
+        if (this && gameObject)
+        {
+
+            // LayoutRebuilder.ForceRebuildLayoutImmediate(GetComponent<RectTransform>());
+            foreach (var h in GetComponentsInChildren<HorizontalLayoutGroup>())
+            {
+                h.enabled = false;
+            }
+            //  string1.GetComponent<HorizontalLayoutGroup>().enabled = false;
+            yield return new WaitForSeconds(0.01f);
+            // Canvas.ForceUpdateCanvases();
+            if (this && gameObject)
+            {
+
+                // LayoutRebuilder.ForceRebuildLayoutImmediate(GetComponent<RectTransform>());
+                foreach (var h in GetComponentsInChildren<HorizontalLayoutGroup>())
+                {
+                    h.enabled = true;
+                }
+                // string1.gameObject.SetActive(true);
+                //string1.GetComponent<HorizontalLayoutGroup>().enabled = true;
+            }
+        }
     }
 
     // Start is called before the first frame update
@@ -31,30 +112,37 @@ public class EnemyCell : MonoBehaviour
     {
         cell = GetComponent<GridCell>();
         countDownObject = cell.countDownObject;
-        countDownText = countDownObject.GetComponentInChildren<Text>(true);
         if (info.moveMode < 0)
         {
             attackCountDown = -info.moveMode;
-            countDownObject.SetActive(true);
-            countDownText.text = attackCountDown.ToString();
+            countDownObject.gameObject.SetActive(true);
+            countDownObject.initCount(attackCountDown);
         }
-         EventPool.OptIn("moveAStep", stepAttack);
+        EventPool.OptIn("moveAStep", stepAttack);
     }
 
     void stepAttack()
     {
+        if (isDead)
+        {
+            return;
+        }
         Debug.Log("step attack");
         isFirst = false;
     }
 
     public void getDamage(int x)
     {
+        if (isDead)
+        {
+            return;
+        }
         GridController.Instance.addEmpty(GetComponent<GridCell>().index);
         GetComponent<Collider2D>().enabled = false;
         isDead = true;
         transform.DOShakeScale(0.3f, GridController.Instance.animTime);
-        Destroy(gameObject, GridController.Instance.animTime+0.1f);
-        foreach(var render in GetComponentsInChildren<SpriteRenderer>())
+        Destroy(gameObject, GridController.Instance.animTime + 0.1f);
+        foreach (var render in GetComponentsInChildren<SpriteRenderer>())
         {
             render.sortingOrder = 100000;
         }
@@ -64,14 +152,23 @@ public class EnemyCell : MonoBehaviour
     void playAttackEffect()
     {
 
-       var go =  Instantiate(Resources.Load<GameObject>("effect/fangAttackEffect"), transform.position, Quaternion.identity);
-        go.transform.DOMove(GridController.Instance.getPlayerTransform().position, GridController.Instance.animTime+0.1f);
+        if (isDead)
+        {
+            return;
+        }
+        var go = Instantiate(Resources.Load<GameObject>("effect/fangAttackEffect"), transform.position, Quaternion.identity);
+        go.transform.DOMove(GridController.Instance.getPlayerTransform().position, GridController.Instance.animTime + 0.1f);
         Destroy(go, 1f);
+        SFXManager.Instance.play("scream");
     }
 
     public IEnumerator activeAttack()
     {
 
+        if (isDead)
+        {
+            yield break;
+        }
         //if player has weapon, unequip weapon and die
         var player = GridController.Instance.getPlayerTransform().GetComponent<GridCell>();
         if (player.hasEquipment())
@@ -79,12 +176,13 @@ public class EnemyCell : MonoBehaviour
             player.unequip(transform);
 
             FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("slash");
+            FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("slash2");
         }
         else
         {
             SFXManager.Instance.play("attack");
             playAttackEffect();
-            RulePopupManager.Instance.showRule("playerNextToSnake");
+            RulePopupManager.Instance.showRule("playerNextTo" + info.type);
             //Instantiate(Resources.Load("effect/attack"), GridController.Instance.getPlayerTransform().position, Quaternion.identity);
 
 
@@ -104,21 +202,57 @@ public class EnemyCell : MonoBehaviour
         hasAttacked = true;
     }
 
+    private void OnMouseEnter()
+    {
+
+        //if (GridController.Instance.isMoving)
+        //{
+        //    return;
+        //}
+
+        if (explainPanel)
+        {
+            //if (!hasUpdatedDescription)
+            //{
+            //    hasUpdatedDescription = true;
+            //    updateDescription();
+            //}
+            DOTween.To(() => explainPanel.alpha, x => explainPanel.alpha = x, 1, 0.3f);
+        }
+
+        //explainPanel.alpha = 1;
+
+    }
+
+    private void OnMouseExit()
+    {
+        if (explainPanel)
+            DOTween.To(() => explainPanel.alpha, x => explainPanel.alpha = x, 0, 0.3f);
+
+        //explainPanel.alpha = 0;
+    }
+
+
     public bool willAttack()
     {
+        hasAttacked = false;
         if (isFirst || isDead)
         {
             return false;
         }
-        if (GridController.Instance.isPlayerAround(GetComponent<GridCell>().index) || attackCountDown == 0)
-        {
-            return true;
-        }
-        return false;
+        //if (GridController.Instance.isPlayerAround(GetComponent<GridCell>().index) || attackCountDown == 0)
+        //{
+        //    return true;
+        //}
+        return true;
 
     }
     public IEnumerator startAttack()
     {
+        if (isDead)
+        {
+            yield break;
+        }
         hasAttacked = false;
         yield return null;
         if (isFirst || isDead)
@@ -136,6 +270,12 @@ public class EnemyCell : MonoBehaviour
         {
             attackCountDown -= 1;
 
+            if (info.moveMode < 0)
+            {
+
+                RulePopupManager.Instance.showRule("foxCountingdown");
+            }
+
             if (GridController.Instance.isPlayerAround(GetComponent<GridCell>().index) || attackCountDown == 0)
             {
                 yield return StartCoroutine(activeAttack());
@@ -151,8 +291,7 @@ public class EnemyCell : MonoBehaviour
                     takeResource(info.requireResourcePerStep, info.attackPerStep);
                 }
             }
-
-            countDownText.text = attackCountDown.ToString();
+            countDownObject.initCount(attackCountDown);
         }
 
     }
@@ -171,18 +310,18 @@ public class EnemyCell : MonoBehaviour
             ResourceManager.Instance.consumeResource(res, resValue);
 
 
-            ResourceManager.Instance.consumeResource("nut", (value - resValue)*2);
+            ResourceManager.Instance.consumeResource("nut", (value - resValue) * 2);
         }
     }
     bool hasAttacked = false;
 
     public bool willMove()
     {
-        if (isFirst|| isDead|| hasAttacked)
+        if (isFirst || isDead || hasAttacked)
         {
             return false;
         }
-        if(info.moveMode == 1 || info.moveMode == 2)
+        if (info.moveMode == 1 || info.moveMode == 2)
         {
             return true;
         }
@@ -192,6 +331,10 @@ public class EnemyCell : MonoBehaviour
     public IEnumerator startMove()
     {
         yield return null;
+        if (isDead)
+        {
+            yield break;
+        }
         if (isFirst)
         {
             yield break;
@@ -210,6 +353,7 @@ public class EnemyCell : MonoBehaviour
         if (info.moveMode == 1 || info.moveMode == 2)
         {
 
+            RulePopupManager.Instance.showRule("weaselMove");
 
             if (GridController.Instance.isPlayerAround(GetComponent<GridCell>().index) || attackCountDown == 0)
             {
@@ -221,7 +365,12 @@ public class EnemyCell : MonoBehaviour
 
             //this enemy would chase player, and only attack infront of it.
             var target = GridController.Instance.getTargetIndexToPlayer(cell.index);
-            yield return  StartCoroutine(GridController.Instance.exchangeCard(cell, target));
+
+            if (!cell || target == null)
+            {
+                Debug.LogError("?");
+            }
+            yield return StartCoroutine(GridController.Instance.exchangeCard(cell, target));
 
 
         }

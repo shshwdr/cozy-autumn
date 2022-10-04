@@ -8,8 +8,7 @@ boulder,stick,generate1:axe|destroy2:0,axe,boulder+stick
 boulder,empty,generate1:stone,stone,boulder+empty
 boulder,stone,generate1:trap|destroy2:0,trap,boulder+stone
 fire,nut,addHot:1|generate2:cookedNut|destroy2:0,edibleNut,fire+nut
-fire,stick,addHot:1|increaseObjectHP:3|destroy2:0,,fire+stick
-fire,empty,addHot:1|increaseObjectHP:-1,,
+fire,stick,addHot:1|increaseObjectHP:4|destroy2:0,,fire+stick
 fire,stone,addHot:1|increaseObjectHP:-3|destroy2:0,,fire+stone
-fire,birdTrap,addHot:1|increaseObjectHP:5|destroy2:0,,fire+birdTrap
+fire,birdTrap,addHot:1|increaseObjectHP:7|destroy2:0,,fire+birdTrap
 fire,trap,addHot:1,,

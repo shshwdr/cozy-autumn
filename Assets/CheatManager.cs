@@ -53,6 +53,17 @@ public class CheatManager : Singleton<CheatManager>
             {
                 E12PopupManagerScript.Instance.unlockAll();
             }
+            if (Input.GetKeyDown(KeyCode.M))
+            {
+                ShopManager.Instance.purchaseAll();
+            }
+
+
+            if (Input.GetKeyDown(KeyCode.B))
+            {
+                GameManager.Instance.gameover();
+            }
+
         }
     }
 }

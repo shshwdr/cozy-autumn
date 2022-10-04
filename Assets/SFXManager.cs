@@ -9,6 +9,10 @@ public class SFXManager : Singleton<SFXManager>
     public void play(string name)
     {
         var clip = Resources.Load<AudioClip>("sfx/" + name);
+        if (!clip)
+        {
+            Debug.Log("no clip");
+        }
         audioSource.PlayOneShot(clip);
     }
     // Start is called before the first frame update

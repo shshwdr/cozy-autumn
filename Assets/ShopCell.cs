@@ -10,6 +10,15 @@ public class ShopCell : GridCell
 
     public ShopInfo cellInfo;
     public bool isShop;
+
+    public override void step()
+    {
+
+    }
+    private void OnDestroy()
+    {
+        transform.DOKill();
+    }
     public void init(string _type, int i, bool s)
     {
 

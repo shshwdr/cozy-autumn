@@ -41,6 +41,8 @@ public class GameManager : Singleton<GameManager>
 
         PopupManager.Instance.showEvent("Game Over", () => { restartGame(); }, "Restart");
 
+        GameObject.FindObjectOfType<TipMenu>(true).gameObject.SetActive(true);
+
         SFXManager.Instance.play("gameover");
     }
 

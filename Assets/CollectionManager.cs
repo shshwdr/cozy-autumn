@@ -35,8 +35,9 @@ public class CollectionManager : Singleton<CollectionManager>
 	[SerializeField] [Range(0.9f, 2f)] float maxAnimDuration;
 
 	[SerializeField] Ease easeType;
+	[SerializeField] Ease dropEaseType;
 	[SerializeField] float spread;
-
+	public float dropXOffset = 0.3f;
     ResourceMenu hud;
 
 	private int _c = 0;
@@ -72,7 +73,7 @@ public class CollectionManager : Singleton<CollectionManager>
 		}
 	}
 
-	void MoveSource(Vector3 start, Vector3 end, string property, int amount, Action action)
+	void MoveSource(Vector3 start, Vector3 end, string property, int amount, Action action, Ease type,string text = "")
 	{
 		for (int i = 0; i < amount; i++)
 		{
@@ -82,6 +83,7 @@ public class CollectionManager : Singleton<CollectionManager>
 				//extract a coin from the pool
 				GameObject coin = coinsQueue.Dequeue();
 				coin.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("resource/" + property);
+				coin.GetComponentInChildren<Text>().text = text;
 				coin.SetActive(true);
 
 				//move coin to the collected coin pos
@@ -93,7 +95,7 @@ public class CollectionManager : Singleton<CollectionManager>
 				//animate coin to target position
 				float duration = Random.Range(minAnimDuration, maxAnimDuration);
 				coin.transform.DOMove(end, duration)
-				.SetEase(easeType)
+				.SetEase(type)
 				.OnComplete(() =>
 				{
 					//executes whenever coin reach target position
@@ -105,37 +107,69 @@ public class CollectionManager : Singleton<CollectionManager>
 		}
 	}
 
-	//public void RemoveCoins(Vector3 removedCoinPosition, List<PairInfo<int>> resource, bool onlyForNonIncreasingResrouce = false)
+	// public void RemoveCoins(Vector3 removedCoinPosition, List<PairInfo<int>> resource, bool onlyForNonIncreasingResrouce = false)
+	// {
+	//     if (resource == null)
+	//     {
+	//         return;
+	//     }
+	//     foreach (var pair in resource)
+	//     {
+	//         //if(onlyForNonIncreasingResrouce && PlantsManager.Instance.isIncreasingResource(pair.Key))
+	//         //         {
+	//         //	continue;
+	//         //         }
+	//         var amount = pair.Value;
+	////get target position
+	//var target = hud.getCellTransform(resource[0].Key); //HUD.Instance.hudByProperty[pair.Key].GetComponent<OneStatHud>().image.transform;
+	//Vector3 screenPoint = target.position + new Vector3(0, 0, 5);  //the "+ new Vector3(0,0,5)" ensures that the object is so close to the camera you dont see it
+
+	////find out where this is in world space
+	//Vector3 worldPos = Camera.main.ScreenToWorldPoint(screenPoint);
+
+
+	//ResourceManager.Instance.addResource(pair.Key, pair.Value);
+
+
+	//MoveSource(worldPos, removedCoinPosition, pair.Key, pair.Value, () =>
 	//{
-	//    if (resource == null)
-	//    {
-	//        return;
-	//    }
-	//    foreach (var pair in resource)
-	//    {
-	//        //if(onlyForNonIncreasingResrouce && PlantsManager.Instance.isIncreasingResource(pair.Key))
-	//        //         {
-	//        //	continue;
-	//        //         }
-	//        var amount = pair.Value;
-	//        //get target position
-	//        var target = HUD.Instance.hudByProperty[pair.Key].GetComponent<OneStatHud>().image.transform;
-	//        Vector3 screenPoint = target.position + new Vector3(0, 0, 5);  //the "+ new Vector3(0,0,5)" ensures that the object is so close to the camera you dont see it
+	//});
+	//     }
+	// }
 
-	//        //find out where this is in world space
-	//        Vector3 worldPos = Camera.main.ScreenToWorldPoint(screenPoint);
+	private void OnDestroy()
+	{
+		transform.DOKill();
+	}
+	public void RemoveCoins(List<PairInfo<int>> resource)
+	{
+		if (resource == null)
+		{
+			return;
+		}
+		foreach (var pair in resource)
+		{
+			//if(onlyForNonIncreasingResrouce && PlantsManager.Instance.isIncreasingResource(pair.Key))
+			//         {
+			//	continue;
+			//         }
+			var amount = pair.Value;
+			//get target position
+			var target = hud.getCellTransform(resource[0].Key); //HUD.Instance.hudByProperty[pair.Key].GetComponent<OneStatHud>().image.transform;
+			Vector3 screenPoint = target.position + new Vector3(0, 0, 5);  //the "+ new Vector3(0,0,5)" ensures that the object is so close to the camera you dont see it
+
+			//find out where this is in world space
+			Vector3 worldPos = Camera.main.ScreenToWorldPoint(screenPoint);
 
 
+			//ResourceManager.Instance.consumeResource(pair.Key, pair.Value);
 
 
-	//        MoveSource(worldPos, removedCoinPosition, pair.Key, pair.Value, () =>
-	//        {
-	//            PlantsManager.Instance.currentResource[pair.Key] -= 1;
-	//            BeeManager.Instance.updateGenerateTime();
-	//            PestManager.Instance.updateGenerateTime();
-	//        });
-	//    }
-	//}
+			MoveSource(worldPos - new Vector3(dropXOffset, 0, 0), worldPos - new Vector3(dropXOffset, 1,0), pair.Key, pair.Value, () =>
+			{
+			},dropEaseType, "-"+pair.Value);
+		}
+	}
 
 	public void AddCoins(Vector3 collectedCoinPosition, List<PairInfo<int>> resource, bool isIncreasingResource = true)
     {
@@ -161,7 +195,7 @@ public class CollectionManager : Singleton<CollectionManager>
                 //BeeManager.Instance.updateGenerateTime();
                 //PestManager.Instance.updateGenerateTime();
                 //TutorialManager.Instance.collectResource(pair.Key);
-            });
+            },easeType);
         }
 
     }

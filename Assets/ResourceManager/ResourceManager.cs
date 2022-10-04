@@ -28,6 +28,11 @@ public class ResourceManager : Singleton<ResourceManager>
 
     public void consumeResource(string type, int value)
     {
+
+        var resource = new List<PairInfo<int>>() { };
+        resource.Add(new PairInfo<int>(type, value));
+        CollectionManager.Instance.RemoveCoins(resource);
+
         changeAmount(type, -value);
         if (!hasEnoughAmount(type,0) && type == "nut")
         {

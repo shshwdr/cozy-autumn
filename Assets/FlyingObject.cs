@@ -16,6 +16,10 @@ public class FlyingObject : MonoBehaviour
         transform.DOMove(target, time);
         Destroy(gameObject, time);
     }
+    private void OnDestroy()
+    {
+        transform.DOKill();
+    }
     // Start is called before the first frame update
     void Start()
     {

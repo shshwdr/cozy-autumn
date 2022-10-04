@@ -15,6 +15,7 @@ public class GenerateResource : MonoBehaviour, CanReset
     public bool isRandom = false;
 
     public bool requirePlayerNotMove;
+    public Transform generatePoint;
     // Start is called before the first frame update
     void Start()
     {
@@ -49,15 +50,22 @@ public class GenerateResource : MonoBehaviour, CanReset
 
     public void finishCollect()
     {
+
+        FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("harvest");
         canGenerate = true;
     }
 
     void generate()
     {
+        if (!gameObject.active)
+        {
+            return;
+        }
+
         canGenerate = false;
         var test = new List<PairInfo<int>>() { };
         test.Add(new PairInfo<int>(Utils.randomList( generateItems) , Utils.randomList(generateItemValues)));
-        var go  = ClickToCollect.createClickToCollectItem(test, transform.position);
+        var go  = ClickToCollect.createClickToCollectItem(test, generatePoint.position);
         go.transform.parent = transform;
     }
 

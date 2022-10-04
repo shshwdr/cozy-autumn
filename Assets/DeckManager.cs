@@ -47,14 +47,14 @@ public class DeckManager : Singleton<DeckManager>
 
         initCurrentDeck();
 
-        if (wouldShuffle)
+        if (wouldShuffle && round != 2)
         {
 
             currentDeck.Shuffle();
         }
 
     }
-    public string drawCard(bool canDrawWaitingDeck)
+    public string drawCard(bool canDrawWaitingDeck,bool isBoss = false)
     {
         if (currentDeck.Count == 0)
         {
@@ -71,6 +71,28 @@ public class DeckManager : Singleton<DeckManager>
         }
         currentDeck.RemoveAt(0);
         return firstCard;
+    }
+    public string drawBossCard()
+    {
+        int test = 100;
+        while (true)
+        {
+
+            var card = drawCard(false);
+
+            var cardInfo = CellManager.Instance.getInfo(card);
+            if (!cardInfo.isEnemy())
+            {
+                return card;
+            }
+
+            test--;
+            if (test <= 0)
+            {
+                return card;
+            }
+        }
+
     }
 
     public string peekCard()

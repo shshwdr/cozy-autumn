@@ -26,6 +26,12 @@ public class ShopGridController : Singleton<ShopGridController>
 
     public IEnumerator getIntoShop()
     {
+        if(shopBoard.childCount == 0)
+        {
+
+            Utils.destroyAllChildren(shopBoard);
+            initShopBoard();
+        }
        // SFXManager.Instance.play("shopappear");
         yield return StartCoroutine(showCells());
 
@@ -85,16 +91,16 @@ public class ShopGridController : Singleton<ShopGridController>
     {
 
         // initMainBoard();
-        Utils.destroyAllChildren(shopBoard);
-        initShopBoard();
+        //Utils.destroyAllChildren(shopBoard);
+        //initShopBoard();
 
     }
 
     void initShopBoard()
     {
 
-        float xStartPosiiton = -cellSize * (cellCountX / 2);
-        float yStartPosiiton = -cellSize * (cellCountY / 2);
+        float xStartPosiiton = -cellSize * (cellCountX / 2) + shopBoard.position.x;
+        float yStartPosiiton = -cellSize * (cellCountY / 2) + shopBoard.position.y;
         // set up cell position
         float xPosition = xStartPosiiton;
         int index = 0;

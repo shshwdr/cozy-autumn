@@ -15,7 +15,7 @@ public class RuleMenu : MonoBehaviour
     {
 
         int i = 0; 
-        if (hintCells == null)
+        //if (hintCells == null)
         {
 
             hintCells = GetComponentsInChildren<HintCell>(true);
@@ -26,11 +26,13 @@ public class RuleMenu : MonoBehaviour
         {
             var ruleCell = hintCells[i];
             StartCoroutine( ruleCell.init(RuleManager.Instance.visitedList[i]));
+            ruleCell.gameObject.SetActive(true);
         }
-        for (; i < RuleManager.Instance.unvisitedList.Count; i++)
+        for (; i < RuleManager.Instance.unvisitedList.Count + RuleManager.Instance.visitedList.Count; i++)
         {
             var ruleCell = hintCells[i];
-            StartCoroutine(ruleCell.init(RuleManager.Instance.unvisitedList[i],true));
+            StartCoroutine(ruleCell.init(RuleManager.Instance.unvisitedList[i - RuleManager.Instance.visitedList.Count],true));
+            ruleCell.gameObject.SetActive(true);
         }
 
         for (; i < hintCells.Length; i++)

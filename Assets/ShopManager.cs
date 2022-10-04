@@ -80,7 +80,13 @@ public class ShopManager : Singleton<ShopManager>
 
     }
 
-
+    public void purchaseAll()
+    {
+        foreach(var i in new List<string>( unPurchasedShopInfos))
+        {
+            purchase(i);
+        }
+    }
 
 
     // Update is called once per frame

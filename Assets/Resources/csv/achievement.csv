@@ -2,12 +2,15 @@
 starving,Starved to death...,Starving,,
 trapped,Drive away the enemy with traps,Trapped!,,
 slash,Drive away the enemy with weapons,Slash!,,
-melt,The bonfire melts ice in one round,Melting,2,round
+melt,The bonfire melts ice,Melting,,
+melt2,The bonfire melts 2 ice in one day,Global Warming,2,round
 spring,Survive the game!,Spring is coming,,
-hiddenTrap,Drive away enemy with trap covered by leaves,Surprise!,,
 winter,It's getting harder to survive…,Winter is coming,,
 allFurniture,Collected all funitures,Cozy Home,,
 allRules,Collected all rules,Omniscient,,
-notMoving,Haven't moved for 10 rounds,Couch potato,10,move
+notMoving,Haven't moved in sequence for 10 rounds,Couch potato,10,move
 allAchievement,Unlock all achievements,Platinum,,
-harvest,Collect item at home,Harvest,20,
+harvest,Collect 20 items at home,Harvest,20,
+slash2,Drive away 2 enemies with weapons in one day,whirl!,2,round
+freezeMove,Failed to move because of freezing,Freeze!,,
+freezeToDeath,Frozen to death…,White Walkers,,

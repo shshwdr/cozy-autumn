@@ -51,11 +51,16 @@ public class FireCell : MonoBehaviour
         var iceAround = GridController.Instance.adjacentType(cell.index, "ice");
         foreach(var c in iceAround)
         {
-            c.thaw();
+            if (!c.GetComponent<GridItem>() && !c.GetComponent<GridBackground>() && !c.GetComponent<GridEmpty>())
+            {
 
-            RulePopupManager.Instance.showRule("iceThaw");
-            SFXManager.Instance.play("icemelt");
-            FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("melt");
+                c.thaw();
+
+                RulePopupManager.Instance.showRule("iceThaw");
+                SFXManager.Instance.play("icemelt");
+                FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("melt");
+                FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("melt2");
+            }
             //getDamage(1);
         }
     }

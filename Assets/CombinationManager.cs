@@ -33,7 +33,6 @@ public class CombinationManager : Singleton<CombinationManager>
 
         }
     }
-
     public CombinationInfo getCombinationResult(string type1,string type2)
     {
         if (!combinationDict.ContainsKey(type1))

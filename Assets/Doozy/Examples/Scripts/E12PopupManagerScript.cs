@@ -12,6 +12,9 @@ namespace Doozy.Examples
         public string type;
         public string description;
         public string title;
+        public int amount;
+        public int currentAmount;
+        public string clearReason;
 
     }
     public class E12PopupManagerScript : Singleton<E12PopupManagerScript>
@@ -45,16 +48,51 @@ namespace Doozy.Examples
                 addRule(rule.type);
             }
         }
-        public void addRule(string type)
+        public bool addRule(string type)
         {
             if (!visited.Contains(type))
             {
+
+                if (ruleDict[type].amount > 0)
+                {
+                    ruleDict[type].currentAmount++;
+                    if (ruleDict[type].currentAmount < ruleDict[type].amount)
+                    {
+                        return false;
+                    }
+                }
+
+
                 visitedList.Add(type);
                 unvisitedList.Remove(type);
+
+                visited.Add(type);
                 //EventPool.Trigger("unlockRule");
             }
-            visited.Add(type);
+            return true;
+        }
 
+        public void clear(string reason)
+        {
+            foreach (var info in ruleList)
+            {
+                if (!visited.Contains(info.type) && info.clearReason == reason)
+                {
+                    info.currentAmount = 0;
+                }
+            }
+        }
+
+        public void clearAll()
+        {
+
+            foreach (var info in ruleList)
+            {
+                if (!visited.Contains(info.type) && info.amount>0)
+                {
+                    info.currentAmount = 0;
+                }
+            }
         }
 
         public bool isUnlocked(string type)
@@ -77,7 +115,10 @@ namespace Doozy.Examples
             {
                 return;
             }
-            addRule(achievementType);
+            if (!addRule(achievementType))
+            {
+                return;
+            }
             //get the achievement from the list
             AchievementInfo achievement = ruleDict[achievementType];
 
@@ -95,7 +136,7 @@ namespace Doozy.Examples
             var icon = Resources.Load<Sprite>("achievement/" + achievement.type);
             if (!icon)
             {
-                Debug.LogError("no icon for " + icon);
+                Debug.LogError("no icon for " + achievement.type);
             }
             m_popup.Data.SetImagesSprites(icon);
             //set the achievement title and message

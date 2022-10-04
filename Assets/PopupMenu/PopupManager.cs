@@ -68,6 +68,7 @@ public class PopupManager : Singleton<PopupManager>
         var go = Instantiate(EventMenuPrefab, mainCanvas.transform);
 
         List<EventButtonInfo> simpleTwoOption = new List<EventButtonInfo>();
+        simpleTwoOption.Add(new EventButtonInfo(button1Text,null));
         //simpleTwoOption.Add(new EventButtonInfo(t, button1Text, null));
         go.GetComponent<PopupMenu>().Init(t, simpleTwoOption);
         go.GetComponent<PopupMenu>().showView();
@@ -79,7 +80,7 @@ public class PopupManager : Singleton<PopupManager>
         var go = Instantiate(EventMenuPrefab, mainCanvas.transform);
 
         List<EventButtonInfo> simpleTwoOption = new List<EventButtonInfo>();
-        simpleTwoOption.Add(new EventButtonInfo(t, action));
+        simpleTwoOption.Add(new EventButtonInfo(button1Text, action));
         go.GetComponent<PopupMenu>().Init(t, simpleTwoOption);
         go.GetComponent<PopupMenu>().showView();
     }

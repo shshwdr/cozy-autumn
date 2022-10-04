@@ -4,6 +4,7 @@ using UnityEngine;
 using DG.Tweening;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using Pool;
 
 public class GridCell : MonoBehaviour
 {
@@ -14,7 +15,7 @@ public class GridCell : MonoBehaviour
 
     public CellInfo cellInfo;
 
-   public  GameObject countDownObject;
+   public  CounterDown countDownObject;
     public string type;
 
     public string equipment = null;
@@ -22,9 +23,9 @@ public class GridCell : MonoBehaviour
     public GameObject ice;
 
     public Text hp;
-
+    public GameObject newRuleAlert;
+    public CanvasGroup descriptionCanvas;
     public bool isFreezed = false;
-
     public void updateHp(int x)
     {
         hp.text = x.ToString();
@@ -43,6 +44,12 @@ public class GridCell : MonoBehaviour
     public void thaw()
     {
         isFreezed = false;
+
+        if (!ice)
+        {
+            Debug.Log("??");
+            return;
+        }
         ice.SetActive(false);
     }
 
@@ -70,6 +77,9 @@ public class GridCell : MonoBehaviour
             gameObject.AddComponent<FireCell>();
             bk.GetComponent<SpriteRenderer>().color = new Color(1,0.5f, 0.5f);
         }
+
+
+
     }
 
     public void equip(string e)
@@ -88,6 +98,11 @@ public class GridCell : MonoBehaviour
     }
 
 
+    private void OnDestroy()
+    {
+        transform.DOKill();
+        descriptionCanvas.DOKill();
+    }
     public void unequip(Transform targetTransform)
     {
         if (equipment == null)
@@ -111,7 +126,28 @@ public class GridCell : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
+        EventPool.OptIn("moveAStep", step);
+    }
+
+    public virtual void step()
+    {
+        var rule = GridController.Instance.combineResult(this);
+        if (rule!=null && !RuleManager.Instance.visitedList.Contains(rule))
+        {
+            newRuleAlert.SetActive(true);
+            descriptionCanvas.transform.Find("attackWhenNext").gameObject.SetActive(true);
+            HintCell.generateHintText(descriptionCanvas.transform.Find("attackWhenNext"), "Move it now to unlock new rule!");
+            descriptionCanvas.transform.Find("attackPerRound").gameObject.SetActive(false);
+            descriptionCanvas.transform.Find("notNut").gameObject.SetActive(false);
+            descriptionCanvas.transform.Find("Move").gameObject.SetActive(false);
+            descriptionCanvas.transform.Find("Move2").gameObject.SetActive(false);
+        }
+        else
+        {
+
+            newRuleAlert.SetActive(false);
+        }
     }
     public virtual void OnMouseDown()
     {
@@ -124,6 +160,8 @@ public class GridCell : MonoBehaviour
             //}
             if (isFreezed)
             {
+
+                FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("freezeMove");
                 failedToMove();
                 return;
             }
@@ -136,13 +174,30 @@ public class GridCell : MonoBehaviour
             //  }
         }
     }
-
     public void failedToMove()
     {
-
+        transform.DOKill();
         transform.DOShakePosition(0.3f, 0.3f, 20);
 
         SFXManager.Instance.play("negative");
     }
 
+    private void OnMouseEnter()
+    {
+        if (newRuleAlert.active)
+        {
+
+            DOTween.To(() => descriptionCanvas.alpha, x => descriptionCanvas.alpha = x, 1, 0.3f);
+        }
+
+        //explainPanel.SetActive(true);
+
+    }
+
+    private void OnMouseExit()
+    {
+        DOTween.To(() => descriptionCanvas.alpha, x => descriptionCanvas.alpha = x, 0, 0.3f);
+
+        //explainPanel.SetActive(false);
+    }
 }

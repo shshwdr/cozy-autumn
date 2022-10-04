@@ -272,6 +272,7 @@ MonoBehaviour:
   bk: {fileID: 1766114459899678835}
   countDownObject: {fileID: 0}
   type: 
+  equipment: 
   equipRenderer: {fileID: 3992577440777430492}
   ice: {fileID: 0}
   hp: {fileID: 0}

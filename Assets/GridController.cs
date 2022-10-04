@@ -1,4 +1,5 @@
 using DG.Tweening;
+using Doozy.Examples;
 using Pool;
 using System.Collections;
 using System.Collections.Generic;
@@ -24,12 +25,13 @@ public class GridController : Singleton<GridController>
     int playerCellIndex { get { return playerCell.index; } }
     int emptyCellIndex { get { return emptyCell.index; } }
 
-    int originalPlayerCell = 5;
+    int originalPlayerCell = 4;
     int originalEmptyCell = 0;
 
     public int snakeChance = 20;
     public int nutChance = 40;
     public int trapChance = 15;
+
 
     public GameObject cellPrefab;
     public GameObject emptyPrefab;
@@ -40,6 +42,8 @@ public class GridController : Singleton<GridController>
 
     public GameObject fireVFX;
 
+    public Boss boss;
+
 
     public float animTime = 1f;
    public  bool isMoving = false;
@@ -47,8 +51,24 @@ public class GridController : Singleton<GridController>
     void Start()
     {
         // initMainBoard();
+        StartCoroutine(test());
+
+        bk.Find("leaf" + currentLeafIndex).GetComponent<ParticleSystem>().Play();
+        E12PopupManagerScript.Instance.clearAll();
+    }
+
+    IEnumerator test()
+    {
+        yield return new WaitForSeconds(0.1f);
+
+        if (E12PopupManagerScript.Instance.visitedList.Count == 0)
+        {
+
+            //PopupManager.Instance.showEvent("Help the squirrel to collect acorns and survive the autumn and winter, and try to make the place cozy for it.", "OK");
+        }
+
+        yield return new WaitForSeconds(0.1f);
         initMainBoard();
-        EventPool.OptIn("moveAStep", step);
     }
 
     void step()
@@ -57,14 +77,70 @@ public class GridController : Singleton<GridController>
         if(currentLeafIndex<moveCountToLeaf.Count && moveCount >= moveCountToLeaf[currentLeafIndex])
         {
             currentLeafIndex++;
+            updateLeafFalling();
+        }
+    }
+    public Transform bk;
+    void updateLeafFalling()
+    {
+        Debug.Log("update leaf " + currentLeafIndex);
+        var parent = bk.Find("leaf" + currentLeafIndex);
+        foreach(var child in parent.GetComponentsInChildren<ParticleSystem>())
+        {
+            child.Play();
+        }
+        if (currentLeafIndex > 0)
+        {
+
+            var parent2 = bk.Find("leaf" + (currentLeafIndex-1));
+            foreach (var child in parent2.GetComponentsInChildren<ParticleSystem>())
+            {
+                child.Stop();
+            }
+        }
+        var sky = bk.Find("sky");
+        if (currentLeafIndex >= 6)
+        {
+            DOTween.To(() => sky.GetComponent<SpriteRenderer>().color, x => sky.GetComponent<SpriteRenderer>().color = x, new Color(255,255,255), 1);
+
+            
+        }
+        else if (currentLeafIndex >= 4)
+        {
+            //turn color of key to grey 209
+
+            DOTween.To(() => sky.GetComponent<SpriteRenderer>().color, x => sky.GetComponent<SpriteRenderer>().color = x, new Color(188, 188, 188), 1);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        //var sky = bk.Find("sky");
+        //sky.GetComponent<SpriteRenderer>().DOKill();
+    }
+
+    public void showDangerousCell(string dangerName, List<int> indices)
+    {
+        foreach(var index in indices)
+        {
+            cellParents[index].GetComponent<GridBackground>().addDangerous(dangerName);
+        }
+    }
+
+
+    public void hideDangerousCell(string dangerName, List<int> indices)
+    {
+        foreach (var index in indices)
+        {
+            cellParents[index].GetComponent<GridBackground>().removeDangerous(dangerName);
         }
     }
 
     void initMainBoard()
     {
         isMoving = true;
-        float xStartPosiiton = -cellSize * (cellCountX / 2);
-        float yStartPosiiton = -cellSize * (cellCountY / 2);
+        float xStartPosiiton = -cellSize * (cellCountX / 2) + mainBoard.position.x;
+        float yStartPosiiton = -cellSize * (cellCountY / 2) + mainBoard.position.y;
         // set up cell position
         float xPosition = xStartPosiiton;
         int index = 0;
@@ -171,7 +247,7 @@ public class GridController : Singleton<GridController>
         addIndices(indices, ix, iy + 1);
         foreach (var cell in FindObjectsOfType<GridCell>())
         {
-            if (indices.Contains(cell.index) && isType(cell, type))
+            if (indices.Contains(cell.index) && isType(cell, type) )
             {
                 res.Add(cell);
             }
@@ -201,7 +277,11 @@ public class GridController : Singleton<GridController>
         {
             return cell.isFreezed;
         }
-        return cell.cellInfo.type == "type";
+        if(!cell || cell.cellInfo == null)
+        {
+            Debug.LogError("?");
+        }
+        return cell.cellInfo.type == type;
     }
 
     bool isAdjacentToType(int i, string type)
@@ -336,6 +416,10 @@ public class GridController : Singleton<GridController>
     {
         isMoving = false;
         Debug.Log("empty index " + emptyCell);
+
+        FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("notMoving");
+
+        GameObject.FindObjectOfType<DayCell>(true).updateText();
     }
     public bool hasPlayerMoved = false;
     void destroy(GameObject go)
@@ -355,7 +439,10 @@ public class GridController : Singleton<GridController>
             destroy(trap.gameObject);
 
             var go = Instantiate(Resources.Load<GameObject>("effect/trapEffect"), cell.transform.parent.position, Quaternion.identity);
-           // go.transform.DOPunchScale(Vector3.one, animTime);
+            // go.transform.DOPunchScale(Vector3.one, animTime);
+
+            RulePopupManager.Instance.showRule("snakeToTrap");
+            FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("trapped");
 
             yield return new WaitForSeconds(animTime);
         }
@@ -370,7 +457,7 @@ public class GridController : Singleton<GridController>
     {
         yield return null;
         {
-            if (cell.GetComponent<GridCell>().cellInfo.isPlayer())
+            if (cell && cell.GetComponent<GridCell>().cellInfo.isPlayer())
             {
 
                 RulePopupManager.Instance.showRule("playerOnHot");
@@ -378,10 +465,11 @@ public class GridController : Singleton<GridController>
 
                 SFXManager.Instance.play("shortburn");
 
+                SFXManager.Instance.play("scream");
                 Instantiate(fireVFX, cellParents[cell.index].position, Quaternion.identity);
                 yield return new WaitForSeconds(animTime);
             }
-            else if (cell.GetComponent<GridCell>().cellInfo.isEnemy())
+            else if (cell && cell.GetComponent<GridCell>().cellInfo.isEnemy())
             {
                 RulePopupManager.Instance.showRule("enemyOnHot");
                 cell.GetComponent<EnemyCell>().getDamage(5);
@@ -390,7 +478,7 @@ public class GridController : Singleton<GridController>
                 yield return new WaitForSeconds(animTime);
             }
 
-            else if (cell.GetComponent<GridCell>().cellInfo.type == "branch")
+            else if (cell && cell.GetComponent<GridCell>().cellInfo.type == "branch")
             {
                 //generate a fire
                 generateCell(cell.index, "fire");
@@ -400,9 +488,11 @@ public class GridController : Singleton<GridController>
                 yield return new WaitForSeconds(animTime);
 
             }
-            else if (cell.GetComponent<GridCell>().cellInfo.type == "nut")
+            else if (cell && cell.GetComponent<GridCell>().cellInfo.type == "nut")
             {
-                generateCell(cell.index, "cookednut");
+
+                RulePopupManager.Instance.showRule("fire+nut");
+                generateCell(cell.index, "cookedNut");
                 SFXManager.Instance.play("shortburn");
                 destroy(cell.gameObject);
                 Instantiate(fireVFX, cellParents[cell.index].position, Quaternion.identity);
@@ -473,6 +563,7 @@ public class GridController : Singleton<GridController>
                     go2.GetComponentInChildren<SpriteRenderer>().sortingOrder = 1;
                     Destroy(go2, 1f);
 
+                    FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("slash2");
                     yield return new WaitForSeconds(animTime);
                 }
             }
@@ -529,19 +620,77 @@ public class GridController : Singleton<GridController>
 
     }
 
+    public string combineResult(GridCell cell)
+    {
+        var targetCell = emptyCell.transform.parent.GetComponentInChildren<GridItem>();
+        var cell2String = targetCell ? targetCell.type : "empty";
+        if (cell && cell.cellInfo!=null && cell.cellInfo.isPlayer())
+        {
+            if (cell2String == "empty")
+            {
+                return "playerMove";
+            }
+            else if (cell2String == "nut")
+            {
+                return "playerToNut";
+            }
+            else if (cell2String == "axe")
+            {
+                return "playerEquipaxe";
+            }
+            else if (cell2String == "bat")
+            {
+                return "playerEquipbat";
+            }else if(targetCell&&cellParents[targetCell.index].GetComponent<GridBackground>().isHot)
+            {
+                return "playerOnHot";
+            }
+        }
+        else
+        {
+
+            if (!cell || cell.cellInfo == null)
+            {
+                return null;
+            }
+            var combination = CombinationManager.Instance.getCombinationResult(cell.cellInfo.type, cell2String);
+
+
+
+            return combination !=null ? combination.rules:null;
+        }
+        return null;
+
+    }
+
     IEnumerator moveCellAnim(GridCell cell) 
     {
         yield return null;
+        E12PopupManagerScript.Instance.clear("round");
         //if is moving player, consume
-        if(cell.cellInfo.isPlayer())
+        if (cell.cellInfo.isPlayer())
         {
+
+            //var resource = new List<PairInfo<int>>() { };
+            //resource.Add(new PairInfo<int>("nut", 1));
+            //CollectionManager.Instance.RemoveCoins(resource);
             ResourceManager.Instance.consumeResource("nut", 1);
             RulePopupManager.Instance.showRule("playerMove");
         }
+        string card = "";
 
+        if (boss)
+        {
 
-        //draw a card
-        var card = DeckManager.Instance.drawCard(cell.cellInfo.isEmpty());
+            card = DeckManager.Instance.drawBossCard();
+        }
+        else
+        {
+            //draw a card
+            card = DeckManager.Instance.drawCard(cell.cellInfo.isEmpty());
+            
+
+        }
         Debug.Log("draw card " + card);
         var cardInfo = CellManager.Instance.getInfo(card);
         var freezedCellCount = freezeCount();
@@ -552,9 +701,9 @@ public class GridController : Singleton<GridController>
             {
                 RulePopupManager.Instance.showRule("ice");
                 List<GridCell> canFreezeCells = new List<GridCell>();
-                foreach(var c in GameObject.FindObjectsOfType<GridCell>())
+                foreach (var c in GameObject.FindObjectsOfType<GridCell>())
                 {
-                    if(c.cellInfo.type!="fire" && !isAdjacentToFire(c.index))
+                    if (c.cellInfo.type != "fire" && !isAdjacentToFire(c.index) && !c.GetComponent<GridItem>() && !c.GetComponent<GridBackground>() && !c.GetComponent<GridEmpty>())
                     {
                         canFreezeCells.Add(c);
                     }
@@ -568,7 +717,8 @@ public class GridController : Singleton<GridController>
                     SFXManager.Instance.play("iceshowup");
                 }
             }
-        }else if (GameObject.FindObjectsOfType<GridCell>().Length > 0)
+        }
+        else if (GameObject.FindObjectsOfType<GridCell>().Length > 0)
         {
             //ice spread
 
@@ -579,17 +729,20 @@ public class GridController : Singleton<GridController>
             {
                 foreach (var c in GameObject.FindObjectsOfType<GridCell>())
                 {
-                    if (!c.GetComponent<GridItem>() && !c.GetComponent<ShopCell>() && c.cellInfo.type != "fire" && !isAdjacentToFire(c.index) && c.cellInfo.type != "ice" && isAdjacentToIce(c.index))
+                    if (!c.GetComponent<GridItem>() && !c.GetComponent<ShopCell>() && c.cellInfo.type != "fire" && !isAdjacentToFire(c.index) && !c.isFreezed && isAdjacentToIce(c.index) && !c.GetComponent<GridItem>() && !c.GetComponent<GridBackground>() && !c.GetComponent<GridEmpty>())
                     {
                         c.freeze();
 
                         SFXManager.Instance.play("icespread");
                         RulePopupManager.Instance.showRule("iceSpread");
                         //if freezed everything, game over
+
+                        freezedCellCount = freezeCount();
                         if (freezedCellCount >= 8)
                         {
 
                             GameManager.Instance.gameover();
+                            E12PopupManagerScript.Instance.clear("freezeToDeath");
                         }
                         break;
                     }
@@ -632,7 +785,19 @@ public class GridController : Singleton<GridController>
 
 
                 yield return StartCoroutine(attackAndMove());
+
+
+
+                if (boss)
+                {
+
+                    boss.onNextStep();
+
+                    yield return new WaitForSeconds(animTime);
+                }
+
                 finishMove();
+                step();
                 EventPool.Trigger("moveAStep");
                 yield break;
             }
@@ -656,13 +821,15 @@ public class GridController : Singleton<GridController>
         generate(movingCellIndex, card);
         yield return new  WaitForSeconds(animTime);
 
-
+        bool willGetIntoShop = false;
 
         var targetCell = cellParents[originEmptyIndex].GetComponentInChildren<GridItem>();
         var cell1String = cell.type;
         var cell2String = targetCell ? targetCell.type : "empty";
         if (cell.GetComponent<GridCell>().cellInfo.isPlayer())
         {
+
+            E12PopupManagerScript.Instance.clear("move");
             hasPlayerMoved = true;
 
             SFXManager.Instance.play("squirrelmove");
@@ -692,12 +859,15 @@ public class GridController : Singleton<GridController>
                 else if (targetCell.cellInfo.isWeapon())
                 {
                     cell.GetComponent<GridCell>().equip(cell2String);
+
+                    RulePopupManager.Instance.showRule("playerEquip"+cell2String);
                     destroy(targetCell.gameObject);
                 }else if (targetCell.cellInfo.type == "shop")
                 {
 
                     destroy(targetCell.gameObject);
                     StartCoroutine( getIntoShop());
+                    willGetIntoShop = true;
                 }
             }
         }
@@ -734,8 +904,6 @@ public class GridController : Singleton<GridController>
                             destroy(targetCell.gameObject);
                             break;
                         case "addHot":
-                            cellParents[movingCellIndex].GetComponent<GridBackground>().heat();
-                            Instantiate(fireVFX, cellParents[movingCellIndex].position, Quaternion.identity);
                             break;
 
                         case "generate1":
@@ -767,8 +935,6 @@ public class GridController : Singleton<GridController>
                             break;
                         case "trap":
 
-                            RulePopupManager.Instance.showRule("snakeToTrap");
-                            FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("trapped");
                             break;
                         default:
                             Debug.LogError("not support combination restul " + pair.Key);
@@ -796,16 +962,29 @@ public class GridController : Singleton<GridController>
         if (cell.cellInfo.type == "fire")
         {
             cell.GetComponent<FireCell>().getDamage(1);
+
+            cellParents[movingCellIndex].GetComponent<GridBackground>().heat();
+            Instantiate(fireVFX, cellParents[movingCellIndex].position, Quaternion.identity);
+
             RulePopupManager.Instance.showRule("fireMove");
         }
 
 
         yield return new WaitForSeconds(animTime);
 
-        if (!targetCell || !cell.cellInfo.isPlayer() || targetCell.cellInfo.type != "shop")
+        if (boss)
+        {
+
+            boss.onNextStep();
+
+            yield return new WaitForSeconds(animTime);
+        }
+
+        if (!willGetIntoShop)
         {
 
             yield return StartCoroutine(attackAndMove());
+            step();
             EventPool.Trigger("moveAStep");
         }
 
@@ -829,7 +1008,7 @@ public class GridController : Singleton<GridController>
         int x = index / cellCountX;
         int y = index % cellCountY;
         int px = playerCellIndex / cellCountX;
-        int py = playerCellIndex / cellCountY;
+        int py = playerCellIndex % cellCountY;
         int newx = x;
         int newy = y;
         if(x== px)
@@ -933,6 +1112,7 @@ public class GridController : Singleton<GridController>
         yield return new WaitForSeconds(animTime);
 
         isMoving = false;
+        EventPool.Trigger("moveAStep");
     }
 
     IEnumerator hideCells()

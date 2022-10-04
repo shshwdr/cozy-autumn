@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class DayCell : MonoBehaviour,CanReset
 {
-    int day = 250;
+    int day = 300;
     public Text dayText;
     // Start is called before the first frame update
     void Start()
@@ -22,10 +22,10 @@ public class DayCell : MonoBehaviour,CanReset
         EventPool.OptIn("moveAStep", moveStep);
     }
 
-    void updateText()
+    public void updateText()
     {
 
-        dayText.text = (day - GridController.Instance.moveCount).ToString() + " Day";
+        dayText.text = (day - GridController.Instance.moveCount).ToString() + "\nDay";
     }
 
     void moveStep()
