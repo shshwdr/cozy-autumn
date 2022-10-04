@@ -14,3 +14,7 @@ harvest,Collect 20 items at home,Harvest,20,
 slash2,Drive away 2 enemies with weapons in one day,whirl!,2,round
 freezeMove,Failed to move because of freezing,Freeze!,,
 freezeToDeath,Frozen to death…,White Walkers,,
+lotsOfAnimals,Get 5 animals on the board,Animal Party,5,
+happyBear,You helped Mother Bear and she is happy,Happy Mom,,
+deadmotherBear,You killed the Big Bear,Bear Killer,,
+deadbabyBear,You monster! You killed this cute little baby bear!,Baby Bear Killer,,

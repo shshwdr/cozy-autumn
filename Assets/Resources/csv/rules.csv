@@ -30,3 +30,5 @@ playerNextTobear,"[player] next to [bear], [stick] - 5, [bear] [run]",Big bear a
 playerNextTofox,"[player] next to [fox], [nut] - 5",I have to deal with the fox
 playerNextToweasel,"[player] next to [weasel], [nut] - 3, [weasel] [run]",Ok take my nuts and leave me alone
 playerEquipaxe,"[player] [move] [axe], equip [axe]",Now I'm not afraid of anyone
+playerNextTomotherBear,"[player] next to [bear], [stick] - 5, [bear] [run]",Keep distance with the bear! 
+playerNextTobabyBear,"[player] next to [bear], [stick] - 5, [bear] [run]",They are young but they still bite!

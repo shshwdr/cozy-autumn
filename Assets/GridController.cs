@@ -22,7 +22,7 @@ public class GridController : Singleton<GridController>
 
     GridCell playerCell;
     GridEmpty emptyCell;
-    int playerCellIndex { get { return playerCell.index; } }
+    public int playerCellIndex { get { return playerCell.index; } }
     int emptyCellIndex { get { return emptyCell.index; } }
 
     int originalPlayerCell = 4;
@@ -127,6 +127,17 @@ public class GridController : Singleton<GridController>
         }
     }
 
+    public Vector3 getCenterOfCells(List<int> indices)
+    {
+        Vector3 res = Vector3.zero;
+        foreach (var i in indices)
+        {
+            var dangerousCell = cellParents[i];
+            res += dangerousCell.transform.position;
+        }
+        return res / indices.Count;
+    }
+
 
     public void hideDangerousCell(string dangerName, List<int> indices)
     {
@@ -134,6 +145,30 @@ public class GridController : Singleton<GridController>
         {
             cellParents[index].GetComponent<GridBackground>().removeDangerous(dangerName);
         }
+    }
+
+    public IEnumerator attackAndMovePlayer(List<int> dangerousIndices, EnemyCell enemy)
+    {
+        yield return null;
+        //find player
+            StartCoroutine(enemy.activeAttack(true));
+
+            //move player to a safe place
+            if (dangerousIndices.Contains(emptyCellIndex))
+            {
+                for (int i = 0; i < 9; i++)
+                {
+                    if (!dangerousIndices.Contains(i))
+                    {
+                        yield return StartCoroutine(exchangeCard(playerCell, i));
+                    }
+                }
+            }
+            else
+            {
+                yield return StartCoroutine(exchangeCard(playerCell, emptyCellIndex));
+            }
+       
     }
 
     void initMainBoard()
@@ -429,13 +464,13 @@ public class GridController : Singleton<GridController>
         Destroy(go, animTime);
     }
 
-    IEnumerator trapCellCalculation(GridCell cell, GridItem trap)
+    IEnumerator trapCellCalculation(EnemyCell cell, GridItem trap)
     {
         yield return null;
         {
-            cell.GetComponent<EnemyCell>().getDamage(1);
-            var trapNmae = trap.type;
-            SFXManager.Instance.play(trapNmae);
+            cell.getDamage(1);
+            var trapName = trap.type;
+            SFXManager.Instance.play(trapName);
             destroy(trap.gameObject);
 
             var go = Instantiate(Resources.Load<GameObject>("effect/trapEffect"), cell.transform.parent.position, Quaternion.identity);
@@ -503,6 +538,18 @@ public class GridController : Singleton<GridController>
         }
     }
 
+
+    public IEnumerator triggerTrapOnCell(int i,EnemyCell cell)
+    {
+        yield return null;
+            var trap = cellParents[i].GetComponentInChildren<GridItem>();
+            bool combination = trap != null && (trap.cellInfo.type.Contains("trap") || trap.cellInfo.type.Contains("Trap"));
+            if (combination)
+            {
+                yield return StartCoroutine(trapCellCalculation(cell, trap));
+            }
+    }
+
     IEnumerator attackAndMove()
     {
        // yield break;
@@ -526,11 +573,9 @@ public class GridController : Singleton<GridController>
         {
             foreach (var cell in cellParents[i].GetComponentsInChildren<GridCell>())
             {
-                var trap = cell.transform.parent.GetComponentInChildren<GridItem>();
-                bool combination = cell != null && cell.cellInfo.isEnemy() && trap != null && (trap.cellInfo.type.Contains("trap") || trap.cellInfo.type.Contains("Trap"));
-                if (combination)
+                if(cell != null && cell.cellInfo.isEnemy())
                 {
-                    yield return StartCoroutine(trapCellCalculation(cell, trap));
+                    StartCoroutine( triggerTrapOnCell(i,cell.GetComponent<EnemyCell>()));
                 }
             }
         }
@@ -668,6 +713,10 @@ public class GridController : Singleton<GridController>
         yield return null;
         E12PopupManagerScript.Instance.clear("round");
         //if is moving player, consume
+        if(!cell || cell.cellInfo == null)
+        {
+            Debug.LogError("???");
+        }
         if (cell.cellInfo.isPlayer())
         {
 
@@ -791,9 +840,8 @@ public class GridController : Singleton<GridController>
                 if (boss)
                 {
 
-                    boss.onNextStep();
+                    yield return StartCoroutine( boss.onNextStep());
 
-                    yield return new WaitForSeconds(animTime);
                 }
 
                 finishMove();
@@ -975,9 +1023,7 @@ public class GridController : Singleton<GridController>
         if (boss)
         {
 
-            boss.onNextStep();
-
-            yield return new WaitForSeconds(animTime);
+            yield return StartCoroutine(boss.onNextStep());
         }
 
         if (!willGetIntoShop)

@@ -16,5 +16,7 @@ public class Boss : MonoBehaviour
     {
         
     }
-    public virtual void onNextStep() { }
+    public virtual IEnumerator onNextStep() {
+        yield return null;
+    }
 }

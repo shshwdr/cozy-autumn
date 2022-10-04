@@ -154,6 +154,12 @@ public class GridCell : MonoBehaviour
         if (!EventSystem.current.IsPointerOverGameObject())
         {
 
+            Collider2D colliderHit = Physics2D.OverlapPoint(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+            if (colliderHit != GetComponent<Collider2D>())
+            {
+                return;
+            }
+
             //if (GetComponent<PlayerCell>())
             //{
             //    ResourceManager.Instance.consumeResource("nut", 1);

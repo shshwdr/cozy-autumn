@@ -18,11 +18,13 @@ public class GridBackground : MonoBehaviour
 
 
         dangeousOverlay.color = new Color(255, 0, 0, 0);
-            DOTween.To(() => dangeousOverlay.color, x => dangeousOverlay.color = x, new Color(255, 0, 0,0.5f), 1).SetLoops(-1,LoopType.Yoyo);
+        DOTween.To(() => dangeousOverlay.color, x => dangeousOverlay.color = x, new Color(255, 0, 0,0.5f), 1).SetLoops(-1,LoopType.Yoyo);
     }
     public void removeDangerous(string dangerName)
     {
         dangeousOverlay.DOKill();
+        DOTween.Kill(dangeousOverlay);
+        DOTween.Kill(transform);
         dangeousOverlay.color = new Color(255, 0, 0, 0);
     }
     public void heat()

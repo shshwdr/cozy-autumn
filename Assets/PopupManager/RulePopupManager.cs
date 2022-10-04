@@ -25,6 +25,11 @@ public class RulePopupManager : Singleton<RulePopupManager>
         {
             return;
         }
+        if (!RuleManager.Instance.unvisitedList.Contains(type))
+        {
+            Debug.LogError("wrong rule " + type);
+            return;
+        }
         visited.Add(type);
         ruleQueues.Enqueue(type);
         RuleManager.Instance.addRule(type);

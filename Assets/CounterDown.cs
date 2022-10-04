@@ -10,6 +10,7 @@ public class CounterDown : MonoBehaviour
     public void initCount(int x)
     {
         count = x;
+        updateText();
     }
 
     public void countDown()

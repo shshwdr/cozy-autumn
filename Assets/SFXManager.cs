@@ -12,11 +12,12 @@ public class SFXManager : Singleton<SFXManager>
         if (!clip)
         {
             Debug.Log("no clip");
+            return;
         }
         audioSource.PlayOneShot(clip);
     }
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         audioSource = GetComponent<AudioSource>();
     }

@@ -13,6 +13,7 @@ public class EnemyCell : MonoBehaviour
     GridCell cell;
     CellInfo info;
     bool isFirst = true;
+    public bool isBoss = false;
 
     int attackCountDown = 10000;
 
@@ -111,12 +112,16 @@ public class EnemyCell : MonoBehaviour
     void Start()
     {
         cell = GetComponent<GridCell>();
-        countDownObject = cell.countDownObject;
-        if (info.moveMode < 0)
+        if (cell)
         {
-            attackCountDown = -info.moveMode;
-            countDownObject.gameObject.SetActive(true);
-            countDownObject.initCount(attackCountDown);
+
+            countDownObject = cell.countDownObject;
+            if (info.moveMode < 0)
+            {
+                attackCountDown = -info.moveMode;
+                countDownObject.gameObject.SetActive(true);
+                countDownObject.initCount(attackCountDown);
+            }
         }
         EventPool.OptIn("moveAStep", stepAttack);
     }
@@ -131,20 +136,39 @@ public class EnemyCell : MonoBehaviour
         isFirst = false;
     }
 
+    void die()
+    {
+        if (!isDead)
+        {
+            GetComponent<Collider2D>().enabled = false;
+            isDead = true;
+            transform.DOShakeScale(0.3f, GridController.Instance.animTime);
+            Destroy(gameObject, GridController.Instance.animTime + 0.1f);
+            foreach (var render in GetComponentsInChildren<SpriteRenderer>())
+            {
+                render.sortingOrder = 100000;
+            }
+
+            if(e12popup)
+        }
+    }
+
     public void getDamage(int x)
     {
         if (isDead)
         {
             return;
         }
-        GridController.Instance.addEmpty(GetComponent<GridCell>().index);
-        GetComponent<Collider2D>().enabled = false;
-        isDead = true;
-        transform.DOShakeScale(0.3f, GridController.Instance.animTime);
-        Destroy(gameObject, GridController.Instance.animTime + 0.1f);
-        foreach (var render in GetComponentsInChildren<SpriteRenderer>())
+
+        hp -= 1;
+        if(hp <= 0)
         {
-            render.sortingOrder = 100000;
+            if (!isBoss)
+            {
+
+                GridController.Instance.addEmpty(GetComponent<GridCell>().index);
+            }
+            die();
         }
         SFXManager.Instance.play("animalLose");
     }
@@ -162,7 +186,7 @@ public class EnemyCell : MonoBehaviour
         SFXManager.Instance.play("scream");
     }
 
-    public IEnumerator activeAttack()
+    public IEnumerator activeAttack(bool forceAttack = false, bool canAttack = true)
     {
 
         if (isDead)
@@ -171,14 +195,14 @@ public class EnemyCell : MonoBehaviour
         }
         //if player has weapon, unequip weapon and die
         var player = GridController.Instance.getPlayerTransform().GetComponent<GridCell>();
-        if (player.hasEquipment())
+        if (player.hasEquipment() && !forceAttack)
         {
             player.unequip(transform);
 
             FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("slash");
             FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("slash2");
         }
-        else
+        else if(canAttack)
         {
             SFXManager.Instance.play("attack");
             playAttackEffect();

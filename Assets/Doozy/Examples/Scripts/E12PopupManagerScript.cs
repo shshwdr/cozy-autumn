@@ -5,8 +5,8 @@ using Pool;
 using Sinbad;
 using UnityEngine;
 
-namespace Doozy.Examples
-{
+//namespace Doozy.Examples
+//{
     public class AchievementInfo
     {
         public string type;
@@ -159,4 +159,4 @@ namespace Doozy.Examples
         public string Description;
         public Sprite Icon;
     }
-}
+//}
