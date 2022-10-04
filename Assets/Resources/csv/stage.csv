@@ -1,5 +1,5 @@
 ﻿cards,triggerRound,,
-trap:1|bat:1,0,,4
+motherBear:1|nut:1,0,,4
 branch:1,2,,4
 weasel:1,3,,7
 branch:1|weasel:1|babyBear:1,4,,2

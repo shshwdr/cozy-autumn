@@ -11,6 +11,8 @@ public class Boss : MonoBehaviour
         
     }
 
+    public virtual void init(string type) { }
+
     // Update is called once per frame
     void Update()
     {

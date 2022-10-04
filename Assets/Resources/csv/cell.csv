@@ -26,4 +26,4 @@ openedNut,,resource,4,nut,,,,,,,,
 cookedNut,,resource,4,nut,,,,,,,,
 counter,,,,,,,,,,,,
 babyBear,1,enemy,,,nut,nut,0,3,0,,,1
-motherBear,0,enemy,,,nut,nut,0,3,0,,,1
+motherBear,1,boss,,,nut,nut,0,3,0,,,1

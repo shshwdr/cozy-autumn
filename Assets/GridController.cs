@@ -17,6 +17,7 @@ public class GridController : Singleton<GridController>
     int currentLeafIndex = 0;
 
    public  int moveCount = 0;
+    public Transform bossParent;
 
     List<Transform> cellParents = new List<Transform>();
 
@@ -804,6 +805,27 @@ public class GridController : Singleton<GridController>
         // empty position not change.
         if (cardInfo.isCell())
         {
+            if (cardInfo.isBoss())
+            {
+                // if it is boss, just create boss and do  nothing
+
+                var go = Instantiate(Resources.Load<GameObject>("boss/" + cardInfo.type), bossParent.position,Quaternion.identity,bossParent);
+                go.GetComponent<Boss>().init(cardInfo.type);
+
+                go.transform.DOPunchScale(Vector3.one, animTime);
+
+                yield return new WaitForSeconds(GridController.Instance.animTime);
+                finishMove();
+                step();
+                EventPool.Trigger("moveAStep");
+
+
+                DeckManager.Instance.removeAllCardFromDeck(card);
+
+                yield break;
+            }
+
+
             //generate cell, if already a cell, don't generate and add it back to the deck.
             if (cell.cellInfo.isEmpty())
             {

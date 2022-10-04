@@ -19,10 +19,14 @@ public class BossMotherBear : Boss
 
     // Start is called before the first frame update
     void Start()
+    { 
+    }
+
+    public override void init(string type)
     {
         GridController.Instance.boss = this;
         enemyCell = bossCell.GetComponent<EnemyCell>();
-        enemyCell.init("motherBear");
+        enemyCell.init(type);
         originPosition = bossCell.transform.position;
         GetComponentInChildren<CounterDown>(true).gameObject.SetActive(false);
 
@@ -31,7 +35,10 @@ public class BossMotherBear : Boss
         int babyCount = 0;
         foreach (var enemy in allEnemies)
         {
-
+            if(enemy.GetComponent<GridCell>() &&  enemy.GetComponent<GridCell>().cellInfo.type == "babyBear")
+            {
+                babyCount++;
+            }
         }
         if (babyCount >= saveBabyRequirement)
         {
@@ -120,6 +127,7 @@ public class BossMotherBear : Boss
                     GridController.Instance.hideDangerousCell("motherBear", dangeousIndices);
                     count = attackRound;
                     stage = Stage.attacked;
+                    SFXManager.Instance.play("motherBearSwoosh");
                 }
                 break;
             case Stage.attacked:

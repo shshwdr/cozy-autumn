@@ -10,6 +10,7 @@ public class CellInfo {
     public string categoryDetail;
     public bool isCell() { return cellType == 1; }
     public bool isEnemy() { return categoryType == "enemy"; }
+    public bool isBoss() { return categoryType == "boss"; }
     public bool isEmpty() { return categoryType == "empty"; }
     public bool isPlayer() { return categoryType == "player"; }
     public bool isResource() { return categoryType == "resource"; }
