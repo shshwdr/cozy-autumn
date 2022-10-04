@@ -55,7 +55,7 @@ public class GameManager : Singleton<GameManager>
         }
         isGameOver = true;
 
-        FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("spring");
+        FindObjectOfType<AchievementManager>().ShowAchievement("spring");
         PopupManager.Instance.showEvent("You survive! It's spring!", () => { restartGame(); }, "Restart");
         SFXManager.Instance.play("win");
     }

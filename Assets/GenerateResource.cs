@@ -51,7 +51,7 @@ public class GenerateResource : MonoBehaviour, CanReset
     public void finishCollect()
     {
 
-        FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("harvest");
+        FindObjectOfType<AchievementManager>().ShowAchievement("harvest");
         canGenerate = true;
     }
 

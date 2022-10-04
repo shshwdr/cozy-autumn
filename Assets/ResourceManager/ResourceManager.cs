@@ -37,7 +37,7 @@ public class ResourceManager : Singleton<ResourceManager>
         if (!hasEnoughAmount(type,0) && type == "nut")
         {
 
-            FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("starving");
+            FindObjectOfType<AchievementManager>().ShowAchievement("starving");
 
             if (!CheatManager.Instance.wontDie)
 

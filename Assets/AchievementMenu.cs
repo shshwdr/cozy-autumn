@@ -22,16 +22,16 @@ public class AchievementMenu : MonoBehaviour
 
             hintCells = GetComponentsInChildren<AchievementCell>(true);
         }
-        for (; i < E12PopupManagerScript.Instance.visitedList.Count; i++)
+        for (; i < AchievementManager.Instance.visitedList.Count; i++)
         {
             var ruleCell = hintCells[i];
-            ruleCell.init(E12PopupManagerScript.Instance.visitedList[i],false);
+            ruleCell.init(AchievementManager.Instance.visitedList[i],false);
             ruleCell.gameObject.SetActive(true);
         }
-        for (; i < E12PopupManagerScript.Instance.unvisitedList.Count+ E12PopupManagerScript.Instance.visitedList.Count; i++)
+        for (; i < AchievementManager.Instance.unvisitedList.Count+ AchievementManager.Instance.visitedList.Count; i++)
         {
             var ruleCell = hintCells[i];
-           ruleCell.init(E12PopupManagerScript.Instance.unvisitedList[i - E12PopupManagerScript.Instance.visitedList.Count], true);
+           ruleCell.init(AchievementManager.Instance.unvisitedList[i - AchievementManager.Instance.visitedList.Count], true);
             ruleCell.gameObject.SetActive(true);
         }
 

@@ -50,7 +50,7 @@ public class RuleManager : Singleton<RuleManager>
         if (visited.Count == ruleDict.Count)
         {
 
-            FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("allRules");
+            FindObjectOfType<AchievementManager>().ShowAchievement("allRules");
         }
     }
 

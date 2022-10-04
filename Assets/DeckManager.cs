@@ -123,7 +123,7 @@ public class DeckManager : Singleton<DeckManager>
                     if(pair.Key == "ice")
                     {
 
-                        FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("winter");
+                        FindObjectOfType<AchievementManager>().ShowAchievement("winter");
                     }
                 }
             }

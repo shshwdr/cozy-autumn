@@ -36,7 +36,7 @@ public class EnemyCell : MonoBehaviour
     void updateDescription()
     {
         HintCell.generateHintText(explainPanel.transform.Find("attackWhenNext"), "Steal " + info.attack + " [" + info.requireResource + "] if next to [player]");
-        if (info.moveMode >= 0)
+        if (info.stayMode == 0)
         {
 
             HintCell.generateHintText(explainPanel.transform.Find("Move2"), "Run away after attack.");
@@ -140,6 +140,15 @@ public class EnemyCell : MonoBehaviour
     {
         if (!isDead)
         {
+            if (!isBoss)
+            {
+
+                GridController.Instance.addEmpty(GetComponent<GridCell>().index);
+            }
+            else
+            {
+                GetComponentInParent<Boss>().getKilled();
+            }
             GetComponent<Collider2D>().enabled = false;
             isDead = true;
             transform.DOShakeScale(0.3f, GridController.Instance.animTime);
@@ -149,7 +158,10 @@ public class EnemyCell : MonoBehaviour
                 render.sortingOrder = 100000;
             }
 
-            if(e12popup)
+            if (AchievementManager.Instance.hasAchievement("dead" + info.type))
+            {
+                AchievementManager.Instance.ShowAchievement("dead" + info.type);
+            }
         }
     }
 
@@ -163,11 +175,6 @@ public class EnemyCell : MonoBehaviour
         hp -= 1;
         if(hp <= 0)
         {
-            if (!isBoss)
-            {
-
-                GridController.Instance.addEmpty(GetComponent<GridCell>().index);
-            }
             die();
         }
         SFXManager.Instance.play("animalLose");
@@ -199,8 +206,8 @@ public class EnemyCell : MonoBehaviour
         {
             player.unequip(transform);
 
-            FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("slash");
-            FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("slash2");
+            FindObjectOfType<AchievementManager>().ShowAchievement("slash");
+            FindObjectOfType<AchievementManager>().ShowAchievement("slash2");
         }
         else if(canAttack)
         {
@@ -217,7 +224,7 @@ public class EnemyCell : MonoBehaviour
         {
             attackCountDown = -info.moveMode;
         }
-        if (info.moveMode >= 0)
+        if (info.stayMode == 0)
         {
             getDamage(1);
         }

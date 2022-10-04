@@ -167,7 +167,7 @@ public class GridCell : MonoBehaviour
             if (isFreezed)
             {
 
-                FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("freezeMove");
+                FindObjectOfType<AchievementManager>().ShowAchievement("freezeMove");
                 failedToMove();
                 return;
             }

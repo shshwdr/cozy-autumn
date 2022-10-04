@@ -17,7 +17,7 @@ using UnityEngine;
         public string clearReason;
 
     }
-    public class E12PopupManagerScript : Singleton<E12PopupManagerScript>
+    public class AchievementManager : Singleton<AchievementManager>
     {
         [Header("Popup Settings")]
         public string PopupName = "AchievementPopup";
@@ -45,10 +45,14 @@ using UnityEngine;
         {
             foreach (var rule in ruleList)
             {
-                addRule(rule.type);
+                addAchievement(rule.type);
             }
         }
-        public bool addRule(string type)
+    public bool hasAchievement(string type)
+    {
+        return ruleDict.ContainsKey(type);
+    }
+        public bool addAchievement(string type)
         {
             if (!visited.Contains(type))
             {
@@ -115,7 +119,7 @@ using UnityEngine;
             {
                 return;
             }
-            if (!addRule(achievementType))
+            if (!addAchievement(achievementType))
             {
                 return;
             }

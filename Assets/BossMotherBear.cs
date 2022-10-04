@@ -12,8 +12,10 @@ public class BossMotherBear : Boss
     List<int> dangeousIndices;
 
     public GameObject bossCell;
-   EnemyCell enemyCell;
+    EnemyCell enemyCell;
     public Vector3 originPosition;
+
+    int saveBabyRequirement = 3;
 
     // Start is called before the first frame update
     void Start()
@@ -23,12 +25,45 @@ public class BossMotherBear : Boss
         enemyCell.init("motherBear");
         originPosition = bossCell.transform.position;
         GetComponentInChildren<CounterDown>(true).gameObject.SetActive(false);
+
+        // if saved 3 baby, let pass
+        var allEnemies = GameObject.FindObjectsOfType<EnemyCell>();
+        int babyCount = 0;
+        foreach (var enemy in allEnemies)
+        {
+
+        }
+        if (babyCount >= saveBabyRequirement)
+        {
+            happyEnd();
+        }
+    }
+
+    public override void getKilled()
+    {
+        killEnd();
+    }
+    void happyEnd()
+    {
+
+
+        FindObjectOfType<AchievementManager>().ShowAchievement("happyBear");
+        PopupManager.Instance.showEvent("You saved 3 baby bears and mom bear is happy, so she let you pass. Poison Forest unlocked.", () => { GameManager.Instance.restartGame(); }, "Restart");
+        SFXManager.Instance.play("win");
+    }
+
+    void killEnd()
+    {
+
+
+        PopupManager.Instance.showEvent("You killed the mom bear and passed the forest. Grass Land unlocked", () => { GameManager.Instance.restartGame(); }, "Restart");
+        SFXManager.Instance.play("win");
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     float animTime = 0.3f;
@@ -47,21 +82,21 @@ public class BossMotherBear : Boss
                 break;
             case Stage.prepare:
                 count--;
-                if(count == 0)
+                if (count == 0)
                 {
                     //start attack
                     //move boss grid to the center of dangerous cell
                     var position = GridController.Instance.getCenterOfCells(dangeousIndices);
-                    bossCell.transform.DOMove(position,animTime);
+                    bossCell.transform.DOMove(position, animTime);
                     yield return new WaitForSeconds(animTime);
                     //bossCell.transform.position = position;
-                    bossCell.transform.Find("front").localScale *=2;
+                    bossCell.transform.Find("front").localScale *= 2;
                     bossCell.GetComponent<BoxCollider2D>().size *= 2;
                     //get attack of traps
                     foreach (var i in dangeousIndices)
                     {
 
-                       yield return StartCoroutine(GridController.Instance. triggerTrapOnCell(i, enemyCell));
+                        yield return StartCoroutine(GridController.Instance.triggerTrapOnCell(i, enemyCell));
                     }
 
                     if (dangeousIndices.Contains(GridController.Instance.playerCellIndex))
@@ -126,7 +161,7 @@ public class BossMotherBear : Boss
 
     bool isNextToPlayer()
     {
-        foreach(var i in dangeousIndices)
+        foreach (var i in dangeousIndices)
         {
             if (GridController.Instance.isPlayerAround(i))
             {

@@ -51,7 +51,7 @@ public class CheatManager : Singleton<CheatManager>
             }
             if (Input.GetKeyDown(KeyCode.J))
             {
-                E12PopupManagerScript.Instance.unlockAll();
+                AchievementManager.Instance.unlockAll();
             }
             if (Input.GetKeyDown(KeyCode.M))
             {

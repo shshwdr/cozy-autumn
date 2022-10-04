@@ -54,14 +54,14 @@ public class GridController : Singleton<GridController>
         StartCoroutine(test());
 
         bk.Find("leaf" + currentLeafIndex).GetComponent<ParticleSystem>().Play();
-        E12PopupManagerScript.Instance.clearAll();
+        AchievementManager.Instance.clearAll();
     }
 
     IEnumerator test()
     {
         yield return new WaitForSeconds(0.1f);
 
-        if (E12PopupManagerScript.Instance.visitedList.Count == 0)
+        if (AchievementManager.Instance.visitedList.Count == 0)
         {
 
             //PopupManager.Instance.showEvent("Help the squirrel to collect acorns and survive the autumn and winter, and try to make the place cozy for it.", "OK");
@@ -452,7 +452,7 @@ public class GridController : Singleton<GridController>
         isMoving = false;
         Debug.Log("empty index " + emptyCell);
 
-        FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("notMoving");
+        FindObjectOfType<AchievementManager>().ShowAchievement("notMoving");
 
         GameObject.FindObjectOfType<DayCell>(true).updateText();
     }
@@ -477,7 +477,7 @@ public class GridController : Singleton<GridController>
             // go.transform.DOPunchScale(Vector3.one, animTime);
 
             RulePopupManager.Instance.showRule("snakeToTrap");
-            FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("trapped");
+            FindObjectOfType<AchievementManager>().ShowAchievement("trapped");
 
             yield return new WaitForSeconds(animTime);
         }
@@ -608,14 +608,14 @@ public class GridController : Singleton<GridController>
                     go2.GetComponentInChildren<SpriteRenderer>().sortingOrder = 1;
                     Destroy(go2, 1f);
 
-                    FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("slash2");
+                    FindObjectOfType<AchievementManager>().ShowAchievement("slash2");
                     yield return new WaitForSeconds(animTime);
                 }
             }
             if (attackWithWeapon)
             {
                 playerCell.unequip(transform);
-                FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("slash");
+                FindObjectOfType<AchievementManager>().ShowAchievement("slash");
             }
         }
 
@@ -711,7 +711,7 @@ public class GridController : Singleton<GridController>
     IEnumerator moveCellAnim(GridCell cell) 
     {
         yield return null;
-        E12PopupManagerScript.Instance.clear("round");
+        AchievementManager.Instance.clear("round");
         //if is moving player, consume
         if(!cell || cell.cellInfo == null)
         {
@@ -791,7 +791,7 @@ public class GridController : Singleton<GridController>
                         {
 
                             GameManager.Instance.gameover();
-                            E12PopupManagerScript.Instance.clear("freezeToDeath");
+                            AchievementManager.Instance.clear("freezeToDeath");
                         }
                         break;
                     }
@@ -877,7 +877,7 @@ public class GridController : Singleton<GridController>
         if (cell.GetComponent<GridCell>().cellInfo.isPlayer())
         {
 
-            E12PopupManagerScript.Instance.clear("move");
+            AchievementManager.Instance.clear("move");
             hasPlayerMoved = true;
 
             SFXManager.Instance.play("squirrelmove");

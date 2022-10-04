@@ -19,4 +19,6 @@ public class Boss : MonoBehaviour
     public virtual IEnumerator onNextStep() {
         yield return null;
     }
+
+    public virtual void getKilled() { }
 }

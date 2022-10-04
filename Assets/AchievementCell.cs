@@ -21,7 +21,7 @@ public class AchievementCell : MonoBehaviour
         {
 
             lockedGo.SetActive(false);
-            var info = E12PopupManagerScript.Instance.getInfo(type);
+            var info = AchievementManager.Instance.getInfo(type);
             image.sprite = Resources.Load<Sprite>("achievement/" + type);
             title.text = info.title;
             desc.text = info.description;

@@ -10510,7 +10510,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a18d300840f89a744b17e0770694e8e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hp: 100
+  hp: 1
   isDead: 0
   isBoss: 1
 --- !u!4 &112640136 stripped

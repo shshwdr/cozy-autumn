@@ -21,6 +21,7 @@ public class CellInfo {
     public string requireResourcePerStep;
     public string requireResource;
     public int attackPerStep; public int attack; public int moveMode;   public int destoryOthers;
+    public int stayMode;//0 after attack, run away, 1 dont run away
 
 
 }

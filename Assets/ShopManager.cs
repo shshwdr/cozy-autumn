@@ -75,7 +75,7 @@ public class ShopManager : Singleton<ShopManager>
         if(unPurchasedShopInfos.Count == 0)
         {
 
-            FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("allFurniture");
+            FindObjectOfType<AchievementManager>().ShowAchievement("allFurniture");
         }
 
     }

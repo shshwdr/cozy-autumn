@@ -58,8 +58,8 @@ public class FireCell : MonoBehaviour
 
                 RulePopupManager.Instance.showRule("iceThaw");
                 SFXManager.Instance.play("icemelt");
-                FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("melt");
-                FindObjectOfType<Doozy.Examples.E12PopupManagerScript>().ShowAchievement("melt2");
+                FindObjectOfType<AchievementManager>().ShowAchievement("melt");
+                FindObjectOfType<AchievementManager>().ShowAchievement("melt2");
             }
             //getDamage(1);
         }
