@@ -709,6 +709,20 @@ public class GridController : Singleton<GridController>
 
     }
 
+    public bool hasEqualOrMoreCardsWithType(string type, int count)
+    {
+        GridCell[] cells = GameObject.FindObjectsOfType<GridCell>();
+        int t = 0;
+        foreach(GridCell c in cells)
+        {
+            if(c.cellInfo!=null && c.cellInfo.type== type)
+            {
+                t++;
+            }
+        }
+        return t >= count;
+    }
+
     IEnumerator moveCellAnim(GridCell cell) 
     {
         yield return null;

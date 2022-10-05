@@ -25,7 +25,7 @@ public class DayCell : MonoBehaviour,CanReset
     public void updateText()
     {
 
-        dayText.text = (day - GridController.Instance.moveCount).ToString() + "\nDay";
+        dayText.text = ( GridController.Instance.moveCount).ToString() + "\nDay";
     }
 
     void moveStep()

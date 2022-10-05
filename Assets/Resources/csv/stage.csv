@@ -1,7 +1,8 @@
 ﻿cards,triggerRound,,
-motherBear:1|nut:1,0,,4
-branch:1,2,,4
-weasel:1,3,,7
-branch:1|weasel:1|babyBear:1,4,,2
+empty:2|nut:2,0,,4
+branch:1|nut:1,2,,4
+weasel:1|nut:1,3,,7
+branch:1|babyBear:1,4,,2
 babyBear:1,6,,1
+motherBear:1|branch:1,6,,1
 empty:2|nut:2,100000,,

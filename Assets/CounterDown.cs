@@ -24,6 +24,11 @@ public class CounterDown : MonoBehaviour
     
     void updateText()
     {
+        if(text == null)
+        {
+            Debug.LogError("no text");
+            return;
+        }
         text.text = count.ToString();
     }
     // Start is called before the first frame update

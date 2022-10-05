@@ -8,6 +8,7 @@ public class CellInfo {
     public int cellType;
     public string categoryType;
     public string categoryDetail;
+    public int maxCount;
     public bool isCell() { return cellType == 1; }
     public bool isEnemy() { return categoryType == "enemy"; }
     public bool isBoss() { return categoryType == "boss"; }

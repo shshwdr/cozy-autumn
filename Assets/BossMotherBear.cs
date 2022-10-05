@@ -44,6 +44,10 @@ public class BossMotherBear : Boss
         {
             happyEnd();
         }
+        else
+        {
+            PopupManager.Instance.showEvent("A Huge Mother Bear shows up:'You hurt my baby bear! How dare you!!!","Fight!");
+        }
     }
 
     public override void getKilled()

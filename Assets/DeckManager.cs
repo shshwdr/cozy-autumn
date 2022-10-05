@@ -56,6 +56,28 @@ public class DeckManager : Singleton<DeckManager>
     }
     public string drawCard(bool canDrawWaitingDeck,bool isBoss = false)
     {
+        int test = 100;
+        while (true)
+        {
+            var card = drawCardInternal(canDrawWaitingDeck);
+            var cardInfo = CellManager.Instance.getInfo(card);
+            if (!GridController.Instance.hasEqualOrMoreCardsWithType(cardInfo.type,cardInfo.maxCount))
+            {
+                return cardInfo.type;
+            }
+
+            test--;
+            if (test <= 0)
+            {
+                Debug.LogError("?");
+                return cardInfo.type;
+            }
+        }
+    }
+
+    string drawCardInternal(bool canDrawWaitingDeck, bool isBoss = false)
+    {
+
         if (currentDeck.Count == 0)
         {
             createAndShuffleCards();
@@ -65,7 +87,7 @@ public class DeckManager : Singleton<DeckManager>
         if (canDrawWaitingDeck && waitDeck.Count > 0)
         {
 
-           firstCard = waitDeck[0];
+            firstCard = waitDeck[0];
             waitDeck.RemoveAt(0);
             return firstCard;
         }

@@ -305,6 +305,7 @@ public class EnemyCell : MonoBehaviour
             {
 
                 RulePopupManager.Instance.showRule("foxCountingdown");
+                countDownObject.initCount(attackCountDown);
             }
 
             if (GridController.Instance.isPlayerAround(GetComponent<GridCell>().index) || attackCountDown == 0)
@@ -322,7 +323,6 @@ public class EnemyCell : MonoBehaviour
                     takeResource(info.requireResourcePerStep, info.attackPerStep);
                 }
             }
-            countDownObject.initCount(attackCountDown);
         }
 
     }
