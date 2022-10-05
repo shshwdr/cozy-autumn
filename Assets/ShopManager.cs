@@ -65,7 +65,7 @@ public class ShopManager : Singleton<ShopManager>
     {
         foreach (var pair in getInfo(type).cost)
         {
-            ResourceManager.Instance.consumeResource(pair.Key, pair.Value);
+            ResourceManager.Instance.consumeResource(pair.Key, pair.Value, transform.position);
         }
         unPurchasedShopInfos.Remove(type);
         purchasedShopInfos.Add(type);

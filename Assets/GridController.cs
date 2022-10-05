@@ -497,7 +497,7 @@ public class GridController : Singleton<GridController>
             {
 
                 RulePopupManager.Instance.showRule("playerOnHot");
-                ResourceManager.Instance.consumeResource("nut", 3);
+                ResourceManager.Instance.consumeResource("nut", 3, cell.transform.position);
 
                 SFXManager.Instance.play("shortburn");
 
@@ -727,6 +727,29 @@ public class GridController : Singleton<GridController>
         return t >= count;
     }
 
+    IEnumerator moveOthers()
+    {
+
+
+        yield return new WaitForSeconds(GridController.Instance.animTime);
+
+        yield return StartCoroutine(attackAndMove());
+
+
+
+        if (boss)
+        {
+
+            yield return StartCoroutine(boss.onNextStep());
+
+        }
+
+        finishMove();
+        step();
+        EventPool.Trigger("moveAStep");
+        yield break;
+    }
+
     IEnumerator moveCellAnim(GridCell cell) 
     {
         yield return null;
@@ -742,158 +765,12 @@ public class GridController : Singleton<GridController>
             //var resource = new List<PairInfo<int>>() { };
             //resource.Add(new PairInfo<int>("nut", 1));
             //CollectionManager.Instance.RemoveCoins(resource);
-            ResourceManager.Instance.consumeResource("nut", 1);
+            ResourceManager.Instance.consumeResource("nut", 1, cell.transform.position);
             RulePopupManager.Instance.showRule("playerMove");
         }
-        string card = "";
-
-        if (boss)
-        {
-
-            card = DeckManager.Instance.drawBossCard();
-        }
-        else
-        {
-            //draw a card
-            card = DeckManager.Instance.drawCard(cell.cellInfo.isEmpty());
-            
-
-        }
-        Debug.Log("draw card " + card);
-        var cardInfo = CellManager.Instance.getInfo(card);
-        var freezedCellCount = freezeCount();
-        if (cardInfo.type == "ice")
-        {
-            //if has ice, don't add
-            if (freezedCellCount == 0)
-            {
-                RulePopupManager.Instance.showRule("ice");
-                List<GridCell> canFreezeCells = new List<GridCell>();
-                foreach (var c in GameObject.FindObjectsOfType<GridCell>())
-                {
-                    if (c.cellInfo.type != "fire" && !isAdjacentToFire(c.index) && !c.GetComponent<GridItem>() && !c.GetComponent<GridBackground>() && !c.GetComponent<GridEmpty>())
-                    {
-                        canFreezeCells.Add(c);
-                    }
-                }
-
-                if (canFreezeCells.Count > 0)
-                {
-                    var freeCell = Utils.randomList(canFreezeCells);
-                    freeCell.freeze();
-
-                    SFXManager.Instance.play("iceshowup");
-                }
-            }
-        }
-        else if (GameObject.FindObjectsOfType<GridCell>().Length > 0)
-        {
-            //ice spread
-
-            if (ShopManager.Instance.hasPurchased("fire") && Random.Range(0, 2) > 0)
-            {
-            }
-            else
-            {
-                foreach (var c in GameObject.FindObjectsOfType<GridCell>())
-                {
-                    if (!c.GetComponent<GridItem>() && !c.GetComponent<ShopCell>() && c.cellInfo.type != "fire" && !isAdjacentToFire(c.index) && !c.isFreezed && isAdjacentToIce(c.index) && !c.GetComponent<GridItem>() && !c.GetComponent<GridBackground>() && !c.GetComponent<GridEmpty>())
-                    {
-                        c.freeze();
-
-                        SFXManager.Instance.play("icespread");
-                        RulePopupManager.Instance.showRule("iceSpread");
-                        //if freezed everything, game over
-
-                        freezedCellCount = freezeCount();
-                        if (freezedCellCount >= 8)
-                        {
-
-                            GameManager.Instance.gameover();
-                            AchievementManager.Instance.clear("freezeToDeath");
-                        }
-                        break;
-                    }
-                }
-
-            }
-        }
-
-        // if it is cell card, don't move it, but destroy and replace it to the cell card
-        // empty position not change.
-        if (cardInfo.isCell())
-        {
-            if (cardInfo.isBoss())
-            {
-                // if it is boss, just create boss and do  nothing
-
-                var go = Instantiate(Resources.Load<GameObject>("boss/" + cardInfo.type), bossParent.position,Quaternion.identity,bossParent);
-                go.GetComponent<Boss>().init(cardInfo.type);
-
-                go.transform.DOPunchScale(Vector3.one, animTime);
-
-                yield return new WaitForSeconds(GridController.Instance.animTime);
-                finishMove();
-                step();
-                EventPool.Trigger("moveAStep");
 
 
-                DeckManager.Instance.removeAllCardFromDeck(card);
-
-                yield break;
-            }
-
-
-            //generate cell, if already a cell, don't generate and add it back to the deck.
-            if (cell.cellInfo.isEmpty())
-            {
-                Debug.Log("generate " + card);
-                //generate a snake
-                var go = generateCell(cell.index, card);
-                destroy(cell.gameObject);
-
-
-                if (go.GetComponent<GridCell>().cellInfo.isEnemy())
-                {
-                    foreach (var item in cellParents[cell.index].GetComponentsInChildren<GridItem>())
-                    {
-                        Destroy(item.gameObject);
-                    }
-                }
-                else
-                {
-                    SFXManager.Instance.play("showup");
-                }
-
-
-
-
-                yield return new WaitForSeconds(GridController.Instance.animTime);
-
-
-
-
-                yield return StartCoroutine(attackAndMove());
-
-
-
-                if (boss)
-                {
-
-                    yield return StartCoroutine( boss.onNextStep());
-
-                }
-
-                finishMove();
-                step();
-                EventPool.Trigger("moveAStep");
-                yield break;
-            }
-            else
-            {
-                DeckManager.Instance.waitingCards(card);
-            }
-        }
+       
 
 
         //move current cell to position
@@ -905,9 +782,6 @@ public class GridController : Singleton<GridController>
 
         var emptyPosition = cellParents[originEmptyIndex].position;
 
-        //cell.transform.DOMove(emptyPosition, animTime);
-        generate(originalMovingCellIndex, card);
-        yield return new  WaitForSeconds(animTime);
 
         bool willGetIntoShop = false;
 
@@ -958,6 +832,9 @@ public class GridController : Singleton<GridController>
                     willGetIntoShop = true;
                 }
             }
+
+            StartCoroutine(moveOthers());
+            yield break;
         }
         else
         {
@@ -1050,6 +927,151 @@ public class GridController : Singleton<GridController>
                     }
                 }
             }
+            else
+            {
+                //draw card
+                string card = "";
+
+                if (boss)
+                {
+
+                    card = DeckManager.Instance.drawBossCard();
+                }
+                else
+                {
+                    //draw a card
+                    card = DeckManager.Instance.drawCard(cell.cellInfo.isEmpty());
+
+
+                }
+                Debug.Log("draw card " + card);
+                var cardInfo = CellManager.Instance.getInfo(card);
+                var freezedCellCount = freezeCount();
+                if (cardInfo.type == "ice")
+                {
+                    //if has ice, don't add
+                    if (freezedCellCount == 0)
+                    {
+                        RulePopupManager.Instance.showRule("ice");
+                        List<GridCell> canFreezeCells = new List<GridCell>();
+                        foreach (var c in GameObject.FindObjectsOfType<GridCell>())
+                        {
+                            if (c.cellInfo.type != "fire" && !isAdjacentToFire(c.index) && !c.GetComponent<GridItem>() && !c.GetComponent<GridBackground>() && !c.GetComponent<GridEmpty>())
+                            {
+                                canFreezeCells.Add(c);
+                            }
+                        }
+
+                        if (canFreezeCells.Count > 0)
+                        {
+                            var freeCell = Utils.randomList(canFreezeCells);
+                            freeCell.freeze();
+
+                            SFXManager.Instance.play("iceshowup");
+                        }
+                    }
+                }
+                else if (GameObject.FindObjectsOfType<GridCell>().Length > 0)
+                {
+                    //ice spread
+
+                    if (ShopManager.Instance.hasPurchased("fire") && Random.Range(0, 2) > 0)
+                    {
+                    }
+                    else
+                    {
+                        foreach (var c in GameObject.FindObjectsOfType<GridCell>())
+                        {
+                            if (!c.GetComponent<GridItem>() && !c.GetComponent<ShopCell>() && c.cellInfo.type != "fire" && !isAdjacentToFire(c.index) && !c.isFreezed && isAdjacentToIce(c.index) && !c.GetComponent<GridItem>() && !c.GetComponent<GridBackground>() && !c.GetComponent<GridEmpty>())
+                            {
+                                c.freeze();
+
+                                SFXManager.Instance.play("icespread");
+                                RulePopupManager.Instance.showRule("iceSpread");
+                                //if freezed everything, game over
+
+                                freezedCellCount = freezeCount();
+                                if (freezedCellCount >= 8)
+                                {
+
+                                    GameManager.Instance.gameover();
+                                    AchievementManager.Instance.clear("freezeToDeath");
+                                }
+                                break;
+                            }
+                        }
+
+                    }
+                }
+
+                // if it is cell card, don't move it, but destroy and replace it to the cell card
+                // empty position not change.
+                if (cardInfo.isCell())
+                {
+                    if (cardInfo.isBoss())
+                    {
+                        // if it is boss, just create boss and do  nothing
+
+                        var go = Instantiate(Resources.Load<GameObject>("boss/" + cardInfo.type), bossParent.position, Quaternion.identity, bossParent);
+                        go.GetComponent<Boss>().init(cardInfo.type);
+
+                        go.transform.DOPunchScale(Vector3.one, animTime);
+
+                        yield return new WaitForSeconds(GridController.Instance.animTime);
+                        finishMove();
+                        step();
+                        EventPool.Trigger("moveAStep");
+
+
+                        DeckManager.Instance.removeAllCardFromDeck(card);
+
+                        yield break;
+                    }
+
+
+                    //generate cell, if already a cell, don't generate and add it back to the deck.
+                    if (cell.cellInfo.isEmpty())
+                    {
+                        Debug.Log("generate " + card);
+                        //generate a snake
+                        var go = generateCell(cell.index, card);
+                        destroy(cell.gameObject);
+
+
+                        if (go.GetComponent<GridCell>().cellInfo.isEnemy())
+                        {
+                            foreach (var item in cellParents[cell.index].GetComponentsInChildren<GridItem>())
+                            {
+                                Destroy(item.gameObject);
+                            }
+                        }
+                        else
+                        {
+                            SFXManager.Instance.play("showup");
+                        }
+
+
+
+
+                    }
+                    else
+                    {
+                        DeckManager.Instance.waitingCards(card);
+                    }
+                }
+
+                //cell.transform.DOMove(emptyPosition, animTime);
+                // generate(originalMovingCellIndex, card);
+                // yield return new WaitForSeconds(animTime);
+
+
+
+
+
+
+                StartCoroutine(moveOthers());
+                yield break;
+            }
 
             // if generate new item on new position, don't update emptyCell
             //if (combination != null && combination.result.ContainsKey("generate1"))
@@ -1078,21 +1100,21 @@ public class GridController : Singleton<GridController>
         }
 
 
-        yield return new WaitForSeconds(animTime);
+        //yield return new WaitForSeconds(animTime);
 
-        if (boss)
-        {
+        //if (boss)
+        //{
 
-            yield return StartCoroutine(boss.onNextStep());
-        }
+        //    yield return StartCoroutine(boss.onNextStep());
+        //}
 
-        if (!willGetIntoShop)
-        {
+        //if (!willGetIntoShop)
+        //{
 
-            yield return StartCoroutine(attackAndMove());
-            step();
-            EventPool.Trigger("moveAStep");
-        }
+        //    yield return StartCoroutine(attackAndMove());
+        //    step();
+        //    EventPool.Trigger("moveAStep");
+        //}
 
 
 

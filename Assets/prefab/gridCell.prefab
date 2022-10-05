@@ -404,7 +404,7 @@ SortingGroup:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1766114458741427111}
-  m_Enabled: 1
+  m_Enabled: 0
   m_SortingLayerID: 1006497223
   m_SortingLayer: 4
   m_SortingOrder: 10
@@ -478,7 +478,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1006497223
   m_SortingLayer: 4
-  m_SortingOrder: 10
+  m_SortingOrder: 105
   m_Sprite: {fileID: 21300000, guid: dc8b1d4841a05f64a805edd4ee56f5a5, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -560,7 +560,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1006497223
   m_SortingLayer: 4
-  m_SortingOrder: 1
+  m_SortingOrder: 100
   m_Sprite: {fileID: 21300000, guid: 9eb5308365cb0f14bbe36489e093f970, type: 3}
   m_Color: {r: 1, g: 0.84705883, b: 0.6627451, a: 1}
   m_FlipX: 0
@@ -815,7 +815,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1006497223
   m_SortingLayer: 4
-  m_SortingOrder: 100
+  m_SortingOrder: 110
   m_Sprite: {fileID: 21300000, guid: 341949c67feae2247a910fc27ec6a87b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -1231,7 +1231,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 0
   m_SortingLayerID: 1006497223
-  m_SortingOrder: 100
+  m_SortingOrder: 120
   m_TargetDisplay: 0
 --- !u!114 &6150836138407753127
 MonoBehaviour:
@@ -1331,7 +1331,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 0
   m_SortingLayerID: 1006497223
-  m_SortingOrder: 101
+  m_SortingOrder: 120
   m_TargetDisplay: 0
 --- !u!114 &1668598159063855408
 MonoBehaviour:

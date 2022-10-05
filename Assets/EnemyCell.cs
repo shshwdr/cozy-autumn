@@ -333,15 +333,15 @@ public class EnemyCell : MonoBehaviour
         if (resValue >= value || res == "nut")
 
         {
-            ResourceManager.Instance.consumeResource(res, value);
+            ResourceManager.Instance.consumeResource(res, value,transform.position);
         }
         else
         {
 
-            ResourceManager.Instance.consumeResource(res, resValue);
+            ResourceManager.Instance.consumeResource(res, resValue, transform.position);
 
 
-            ResourceManager.Instance.consumeResource("nut", (value - resValue) * 2);
+            ResourceManager.Instance.consumeResource("nut", (value - resValue) * 2, transform.position);
         }
     }
     bool hasAttacked = false;

@@ -73,7 +73,7 @@ public class CollectionManager : Singleton<CollectionManager>
 		}
 	}
 
-	void MoveSource(Vector3 start, Vector3 end, string property, int amount, Action action, Ease type,string text = "")
+	void MoveSource(Vector3 start, Vector3 end, string property, int amount, Action action, Ease type, Color color, string text = "")
 	{
 		for (int i = 0; i < amount; i++)
 		{
@@ -84,6 +84,7 @@ public class CollectionManager : Singleton<CollectionManager>
 				GameObject coin = coinsQueue.Dequeue();
 				coin.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("resource/" + property);
 				coin.GetComponentInChildren<Text>().text = text;
+				coin.GetComponentInChildren<Text>().color = color;
 				coin.SetActive(true);
 
 				//move coin to the collected coin pos
@@ -141,7 +142,7 @@ public class CollectionManager : Singleton<CollectionManager>
 	{
 		transform.DOKill();
 	}
-	public void RemoveCoins(List<PairInfo<int>> resource)
+	public void RemoveCoins(List<PairInfo<int>> resource,Vector3 position)
 	{
 		if (resource == null)
 		{
@@ -164,10 +165,10 @@ public class CollectionManager : Singleton<CollectionManager>
 
 			//ResourceManager.Instance.consumeResource(pair.Key, pair.Value);
 
-
-			MoveSource(worldPos - new Vector3(dropXOffset, 0, 0), worldPos - new Vector3(dropXOffset, 1,0), pair.Key, pair.Value, () =>
+			//worldPos - new Vector3(dropXOffset, 0, 0)
+			MoveSource(position, worldPos - new Vector3(dropXOffset, 1,0), pair.Key, pair.Value, () =>
 			{
-			},dropEaseType, "-"+pair.Value);
+			},dropEaseType, Color.red, "-"+pair.Value);
 		}
 	}
 
@@ -195,7 +196,7 @@ public class CollectionManager : Singleton<CollectionManager>
                 //BeeManager.Instance.updateGenerateTime();
                 //PestManager.Instance.updateGenerateTime();
                 //TutorialManager.Instance.collectResource(pair.Key);
-            },easeType);
+            },easeType, Color.black);
         }
 
     }
