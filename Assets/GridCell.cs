@@ -26,6 +26,9 @@ public class GridCell : MonoBehaviour
     public GameObject newRuleAlert;
     public CanvasGroup descriptionCanvas;
     public bool isFreezed = false;
+
+    public Text amountLabel;
+    public int amount;
     public void updateHp(int x)
     {
         hp.text = x.ToString();
@@ -53,7 +56,7 @@ public class GridCell : MonoBehaviour
         ice.SetActive(false);
     }
 
-    public  void init(string _type,int i)
+    public  void init(string _type,int i,int _amount)
     {
         if (hp)
         {
@@ -78,8 +81,48 @@ public class GridCell : MonoBehaviour
             bk.GetComponent<SpriteRenderer>().color = new Color(1,0.5f, 0.5f);
         }
 
+        if (_amount > 0)
+        {
+            amount = _amount;
+        }
+        else
+        {
+            if (cellInfo.categoryValue > 0)
+            {
+                amount = cellInfo.categoryValue;
+            }
+            else
+            {
+                amount = 1;
+            }
+        }
+        updateAmount();
+    }
 
-
+    public void updateAmount()
+    {
+        if(amountLabel == null)
+        {
+            return;
+        }
+        if (amount > 1)
+        {
+            amountLabel.text = amount.ToString();
+        }
+        else
+        {
+            amountLabel.text = "";
+        }
+    }
+    public void addAmount()
+    {
+        amount += 1;
+        updateAmount();
+    }
+    public void decreaseAmount()
+    {
+        amount -= 1;
+        updateAmount();
     }
 
     public void equip(string e)

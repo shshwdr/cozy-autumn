@@ -12,3 +12,6 @@ fire,stick,addHot:1|increaseObjectHP:4|destroy2:0,,fire+stick
 fire,stone,addHot:1|increaseObjectHP:-3|destroy2:0,,fire+stone
 fire,birdTrap,addHot:1|increaseObjectHP:7|destroy2:0,,fire+birdTrap
 fire,trap,addHot:1,,
+nutOnTree,empty,generate1:nut,,
+nutOnTree,stick,generate1:birdTrap|destroy2:0,,
+nutOnTree,nut,generate1:nut,,

@@ -372,7 +372,7 @@ public class GridController : Singleton<GridController>
     {
         return playerCell.transform;
     }
-    GameObject generateCell(int index, string type)
+    GameObject generateCell(int index, string type, int amount = -1)
     {
         GameObject res;
         if(type == "empty")
@@ -394,7 +394,7 @@ public class GridController : Singleton<GridController>
       //  res.transform.localScale = Vector3.one;
         res.transform.DOPunchScale(Vector3.one, animTime);
 
-        res.GetComponent<GridCell>().init(type, index);
+        res.GetComponent<GridCell>().init(type, index, amount);
         return res;
     }
 
@@ -711,6 +711,10 @@ public class GridController : Singleton<GridController>
 
     public bool hasEqualOrMoreCardsWithType(string type, int count)
     {
+        if(count == 0)
+        {
+            return false;
+        }
         GridCell[] cells = GameObject.FindObjectsOfType<GridCell>();
         int t = 0;
         foreach(GridCell c in cells)
@@ -894,7 +898,7 @@ public class GridController : Singleton<GridController>
 
         //move current cell to position
         var originEmptyIndex = emptyCellIndex;
-        var movingCellIndex = cell.index;
+        var originalMovingCellIndex = cell.index;
 
         StartCoroutine( exchangeCard(cell, emptyCellIndex));
 
@@ -902,7 +906,7 @@ public class GridController : Singleton<GridController>
         var emptyPosition = cellParents[originEmptyIndex].position;
 
         //cell.transform.DOMove(emptyPosition, animTime);
-        generate(movingCellIndex, card);
+        generate(originalMovingCellIndex, card);
         yield return new  WaitForSeconds(animTime);
 
         bool willGetIntoShop = false;
@@ -980,21 +984,41 @@ public class GridController : Singleton<GridController>
                         //    resource.Add(new PairInfo<int>(info.categoryDetail, int.Parse(pair.Value)));
                         //    CollectionManager.Instance.AddCoins(transform.position, resource);
                         //    break;
-                        case "destroy1":
-                            addEmpty(originEmptyIndex);
-                            destroy(cell.gameObject);
-                            break;
+                        //case "destroy1":
+                        //    cell.decreaseAmount();
+                        //    if (cell.amount == 0)
+                        //    {
+
+                        //        addEmpty(originEmptyIndex);
+                        //        destroy(cell.gameObject);
+                        //    }
+                        //    break;
                         case "destroy2":
                             destroy(targetCell.gameObject);
                             break;
                         case "addHot":
                             break;
-
                         case "generate1":
-                            //generate new item in target position, generate empty in origin position
-                            addEmpty(movingCellIndex);
+                            cell.decreaseAmount();
+                            if (cell.amount == 0)
+                            {
+
+                                //generate new item in target position, generate empty in origin position
+                                addEmpty(originalMovingCellIndex);
+                            }
+                            else
+                            {
+                                generateCell(originalMovingCellIndex, cell.type, cell.amount);
+                            }
                             destroy(cell.gameObject);
-                            generateCell(originEmptyIndex, pair.Value);
+                            if (targetCell && targetCell.type == pair.Value)
+                            {
+                                targetCell.addAmount();
+                            }
+                            else
+                            {
+                                generateCell(originEmptyIndex, pair.Value);
+                            }
 
                             moveCard(emptyCell, originEmptyIndex);
 
@@ -1005,12 +1029,12 @@ public class GridController : Singleton<GridController>
                             //addEmpty(originEmptyIndex);
                             //destroy(cell.gameObject);
 
-                            if (cellParents[movingCellIndex].GetComponentInChildren<GridItem>())
+                            if (cellParents[originalMovingCellIndex].GetComponentInChildren<GridItem>())
                             {
-                                destroy( cellParents[movingCellIndex].GetComponentInChildren<GridItem>().gameObject);
+                                destroy( cellParents[originalMovingCellIndex].GetComponentInChildren<GridItem>().gameObject);
                             }
 
-                            generateCell(movingCellIndex, pair.Value);
+                            generateCell(originalMovingCellIndex, pair.Value);
 
                             SFXManager.Instance.play("showup");
                             break;
@@ -1047,8 +1071,8 @@ public class GridController : Singleton<GridController>
         {
             cell.GetComponent<FireCell>().getDamage(1);
 
-            cellParents[movingCellIndex].GetComponent<GridBackground>().heat();
-            Instantiate(fireVFX, cellParents[movingCellIndex].position, Quaternion.identity);
+            cellParents[originalMovingCellIndex].GetComponent<GridBackground>().heat();
+            Instantiate(fireVFX, cellParents[originalMovingCellIndex].position, Quaternion.identity);
 
             RulePopupManager.Instance.showRule("fireMove");
         }
