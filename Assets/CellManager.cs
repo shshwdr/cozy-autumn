@@ -9,7 +9,10 @@ public class CellInfo {
     public string categoryType;
     public string categoryDetail;
     public int maxCount;
-    
+    public Dictionary<int, string> textWhenFirstMeet;
+    public int showTime = 0;
+
+
     public bool isCell() { return cellType == 1; }
     public bool isEnemy() { return categoryType == "enemy"; }
     public bool isBoss() { return categoryType == "boss"; }
@@ -42,7 +45,18 @@ public class CellManager : Singleton<CellManager>
             cellInfoDict[info.type] = info;
         }
     }
-
+    public void showCell(string type)
+    {
+        if (!cellInfoDict.ContainsKey(type))
+        {
+            return;
+        }
+        cellInfoDict[type].showTime++;
+        if (cellInfoDict[type].textWhenFirstMeet !=null&& cellInfoDict[type].textWhenFirstMeet.ContainsKey(cellInfoDict[type].showTime))
+        {
+            TextWhenShowCell.Instance.showText(cellInfoDict[type].textWhenFirstMeet[cellInfoDict[type].showTime]);
+        }
+    }
     public CellInfo getInfo(string type)
     {
 

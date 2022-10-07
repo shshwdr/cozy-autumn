@@ -58,6 +58,7 @@ public class GridCell : MonoBehaviour
 
     public  void init(string _type,int i,int _amount)
     {
+        CellManager.Instance.showCell(_type);
         if (hp)
         {
 
@@ -192,6 +193,77 @@ public class GridCell : MonoBehaviour
             newRuleAlert.SetActive(false);
         }
     }
+
+    bool isMouseDown = false;
+    float mouseDownTime;
+    float longPressTime = 0.3f;
+    public virtual void OnMouseUp()
+    {
+
+        Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+        if (GetComponent<Collider2D>().OverlapPoint(mousePosition))
+        {
+            if (Time.time - mouseDownTime > longPressTime)
+            {
+
+                //GridController.Instance.exploreCell(this);
+                GridController.Instance.moveCell(this,true);
+
+                ResourceManager.Instance.consumeResource("nut", 1, transform.position);
+            }
+            else
+            {
+
+                GridController.Instance.moveCell(this,false);
+            }
+        }
+
+
+
+
+
+
+
+        isMouseDown = false;
+
+        ExploreHoldText.text = "";
+        progressBar.fillAmount = 0;
+    }
+
+    public Image progressBar;
+    public Text ExploreHoldText;
+
+    
+    private void OnMouseOver()
+    {
+        Debug.Log("just over");
+        if (isMouseDown)
+        {
+            
+            progressBar.fillAmount = (Time.time - mouseDownTime) / longPressTime;
+            if (progressBar.fillAmount >= 1)
+            {
+                progressBar.color = Color.black;
+            }
+            else
+            {
+
+                progressBar.color = Color.green;
+            }
+            Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            if (!GetComponent<Collider2D>().OverlapPoint(mousePosition))
+            {
+
+                ExploreHoldText.text = "Cancel";
+               // progressBar.fillAmount = 0;
+                return;
+            }
+
+            //update progress bar
+        }
+    }
+
     public virtual void OnMouseDown()
     {
         if (!EventSystem.current.IsPointerOverGameObject())
@@ -214,8 +286,9 @@ public class GridCell : MonoBehaviour
                 failedToMove();
                 return;
             }
-
-            GridController.Instance.moveCell(this);
+            isMouseDown = true;
+            mouseDownTime = Time.time;
+            ExploreHoldText.text = "Move";
             //index = GridController.Instance.moveCellToEmpty(this);
             //  if(index == -1)
             //  {

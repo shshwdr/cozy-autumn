@@ -462,7 +462,7 @@ namespace Sinbad
                 string[] pairs = strValue.Split('|');
                 foreach (string pair in pairs)
                 {
-                    if(pair.Length == 0)
+                    if (pair.Length == 0)
                     {
                         continue;
                     }
@@ -477,6 +477,37 @@ namespace Sinbad
                         Debug.LogError("key " + p[0] + " has been defined multiple times in string: " + strValue);
                     }
                     res[p[0]] = p[1];
+                }
+                return res;
+            }
+            else if (t == typeof(Dictionary<int, string>))
+            {
+                Dictionary<int, string> res = new Dictionary<int, string>();
+                string[] pairs = strValue.Split('|');
+                foreach (string pair in pairs)
+                {
+                    if (pair.Length == 0)
+                    {
+                        continue;
+                    }
+                    string[] p = pair.Split(':');
+                    if (p.Length != 2)
+                    {
+                        Debug.LogError("error when parse pair" + pair + " in string: " + strValue);
+                        return res;
+                    }
+
+                    int parsedInt = 0;
+                    bool suc= int.TryParse(p[0],out parsedInt);
+                    if (!suc)
+                    {
+                        Debug.LogError("key " + p[0] + "is not int");
+                    }
+                    if (res.ContainsKey(parsedInt))
+                    {
+                        Debug.LogError("key " + p[0] + " has been defined multiple times in string: " + strValue);
+                    }
+                    res[parsedInt] = p[1];
                 }
                 return res;
             }

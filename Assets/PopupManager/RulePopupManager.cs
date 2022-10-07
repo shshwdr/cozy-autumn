@@ -18,6 +18,7 @@ public class RulePopupManager : Singleton<RulePopupManager>
     bool isShowing;
     HashSet<string> visited = new HashSet<string>();
     Queue<string> ruleQueues = new Queue<string>();
+    float rulePopupTime = 10f;
     public void showRule(string type)
     {
         getCanvas();
@@ -45,7 +46,7 @@ public class RulePopupManager : Singleton<RulePopupManager>
     }
     IEnumerator closePopup(GameObject go)
     {
-        yield return new WaitForSeconds(5);
+        yield return new WaitForSeconds(rulePopupTime);
         if (go)
         {
             go.GetComponent<UIView>().Hide();
