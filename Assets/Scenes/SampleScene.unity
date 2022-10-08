@@ -11134,7 +11134,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8e3644bf9e792348a1aea4b380908d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wouldShuffle: 1
+  wouldShuffle: 0
 --- !u!1 &257566117
 GameObject:
   m_ObjectHideFlags: 0
@@ -20630,9 +20630,10 @@ MonoBehaviour:
   countDownObject: {fileID: 0}
   type: 
   equipment: 
+  equipementDamage: 0
+  equipementDamageLabel: {fileID: 0}
   equipRenderer: {fileID: 1863671512}
   ice: {fileID: 1213093012}
-  hp: {fileID: 314409709}
   newRuleAlert: {fileID: 0}
   descriptionCanvas: {fileID: 0}
   isFreezed: 0
@@ -49418,9 +49419,10 @@ MonoBehaviour:
   countDownObject: {fileID: 0}
   type: 
   equipment: 
+  equipementDamage: 0
+  equipementDamageLabel: {fileID: 0}
   equipRenderer: {fileID: 2073926364}
   ice: {fileID: 39756146}
-  hp: {fileID: 1748658125}
   newRuleAlert: {fileID: 0}
   descriptionCanvas: {fileID: 0}
   isFreezed: 0
@@ -72692,9 +72694,10 @@ MonoBehaviour:
   countDownObject: {fileID: 0}
   type: 
   equipment: 
+  equipementDamage: 0
+  equipementDamageLabel: {fileID: 0}
   equipRenderer: {fileID: 1534818026}
   ice: {fileID: 1618634564}
-  hp: {fileID: 713038287}
   newRuleAlert: {fileID: 0}
   descriptionCanvas: {fileID: 0}
   isFreezed: 0
@@ -93934,9 +93937,10 @@ MonoBehaviour:
   countDownObject: {fileID: 0}
   type: 
   equipment: 
+  equipementDamage: 0
+  equipementDamageLabel: {fileID: 0}
   equipRenderer: {fileID: 0}
   ice: {fileID: 0}
-  hp: {fileID: 0}
   newRuleAlert: {fileID: 0}
   descriptionCanvas: {fileID: 0}
   isFreezed: 0

@@ -19,20 +19,18 @@ public class GridCell : MonoBehaviour
     public string type;
 
     public string equipment = null;
+    public int equipementDamage;
+    public Text equipementDamageLabel;
     public SpriteRenderer equipRenderer;
     public GameObject ice;
 
-    public Text hp;
     public GameObject newRuleAlert;
     public CanvasGroup descriptionCanvas;
     public bool isFreezed = false;
 
     public Text amountLabel;
     public int amount;
-    public void updateHp(int x)
-    {
-        hp.text = x.ToString();
-    }
+
 
     public void freeze()
     {
@@ -60,29 +58,18 @@ public class GridCell : MonoBehaviour
     public  void init(string _type,int i,int _amount)
     {
         CellManager.Instance.showCell(_type);
-        if (hp)
-        {
-
-            hp.text = "";
-        }
         type = _type;
         cellInfo = CellManager.Instance.getInfo(type);
         renderer.sprite = Resources.Load<Sprite>("cell/" + type);
         index = i;
         bk.SetActive(cellInfo.isCell());
 
-        if (cellInfo.isEnemy())
-        {
-
-            gameObject. AddComponent<EnemyCell>().init(type);
-            bk.GetComponent<SpriteRenderer>().color = Color.red;
-        }
         if(cellInfo.type == "fire")
         {
             gameObject.AddComponent<FireCell>();
             bk.GetComponent<SpriteRenderer>().color = new Color(1,0.5f, 0.5f);
         }
-
+        
         if (_amount > 0)
         {
             amount = _amount;
@@ -92,14 +79,41 @@ public class GridCell : MonoBehaviour
             if (cellInfo.categoryValue > 0)
             {
                 amount = cellInfo.categoryValue;
+                amountLabel.gameObject.SetActive(true);
             }
             else
             {
                 amount = 1;
+                if (amountLabel)
+                {
+
+                    amountLabel.gameObject.SetActive(false);
+                }
             }
         }
+
+
+        if (cellInfo.isEnemy())
+        {
+
+            gameObject.AddComponent<EnemyCell>().init(type,amount);
+            bk.GetComponent<SpriteRenderer>().color = Color.red;
+        }
+
         updateAmount();
+
+        equipementDamage = 0;
+        updateEquipmentDamage();
+
+        equipment = null;
+        if (equipRenderer!=null)
+        {
+
+            equipRenderer.sprite = Resources.Load<Sprite>("cell/" + "empty");
+        }
     }
+
+
 
     public void updateAmount()
     {
@@ -116,18 +130,24 @@ public class GridCell : MonoBehaviour
             amountLabel.text = "";
         }
     }
+
+    public void setAmount(int x)
+    {
+        amount = x;
+        updateAmount();
+    }
     public void addAmount()
     {
         amount += 1;
         updateAmount();
     }
-    public void decreaseAmount()
+    public void decreaseAmount(int x = 1)
     {
-        amount -= 1;
+        amount -= x;
         updateAmount();
     }
 
-    public void equip(string e)
+    public void equip(string e, int am)
     {
         equipment = e;
         equipRenderer.sprite = Resources.Load<Sprite>("cell/" + equipment);
@@ -135,6 +155,8 @@ public class GridCell : MonoBehaviour
         equipRenderer.transform.DOPunchScale(equipRenderer.transform.localScale*2, GridController.Instance.animTime);
 
         SFXManager.Instance.play("equipweapon");
+        equipementDamage = am;
+        updateEquipmentDamage();
     }
 
     public bool hasEquipment()
@@ -148,6 +170,32 @@ public class GridCell : MonoBehaviour
         transform.DOKill();
         descriptionCanvas.DOKill();
     }
+
+    void updateEquipmentDamage()
+    {
+        if (!equipementDamageLabel)
+        {
+            return;
+        }
+        if (equipementDamage <= 0)
+        {
+            equipementDamageLabel.text = "";
+        }
+        else
+        {
+
+            equipementDamageLabel.text = equipementDamage.ToString();
+        }
+    }
+    public void attackWithEquipement(int value)
+    {
+        equipementDamage -= value;
+        if (equipementDamage <= 0)
+        {
+            unequip(transform);
+        }
+        updateEquipmentDamage();
+    }
     public void unequip(Transform targetTransform)
     {
         if (equipment == null)
@@ -155,9 +203,9 @@ public class GridCell : MonoBehaviour
             Debug.LogError("nothing to unequip");
         }
 
-        var go = Instantiate(Resources.Load<GameObject>("flyingObject"), equipRenderer.transform.position, Quaternion.identity);
-        go.transform.localScale = equipRenderer.transform.localScale;
-        go.GetComponent<FlyingObject>().init(equipRenderer.sprite, targetTransform.position);
+        //var go = Instantiate(Resources.Load<GameObject>("flyingObject"), equipRenderer.transform.position, Quaternion.identity);
+        //go.transform.localScale = equipRenderer.transform.localScale;
+        //go.GetComponent<FlyingObject>().init(equipRenderer.sprite, targetTransform.position);
 
         equipment = null;
         equipRenderer.sprite = Resources.Load<Sprite>("cell/" + "empty");
@@ -201,7 +249,11 @@ public class GridCell : MonoBehaviour
     public virtual void OnMouseUp()
     {
 
-        Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        if (!isMouseDown)
+        {
+            return;
+        }
+            Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
         if (GetComponent<Collider2D>().OverlapPoint(mousePosition))
         {

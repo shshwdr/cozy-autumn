@@ -63,14 +63,14 @@ public class DeckManager : Singleton<DeckManager>
             var cardInfo = CellManager.Instance.getInfo(card);
             if (!GridController.Instance.hasEqualOrMoreCardsWithType(cardInfo.type,cardInfo.maxCount))
             {
-                return cardInfo.type;
+                return card;
             }
 
             test--;
             if (test <= 0)
             {
                 Debug.LogError("?");
-                return cardInfo.type;
+                return card;
             }
         }
     }

@@ -16,7 +16,7 @@ public class FireCell : MonoBehaviour
         cell = GetComponent<GridCell>();
         EventPool.OptIn("moveAStep", stepAttack);
         stepAttack();
-        cell.updateHp(hp);
+        cell.setAmount(hp);
 
         SFXManager.Instance.play("fire");
     }
@@ -25,13 +25,13 @@ public class FireCell : MonoBehaviour
     {
         hp += x;
 
-        cell.updateHp(hp);
+        cell.setAmount(hp);
     }
 
     public void getDamage(int x)
     {
         hp -= 1;
-        cell.updateHp(hp);
+        cell.setAmount(hp);
         if (hp <= 0)
         {
             GridController.Instance.addEmpty(GetComponent<GridCell>().index);

@@ -13,20 +13,33 @@ public class EnemyCell : MonoBehaviour
     GridCell cell;
     CellInfo info;
     bool isFirst = true;
+    bool hasBeenAttacked = false;
     public bool isBoss = false;
+
+    int getAttack { get { return hp; } }
+
 
     int attackCountDown = 10000;
 
     CounterDown countDownObject;
     CanvasGroup explainPanel;
     bool hasUpdatedDescription = false;
-    public void init(string type)
+    public void init(string type,int a)
     {
         info = CellManager.Instance.getInfo(type);
 
         SFXManager.Instance.play(type + "show");
         explainPanel = GetComponentInChildren<CanvasGroup>();
         updateDescription();
+        hp = a;
+
+        cell = GetComponent<GridCell>();
+        cell.setAmount(hp);
+    }
+
+    public void finishedMove()
+    {
+        hasBeenAttacked = false;
     }
 
     private void OnDestroy()
@@ -172,12 +185,15 @@ public class EnemyCell : MonoBehaviour
             return;
         }
 
-        hp -= 1;
+        hp -= x;
         if(hp <= 0)
         {
             die();
         }
+        cell.setAmount(hp);
         SFXManager.Instance.play("animalLose");
+        isFirst = false;
+        hasBeenAttacked = true;
     }
 
     void playAttackEffect(GridCell attackee)
@@ -192,18 +208,18 @@ public class EnemyCell : MonoBehaviour
         Destroy(go, 1f);
         SFXManager.Instance.play("scream");
     }
-    bool beAttack(GridCell attackee, bool forceAttack)
-    {
-        if (attackee.hasEquipment() && !forceAttack && canBeAttacked())
-        {
-            attackee.unequip(transform);
+    //bool beAttack(GridCell attackee, bool forceAttack)
+    //{
+    //    if (attackee.hasEquipment() && !forceAttack && canBeAttacked())
+    //    {
+    //        attackee.unequip(transform);
 
-            FindObjectOfType<AchievementManager>().ShowAchievement("slash");
-            FindObjectOfType<AchievementManager>().ShowAchievement("slash2");
-            return true;
-        }
-        return false;
-    }
+    //        FindObjectOfType<AchievementManager>().ShowAchievement("slash");
+    //        FindObjectOfType<AchievementManager>().ShowAchievement("slash2");
+    //        return true;
+    //    }
+    //    return false;
+    //}
     bool attack(GridCell attackee, bool canAttack)
     {
         if (canAttack && !isDead)
@@ -216,11 +232,11 @@ public class EnemyCell : MonoBehaviour
             if (attackee.cellInfo.isPlayer())
             {
 
-                takeResource(info.requireResource, info.attack);
+                takeResource(info.requireResource, getAttack);
             }
             else
             {
-                attackee.decreaseAmount();
+                attackee.decreaseAmount(getAttack);
             }
             return true;
         }
@@ -238,11 +254,13 @@ public class EnemyCell : MonoBehaviour
         var player = GridController.Instance.getPlayerTransform().GetComponent<GridCell>();
         var ally = GridController.Instance.getAllyGridCell();
         //logic need to change if enemy has more than one hp
-        if (ally && GridController.Instance.isAllyAround(GetComponent<GridCell>().index) && beAttack(ally, forceAttack))
-        {
-        } else if (player && GridController.Instance.isPlayerAround(GetComponent<GridCell>().index) && beAttack(player, forceAttack))
-        {
-        }else if (ally && GridController.Instance.isAllyAround(GetComponent<GridCell>().index) && attack(ally, canAttack))
+        //if (ally && GridController.Instance.isAllyAround(GetComponent<GridCell>().index) && beAttack(ally, forceAttack))
+        //{
+        //} else if (player && GridController.Instance.isPlayerAround(GetComponent<GridCell>().index) && beAttack(player, forceAttack))
+        //{
+        //}else 
+        
+        if (ally && GridController.Instance.isAllyAround(GetComponent<GridCell>().index) && attack(ally, canAttack))
         {
 
         }else if (player && GridController.Instance.isPlayerAround(GetComponent<GridCell>().index) && attack(player, canAttack))
@@ -253,7 +271,7 @@ public class EnemyCell : MonoBehaviour
         }
         if (info.stayMode == 0)
         {
-            getDamage(1);
+            getDamage(getAttack);
         }
         yield return new WaitForSeconds(GridController.Instance.animTime);
 
@@ -294,7 +312,7 @@ public class EnemyCell : MonoBehaviour
     public bool willAttack()
     {
         hasAttacked = false;
-        if (isFirst || isDead)
+        if (isFirst || isDead || hasBeenAttacked)
         {
             return false;
         }
@@ -379,7 +397,7 @@ public class EnemyCell : MonoBehaviour
 
     public bool willMove()
     {
-        if (isFirst || isDead || hasAttacked)
+        if (isFirst || isDead || hasAttacked|| hasBeenAttacked)
         {
             return false;
         }
@@ -395,19 +413,23 @@ public class EnemyCell : MonoBehaviour
         yield return null;
         if (isDead)
         {
+            hasBeenAttacked = false;
             yield break;
         }
         if (isFirst)
         {
+            hasBeenAttacked = false;
             yield break;
         }
         if (isDead)
         {
+            hasBeenAttacked = false;
             yield break;
         }
         if (hasAttacked)
         {
 
+            hasBeenAttacked = false;
             yield break;
         }
 
@@ -420,6 +442,7 @@ public class EnemyCell : MonoBehaviour
             if (GridController.Instance.isCharacterAround(GetComponent<GridCell>().index) || attackCountDown == 0)
             {
                 yield return StartCoroutine(activeAttack());
+                hasBeenAttacked = false;
                 yield break;
             }
             hasAttacked = true;
@@ -439,6 +462,7 @@ public class EnemyCell : MonoBehaviour
 
 
 
+        hasBeenAttacked = false;
     }
 
 

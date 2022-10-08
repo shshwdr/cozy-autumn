@@ -154,7 +154,7 @@ public class GridController : Singleton<GridController>
     {
         yield return null;
         //find player
-            StartCoroutine(enemy.activeAttack(true));
+        yield return StartCoroutine(enemy.activeAttack(true));
 
             //move player to a safe place
             if (dangerousIndices.Contains(emptyCellIndex))
@@ -426,6 +426,13 @@ public class GridController : Singleton<GridController>
       //  res.transform.localScale = Vector3.one;
         res.transform.DOPunchScale(Vector3.one, animTime);
 
+        var typeSplit = type.Split('_');
+        if (typeSplit.Length > 1)
+        {
+            type = typeSplit[0];
+            amount = int.Parse(typeSplit[1]);
+        }
+
         res.GetComponent<GridCell>().init(type, index, amount);
         return res;
     }
@@ -513,7 +520,11 @@ public class GridController : Singleton<GridController>
     {
         yield return null;
         {
-            cell.getDamage(1);
+            var trapDamage = trap.amount;
+            var cellHp = cell.hp;
+            var damage = Mathf.Min(trapDamage, cellHp);
+            cell.getDamage(damage);
+            trap.decreaseAmount(damage);
             var trapName = trap.type;
             SFXManager.Instance.play(trapName);
             destroy(trap.gameObject);
@@ -608,14 +619,23 @@ public class GridController : Singleton<GridController>
             bool attackWithWeapon = false;
 
 
+            int damage = characterCell.equipementDamage;
+            foreach (var cell in getAdjacentCells(index))
+            {
+                if (cell.cellInfo.isEnemy() && cell.GetComponent<EnemyCell>().canBeAttacked())
+                {
+
+                    damage = Mathf.Min(damage, cell.amount);
+                    attackWithWeapon = true;
+                }
+            }
 
             foreach (var cell in getAdjacentCells(index))
             {
                 if (cell.cellInfo.isEnemy() && cell.GetComponent<EnemyCell>().canBeAttacked())
                 {
 
-                    cell.GetComponent<EnemyCell>().getDamage(1);
-                    attackWithWeapon = true;
+                    cell.GetComponent<EnemyCell>().getDamage(damage);
                     if (characterCell.equipment != null)
                     {
 
@@ -639,7 +659,7 @@ public class GridController : Singleton<GridController>
             }
             if (attackWithWeapon)
             {
-                characterCell.unequip(transform);
+                characterCell.attackWithEquipement(damage);
                 FindObjectOfType<AchievementManager>().ShowAchievement("slash");
             }
         }
@@ -675,9 +695,9 @@ public class GridController : Singleton<GridController>
             }
         }
 
-        //calculate player
-        StartCoroutine(characterAttack(allyCell, allyCellIndex));
-        StartCoroutine(characterAttack(playerCell, playerCellIndex));
+        //calculate player attack
+        yield return StartCoroutine(characterAttack(allyCell, allyCellIndex));
+        yield return StartCoroutine(characterAttack(playerCell, playerCellIndex));
 
         //calcualte enemy attack
 
@@ -704,6 +724,12 @@ public class GridController : Singleton<GridController>
                 {
 
                     yield return StartCoroutine(cell.GetComponent<EnemyCell>().startMove());
+                    
+                }
+                if (cell.cellInfo.isEnemy())
+                {
+
+                    cell.GetComponent<EnemyCell>().finishedMove();
                 }
             }
         }
@@ -957,7 +983,7 @@ public class GridController : Singleton<GridController>
         }
 
 
-        StartCoroutine(moveOthers());
+        yield return  StartCoroutine(moveOthers());
 
     }
     IEnumerator moveCellAnim(GridCell cell, bool forceMove)
@@ -1000,7 +1026,7 @@ public class GridController : Singleton<GridController>
 
         if (cell.GetComponent<GridCell>().cellInfo.isAlly())
         {
-            StartCoroutine(exchangeCard(cell, emptyCellIndex));
+            yield return StartCoroutine(exchangeCard(cell, emptyCellIndex));
 
             SFXManager.Instance.play("squirrelmove");
             if (targetCell)
@@ -1029,7 +1055,7 @@ public class GridController : Singleton<GridController>
                 //else 
                 if (targetCell.cellInfo.isWeapon())
                 {
-                    cell.GetComponent<GridCell>().equip(cell2String);
+                    cell.GetComponent<GridCell>().equip(cell2String, targetCell.cellInfo.categoryValue);
 
                     RulePopupManager.Instance.showRule("playerEquip" + cell2String);
                     destroy(targetCell.gameObject);
@@ -1045,7 +1071,7 @@ public class GridController : Singleton<GridController>
         }
         else if (cell.GetComponent<GridCell>().cellInfo.isPlayer())
         {
-            StartCoroutine(exchangeCard(cell, emptyCellIndex));
+            yield return StartCoroutine(exchangeCard(cell, emptyCellIndex));
 
             AchievementManager.Instance.clear("move");
             hasPlayerMoved = true;
@@ -1076,7 +1102,7 @@ public class GridController : Singleton<GridController>
                 }
                 else if (targetCell.cellInfo.isWeapon())
                 {
-                    cell.GetComponent<GridCell>().equip(cell2String);
+                    cell.GetComponent<GridCell>().equip(cell2String,targetCell.cellInfo.categoryValue);
 
                     RulePopupManager.Instance.showRule("playerEquip" + cell2String);
                     destroy(targetCell.gameObject);
@@ -1085,7 +1111,7 @@ public class GridController : Singleton<GridController>
                 {
 
                     destroy(targetCell.gameObject);
-                    StartCoroutine(getIntoShop());
+                    yield return StartCoroutine(getIntoShop());
                     willGetIntoShop = true;
                 }
             }
@@ -1102,7 +1128,7 @@ public class GridController : Singleton<GridController>
             if (combination != null)
             {
 
-                StartCoroutine(exchangeCard(cell, emptyCellIndex));
+                yield return StartCoroutine(exchangeCard(cell, emptyCellIndex));
                 if (combination.rules!=null && combination.rules.Length > 0)
                 {
 
@@ -1272,7 +1298,7 @@ public class GridController : Singleton<GridController>
 
 
 
-        StartCoroutine(moveOthers());
+        yield return StartCoroutine(moveOthers());
        //// yield break;
        // finishMove();
 

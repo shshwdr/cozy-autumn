@@ -27,7 +27,10 @@ public class CellInfo {
 
     public string requireResourcePerStep;
     public string requireResource;
-    public int attackPerStep; public int attack; public int moveMode;   public int destoryOthers;
+    public int attackPerStep; 
+    public int attack; 
+    public int moveMode;   
+    public int destoryOthers;
     public int stayMode;//0 after attack, run away, 1 dont run away
 
 
@@ -65,6 +68,11 @@ public class CellManager : Singleton<CellManager>
         {
             type = "leaf";
         }
+        var typeSplit = type.Split('_');
+        if (typeSplit.Length > 1)
+        {
+            type = typeSplit[0];
+        }
         if (!cellInfoDict.ContainsKey(type))
         {
             Debug.LogError("no key for " + type);
@@ -74,15 +82,8 @@ public class CellManager : Singleton<CellManager>
 
     public bool isCell(string type)
     {
-        if (!cellInfoDict.ContainsKey(type))
-        {
-            if (type.StartsWith("leaf"))
-            {
-                return true;
-            }
-            Debug.LogError("no key for " + type);
-        }
-        return cellInfoDict[type].isCell();
+        var info = getInfo(type);
+        return cellInfoDict[info.type].isCell();
     }
 
 

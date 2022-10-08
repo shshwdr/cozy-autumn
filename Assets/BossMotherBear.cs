@@ -26,7 +26,9 @@ public class BossMotherBear : Boss
     {
         GridController.Instance.boss = this;
         enemyCell = bossCell.GetComponent<EnemyCell>();
-        enemyCell.init(type);
+
+        var info = CellManager.Instance.getInfo(type);
+        enemyCell.init(type,info.categoryValue);
         originPosition = bossCell.transform.position;
         GetComponentInChildren<CounterDown>(true).gameObject.SetActive(false);
 

@@ -1,4 +1,4 @@
-﻿type,cellType,categoryType,categoryValue,categoryDetail,requireResourcePerStep,requireResource,attackPerStep,attack,moveMode,destoryOthers,enemyExplain,stayMode,maxCount,textWhenFirstMeet
+﻿type,cellType,categoryType,categoryValue,categoryDetail,requireResourcePerStep,requireResource,attackPerStep,attack,moveMode,destoryOthers,enemyPoints,stayMode,maxCount,textWhenFirstMeet
 player,1,player,,,,,,,,,,,,
 branch,1,,2,,,,,,,,,,,
 fire,1,,,,,,,,,,,,,
@@ -7,15 +7,15 @@ stick,,resource,1,stick,,,,,,,,,,
 trap,,,,,,,,,,,,,,
 empty,,,,,,,,,,,,,,
 bat,,,,,,,,,,,,,,
-birdTrap,,,,,,,,,,,,,,1:A trap! You can use it to chase away other animals by moving them on top of it.
+birdTrap,,,4,,,,,,,,,,,1:A trap! You can use it to chase away other animals by moving them on top of it.
 leaf,1,empty,,,,,,,,,,,,
 shop,,,,,,,,,,,,,,
-weasel,1,enemy,,,nut,nut,1,5,0,,,0,,1:a sneaky weasel! Try not get close to it as it might bite you!
-snake,1,enemy,,,nut,nut,1,5,,,,0,,
-owl,1,enemy,,,stick,stick,1,5,,,,0,,
-fox,1,enemy,,,nut,nut,0,5,-4,,,0,,1:a sneaky fox! It would attack every 4 rounds so chase it away before that!
-bear,1,enemy,,,stone,nut,0,5,0,1,,0,,
-bat,,weapon,,,,,,,,,,,,
+weasel,1,enemy,5,,nut,nut,0,5,0,,,0,,1:a sneaky weasel! Try not get close to it as it might bite you!
+snake,1,enemy,5,,nut,nut,1,5,,,,0,,
+owl,1,enemy,5,,stick,stick,1,5,,,,0,,
+fox,1,enemy,5,,nut,nut,0,5,-4,,,0,,1:a sneaky fox! It would attack every 4 rounds so chase it away before that!
+bear,1,enemy,5,,stone,nut,0,5,0,1,,0,,
+bat,,weapon,3,,,,,,,,,,,
 boulder,1,,,,,,,,,,,,,
 axe,,weapon,,,,,,,,,,,,
 stone,,resource,2,stone,,,,,,,,,,
@@ -25,7 +25,7 @@ hot,,,,,,,,,,,,,,
 openedNut,,resource,4,nut,,,,,,,,,,
 cookedNut,,resource,4,nut,,,,,,,,,,
 counter,,,,,,,,,,,,,,
-babyBear,1,enemy,,,nut,nut,0,3,0,,,1,3,1:You heard a low growl deep in the forest|3:The growl getting closer and closer…
-motherBear,1,boss,,,nut,nut,0,3,0,,,1,,1:nuts on the tree! Try hit them to the ground and collect them! You can stack them on the ground.
+babyBear,1,enemy,3,,nut,nut,0,3,0,,,1,3,1:You heard a low growl deep in the forest|3:The growl getting closer and closer…
+motherBear,1,boss,10,,nut,nut,0,3,0,,,1,,1:nuts on the tree! Try hit them to the ground and collect them! You can stack them on the ground.
 nutOnTree,1,,2,,,,,,,,,,,
 hedgehog,1,ally,3,hp,,,,,,,,,,
