@@ -180,7 +180,7 @@ public class EnemyCell : MonoBehaviour
         SFXManager.Instance.play("animalLose");
     }
 
-    void playAttackEffect()
+    void playAttackEffect(GridCell attackee)
     {
 
         if (isDead)
@@ -188,9 +188,43 @@ public class EnemyCell : MonoBehaviour
             return;
         }
         var go = Instantiate(Resources.Load<GameObject>("effect/fangAttackEffect"), transform.position, Quaternion.identity);
-        go.transform.DOMove(GridController.Instance.getPlayerTransform().position, GridController.Instance.animTime + 0.1f);
+        go.transform.DOMove(attackee.transform.position, GridController.Instance.animTime + 0.1f);
         Destroy(go, 1f);
         SFXManager.Instance.play("scream");
+    }
+    bool beAttack(GridCell attackee, bool forceAttack)
+    {
+        if (attackee.hasEquipment() && !forceAttack && canBeAttacked())
+        {
+            attackee.unequip(transform);
+
+            FindObjectOfType<AchievementManager>().ShowAchievement("slash");
+            FindObjectOfType<AchievementManager>().ShowAchievement("slash2");
+            return true;
+        }
+        return false;
+    }
+    bool attack(GridCell attackee, bool canAttack)
+    {
+        if (canAttack && !isDead)
+        {
+            SFXManager.Instance.play("attack");
+            playAttackEffect(attackee);
+            RulePopupManager.Instance.showRule("playerNextTo" + info.type);
+            //Instantiate(Resources.Load("effect/attack"), GridController.Instance.getPlayerTransform().position, Quaternion.identity);
+
+            if (attackee.cellInfo.isPlayer())
+            {
+
+                takeResource(info.requireResource, info.attack);
+            }
+            else
+            {
+                attackee.decreaseAmount();
+            }
+            return true;
+        }
+        return false;
     }
 
     public IEnumerator activeAttack(bool forceAttack = false, bool canAttack = true)
@@ -202,23 +236,16 @@ public class EnemyCell : MonoBehaviour
         }
         //if player has weapon, unequip weapon and die
         var player = GridController.Instance.getPlayerTransform().GetComponent<GridCell>();
-        if (player.hasEquipment() && !forceAttack)
+        var ally = GridController.Instance.getAllyGridCell();
+        //logic need to change if enemy has more than one hp
+        if (ally && GridController.Instance.isAllyAround(GetComponent<GridCell>().index) && beAttack(ally, forceAttack))
         {
-            player.unequip(transform);
-
-            FindObjectOfType<AchievementManager>().ShowAchievement("slash");
-            FindObjectOfType<AchievementManager>().ShowAchievement("slash2");
-        }
-        else if(canAttack)
+        } else if (player && GridController.Instance.isPlayerAround(GetComponent<GridCell>().index) && beAttack(player, forceAttack))
         {
-            SFXManager.Instance.play("attack");
-            playAttackEffect();
-            RulePopupManager.Instance.showRule("playerNextTo" + info.type);
-            //Instantiate(Resources.Load("effect/attack"), GridController.Instance.getPlayerTransform().position, Quaternion.identity);
+        }else if (ally && GridController.Instance.isAllyAround(GetComponent<GridCell>().index) && attack(ally, canAttack))
+        {
 
-
-            takeResource(info.requireResource, info.attack);
-        }
+        }else if (player && GridController.Instance.isPlayerAround(GetComponent<GridCell>().index) && attack(player, canAttack))
 
         if (attackCountDown == 0)
         {
@@ -278,6 +305,10 @@ public class EnemyCell : MonoBehaviour
         return true;
 
     }
+    public bool canBeAttacked()
+    {
+        return !isDead && !isFirst;
+    }
     public IEnumerator startAttack()
     {
         if (isDead)
@@ -308,7 +339,7 @@ public class EnemyCell : MonoBehaviour
                 countDownObject.initCount(attackCountDown);
             }
 
-            if (GridController.Instance.isPlayerAround(GetComponent<GridCell>().index) || attackCountDown == 0)
+            if (GridController.Instance.isCharacterAround(GetComponent<GridCell>().index) || attackCountDown == 0)
             {
                 yield return StartCoroutine(activeAttack());
             }
@@ -385,8 +416,8 @@ public class EnemyCell : MonoBehaviour
         {
 
             RulePopupManager.Instance.showRule("weaselMove");
-
-            if (GridController.Instance.isPlayerAround(GetComponent<GridCell>().index) || attackCountDown == 0)
+            //should it move and attack? not wait a move?
+            if (GridController.Instance.isCharacterAround(GetComponent<GridCell>().index) || attackCountDown == 0)
             {
                 yield return StartCoroutine(activeAttack());
                 yield break;

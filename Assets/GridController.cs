@@ -22,8 +22,10 @@ public class GridController : Singleton<GridController>
     List<Transform> cellParents = new List<Transform>();
 
     GridCell playerCell;
+    GridCell allyCell;
     GridEmpty emptyCell;
     public int playerCellIndex { get { return playerCell.index; } }
+    public int allyCellIndex { get { return allyCell? allyCell.index:-1; } }
     int emptyCellIndex { get { return emptyCell.index; } }
 
     int originalPlayerCell = 4;
@@ -147,7 +149,7 @@ public class GridController : Singleton<GridController>
             cellParents[index].GetComponent<GridBackground>().removeDangerous(dangerName);
         }
     }
-
+    // if need to support allies here.. change this
     public IEnumerator attackAndMovePlayer(List<int> dangerousIndices, EnemyCell enemy)
     {
         yield return null;
@@ -349,6 +351,16 @@ public class GridController : Singleton<GridController>
         return isAdjacentToType(i, "fire");
     }
 
+    public bool isCharacterAround(int index)
+    {
+        return isPlayerAround (index) || isAllyAround(index);
+    }
+
+    public bool isAllyAround(int index)
+    {
+        return (allyCellIndex != -1 && isTwoIndexCrossAdjacent(index, allyCellIndex));
+    }
+
     public bool isPlayerAround(int index)
     {
         return isTwoIndexCrossAdjacent(index, playerCellIndex);
@@ -356,11 +368,21 @@ public class GridController : Singleton<GridController>
 
     public List<GridCell> getPlayerAdjacentCells()
     {
+        return getAdjacentCells(playerCellIndex);
+    }
+    public List<GridCell> getAllyAdjacentCells()
+    {
+        return getAdjacentCells(allyCellIndex);
+    }
+
+    public List<GridCell> getAdjacentCells(int index)
+    {
+
         var res = new List<GridCell>();
-        var indices = getAdjacentCellsIndex(playerCellIndex);
-        foreach(var i in indices)
+        var indices = getAdjacentCellsIndex(index);
+        foreach (var i in indices)
         {
-            foreach(var cell in cellParents[i].GetComponentsInChildren<GridCell>())
+            foreach (var cell in cellParents[i].GetComponentsInChildren<GridCell>())
             {
                 res.Add(cell);
             }
@@ -371,6 +393,16 @@ public class GridController : Singleton<GridController>
     public Transform getPlayerTransform()
     {
         return playerCell.transform;
+    }
+
+    public Transform getAllyTransform()
+    {
+        return allyCell? allyCell.transform:null;
+    }
+
+    public GridCell getAllyGridCell()
+    {
+        return allyCell;
     }
     GameObject generateCell(int index, string type, int amount = -1)
     {
@@ -497,10 +529,11 @@ public class GridController : Singleton<GridController>
     }
     bool canBeHeated(GridCell cell)
     {
-        return cell.GetComponent<GridCell>().cellInfo.isPlayer() || cell.GetComponent<GridCell>().cellInfo.isEnemy() || cell.GetComponent<GridCell>().cellInfo.type == "branch"
+        return cell.GetComponent<GridCell>().cellInfo.isPlayer() || cell.GetComponent<GridCell>().cellInfo.isAlly() || cell.GetComponent<GridCell>().cellInfo.isEnemy() || cell.GetComponent<GridCell>().cellInfo.type == "branch"
             || cell.GetComponent<GridCell>().cellInfo.type == "nut";
 
     }
+    //todo: add ally logic later if needed
     IEnumerator hotCellCalculation(GridCell cell)
     {
         yield return null;
@@ -517,7 +550,7 @@ public class GridController : Singleton<GridController>
                 Instantiate(fireVFX, cellParents[cell.index].position, Quaternion.identity);
                 yield return new WaitForSeconds(animTime);
             }
-            else if (cell && cell.GetComponent<GridCell>().cellInfo.isEnemy())
+            else if (cell && cell.GetComponent<GridCell>().cellInfo.isEnemy() && cell.GetComponent<EnemyCell>().canBeAttacked())
             {
                 RulePopupManager.Instance.showRule("enemyOnHot");
                 cell.GetComponent<EnemyCell>().getDamage(5);
@@ -563,6 +596,55 @@ public class GridController : Singleton<GridController>
             }
     }
 
+    IEnumerator characterAttack(GridCell characterCell,int index)
+    {
+        yield return null;
+        if (!characterCell)
+        {
+            yield break;
+        }
+        if (characterCell.hasEquipment())
+        {
+            bool attackWithWeapon = false;
+
+
+
+            foreach (var cell in getAdjacentCells(index))
+            {
+                if (cell.cellInfo.isEnemy() && cell.GetComponent<EnemyCell>().canBeAttacked())
+                {
+
+                    cell.GetComponent<EnemyCell>().getDamage(1);
+                    attackWithWeapon = true;
+                    if (characterCell.equipment != null)
+                    {
+
+                        SFXManager.Instance.play("hit" + characterCell.equipment);
+                    }
+
+                    var go = Instantiate(Resources.Load<GameObject>("effect/attack"), cellParents[characterCell.index].transform.position, Quaternion.identity);
+                    go.transform.DOMove(cellParents[cell.index].transform.position, GridController.Instance.animTime + 0.1f);
+                    Destroy(go, 1f);
+
+
+                    var go2 = Instantiate(Resources.Load<GameObject>("effect/attack"), cellParents[characterCell.index].transform.position, Quaternion.identity);
+                    go2.transform.DOMove(cellParents[cell.index].transform.position, GridController.Instance.animTime + 0.1f);
+                    go2.GetComponentInChildren<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/" + characterCell.equipment);
+                    go2.GetComponentInChildren<SpriteRenderer>().sortingOrder = 1;
+                    Destroy(go2, 1f);
+
+                    FindObjectOfType<AchievementManager>().ShowAchievement("slash2");
+                    yield return new WaitForSeconds(animTime);
+                }
+            }
+            if (attackWithWeapon)
+            {
+                characterCell.unequip(transform);
+                FindObjectOfType<AchievementManager>().ShowAchievement("slash");
+            }
+        }
+    }
+
     IEnumerator attackAndMove()
     {
        // yield break;
@@ -586,7 +668,7 @@ public class GridController : Singleton<GridController>
         {
             foreach (var cell in cellParents[i].GetComponentsInChildren<GridCell>())
             {
-                if(cell != null && cell.cellInfo.isEnemy())
+                if(cell != null && cell.cellInfo.isEnemy() && cell.GetComponent<EnemyCell>().canBeAttacked())
                 {
                     yield return StartCoroutine( triggerTrapOnCell(i,cell.GetComponent<EnemyCell>()));
                 }
@@ -594,43 +676,8 @@ public class GridController : Singleton<GridController>
         }
 
         //calculate player
-        if (playerCell.hasEquipment())
-        {
-            bool attackWithWeapon = false;
-            foreach (var cell in getPlayerAdjacentCells())
-            {
-                if (cell.cellInfo.isEnemy() && !cell.GetComponent<EnemyCell>().isDead)
-                {
-
-                    cell.GetComponent<EnemyCell>().getDamage(1);
-                    attackWithWeapon = true;
-                    if (playerCell.equipment!=null)
-                    {
-
-                        SFXManager.Instance.play("hit" + playerCell.equipment);
-                    }
-
-                    var go = Instantiate(Resources.Load<GameObject>("effect/attack"), cellParents[ playerCell.index].transform.position, Quaternion.identity);
-                    go.transform.DOMove(cellParents[cell.index].transform.position, GridController.Instance.animTime + 0.1f);
-                    Destroy(go, 1f);
-
-
-                    var go2 = Instantiate(Resources.Load<GameObject>("effect/attack"), cellParents[playerCell.index].transform.position, Quaternion.identity);
-                    go2.transform.DOMove(cellParents[cell.index].transform.position, GridController.Instance.animTime + 0.1f);
-                    go2.GetComponentInChildren<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/" + playerCell. equipment);
-                    go2.GetComponentInChildren<SpriteRenderer>().sortingOrder = 1;
-                    Destroy(go2, 1f);
-
-                    FindObjectOfType<AchievementManager>().ShowAchievement("slash2");
-                    yield return new WaitForSeconds(animTime);
-                }
-            }
-            if (attackWithWeapon)
-            {
-                playerCell.unequip(transform);
-                FindObjectOfType<AchievementManager>().ShowAchievement("slash");
-            }
-        }
+        StartCoroutine(characterAttack(allyCell, allyCellIndex));
+        StartCoroutine(characterAttack(playerCell, playerCellIndex));
 
         //calcualte enemy attack
 
@@ -786,6 +833,7 @@ public class GridController : Singleton<GridController>
 
 
         }
+
         Debug.Log("draw card " + card);
         var cardInfo = CellManager.Instance.getInfo(card);
         var freezedCellCount = freezeCount();
@@ -855,6 +903,7 @@ public class GridController : Singleton<GridController>
             var go2 = Instantiate(Resources.Load<GameObject>("boss/" + cardInfo.type), bossParent.position, Quaternion.identity, bossParent);
             go2.GetComponent<Boss>().init(cardInfo.type);
 
+
             go2.transform.DOPunchScale(Vector3.one, animTime);
 
             yield return new WaitForSeconds(GridController.Instance.animTime);
@@ -881,12 +930,25 @@ public class GridController : Singleton<GridController>
             destroy(cell.gameObject);
 
 
+            if (cardInfo.isAlly())
+            {
+                if (allyCell)
+                {
+                    Debug.LogError("does not support multiple ally now");
+                }
+                else
+                {
+                    allyCell = go.GetComponent<GridCell>();
+                }
+            }
+
+            //destory what's underground when spawn enemy.. comment for now.
             if (go.GetComponent<GridCell>().cellInfo.isEnemy())
             {
-                foreach (var item in cellParents[cell.index].GetComponentsInChildren<GridItem>())
-                {
-                    Destroy(item.gameObject);
-                }
+                //foreach (var item in cellParents[cell.index].GetComponentsInChildren<GridItem>())
+                //{
+                //    Destroy(item.gameObject);
+                //}
             }
             else
             {
@@ -913,6 +975,11 @@ public class GridController : Singleton<GridController>
             ResourceManager.Instance.consumeResource("nut", 1, cell.transform.position);
             RulePopupManager.Instance.showRule("playerMove");
         }
+        if (cell.cellInfo.isAlly())
+        {
+            ResourceManager.Instance.consumeResource("nut", 1, cell.transform.position);
+            //RulePopupManager.Instance.showRule("playerMove");
+        }
 
 
 
@@ -931,7 +998,52 @@ public class GridController : Singleton<GridController>
         var cell1String = cell.type;
         var cell2String = targetCell ? targetCell.type : "empty";
 
-        if (cell.GetComponent<GridCell>().cellInfo.isPlayer())
+        if (cell.GetComponent<GridCell>().cellInfo.isAlly())
+        {
+            StartCoroutine(exchangeCard(cell, emptyCellIndex));
+
+            SFXManager.Instance.play("squirrelmove");
+            if (targetCell)
+            {
+                //if (targetCell.cellInfo.isResource())
+                //{
+
+                //    SFXManager.Instance.play("collect" + targetCell.cellInfo.categoryDetail);
+                //    var resource = new List<PairInfo<int>>() { };
+                //    resource.Add(new PairInfo<int>(targetCell.cellInfo.categoryDetail, targetCell.amount));
+                //    CollectionManager.Instance.AddCoins(targetCell.transform.position, resource);
+                //    destroy(targetCell.gameObject);
+
+                //    switch (targetCell.type)
+                //    {
+                //        case "nut":
+
+                //            RulePopupManager.Instance.showRule("playerToNut");
+                //            break;
+                //        case "cookedNut":
+                //            RulePopupManager.Instance.showRule("eatHotNut");
+                //            break;
+                //    }
+
+                //}
+                //else 
+                if (targetCell.cellInfo.isWeapon())
+                {
+                    cell.GetComponent<GridCell>().equip(cell2String);
+
+                    RulePopupManager.Instance.showRule("playerEquip" + cell2String);
+                    destroy(targetCell.gameObject);
+                }
+                //else if (targetCell.cellInfo.type == "shop")
+                //{
+
+                //    destroy(targetCell.gameObject);
+                //    StartCoroutine(getIntoShop());
+                //    willGetIntoShop = true;
+                //}
+            }
+        }
+        else if (cell.GetComponent<GridCell>().cellInfo.isPlayer())
         {
             StartCoroutine(exchangeCard(cell, emptyCellIndex));
 
@@ -944,7 +1056,7 @@ public class GridController : Singleton<GridController>
                 if (targetCell.cellInfo.isResource())
                 {
 
-                    SFXManager.Instance.play("collect"+ targetCell.cellInfo.categoryDetail);
+                    SFXManager.Instance.play("collect" + targetCell.cellInfo.categoryDetail);
                     var resource = new List<PairInfo<int>>() { };
                     resource.Add(new PairInfo<int>(targetCell.cellInfo.categoryDetail, targetCell.amount));
                     CollectionManager.Instance.AddCoins(targetCell.transform.position, resource);
@@ -966,19 +1078,17 @@ public class GridController : Singleton<GridController>
                 {
                     cell.GetComponent<GridCell>().equip(cell2String);
 
-                    RulePopupManager.Instance.showRule("playerEquip"+cell2String);
+                    RulePopupManager.Instance.showRule("playerEquip" + cell2String);
                     destroy(targetCell.gameObject);
-                }else if (targetCell.cellInfo.type == "shop")
+                }
+                else if (targetCell.cellInfo.type == "shop")
                 {
 
                     destroy(targetCell.gameObject);
-                    StartCoroutine( getIntoShop());
+                    StartCoroutine(getIntoShop());
                     willGetIntoShop = true;
                 }
             }
-
-            //StartCoroutine(moveOthers());
-           // yield break;
         }
         else if (forceMove)
         {

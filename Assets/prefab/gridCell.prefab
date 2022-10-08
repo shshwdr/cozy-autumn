@@ -360,7 +360,7 @@ MonoBehaviour:
   index: 0
   renderer: {fileID: 1766114459308562573}
   bk: {fileID: 1766114459899678835}
-  countDownObject: {fileID: 2952308542357973969}
+  countDownObject: {fileID: 7252881300517304950}
   type: 
   equipment: 
   equipRenderer: {fileID: 3992577440777430492}
@@ -1870,13 +1870,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e1e612316719a6849a71a07d47a2b1c3, type: 3}
+--- !u!114 &7252881300517304950 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4985209945077342973, guid: e1e612316719a6849a71a07d47a2b1c3, type: 3}
+  m_PrefabInstance: {fileID: 2416303339432859787}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4660ee5a703e5c24281f81584c258f79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &7437103458244743666 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5097381144504928633, guid: e1e612316719a6849a71a07d47a2b1c3, type: 3}
-  m_PrefabInstance: {fileID: 2416303339432859787}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &2952308542357973969 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 680285367150408538, guid: e1e612316719a6849a71a07d47a2b1c3, type: 3}
   m_PrefabInstance: {fileID: 2416303339432859787}
   m_PrefabAsset: {fileID: 0}

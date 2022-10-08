@@ -56,6 +56,7 @@ public class GridCell : MonoBehaviour
         ice.SetActive(false);
     }
 
+
     public  void init(string _type,int i,int _amount)
     {
         CellManager.Instance.showCell(_type);

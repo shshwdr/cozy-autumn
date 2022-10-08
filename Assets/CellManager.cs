@@ -18,6 +18,7 @@ public class CellInfo {
     public bool isBoss() { return categoryType == "boss"; }
     public bool isEmpty() { return categoryType == "empty"; }
     public bool isPlayer() { return categoryType == "player"; }
+    public bool isAlly() { return categoryType == "ally"; }
     public bool isResource() { return categoryType == "resource"; }
     public bool isWeapon() { return categoryType == "weapon"; }
 
