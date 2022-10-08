@@ -34,7 +34,17 @@ public class EnemyCell : MonoBehaviour
         hp = a;
 
         cell = GetComponent<GridCell>();
-        cell.setAmount(hp);
+        if (cell)
+        {
+
+            cell.setAmount(hp);
+        }
+       var  bossCell=GetComponentInParent<Boss>();
+        if (bossCell)
+        {
+
+            bossCell.setAmount(hp);
+        }
     }
 
     public void finishedMove()
@@ -190,7 +200,18 @@ public class EnemyCell : MonoBehaviour
         {
             die();
         }
-        cell.setAmount(hp);
+        if (cell)
+        {
+
+            cell.setAmount(hp);
+        }
+        var bossCell = GetComponentInParent<Boss>();
+        if (bossCell)
+        {
+
+            bossCell.setAmount(hp);
+        }
+
         SFXManager.Instance.play("animalLose");
         isFirst = false;
         hasBeenAttacked = true;
@@ -259,11 +280,19 @@ public class EnemyCell : MonoBehaviour
         //} else if (player && GridController.Instance.isPlayerAround(GetComponent<GridCell>().index) && beAttack(player, forceAttack))
         //{
         //}else 
-        
-        if (ally && GridController.Instance.isAllyAround(GetComponent<GridCell>().index) && attack(ally, canAttack))
+        if (!ally)
         {
+            attack(player, canAttack);
+        }
+        else
+        {
+            if (ally && GridController.Instance.isAllyAround(GetComponent<GridCell>().index) && attack(ally, canAttack))
+            {
 
-        }else if (player && GridController.Instance.isPlayerAround(GetComponent<GridCell>().index) && attack(player, canAttack))
+            }
+            else if (player && GridController.Instance.isPlayerAround(GetComponent<GridCell>().index) && attack(player, canAttack)) { }
+
+        }
 
         if (attackCountDown == 0)
         {

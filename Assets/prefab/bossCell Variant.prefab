@@ -73,7 +73,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1766114458741427111, guid: 9e29a52581a5504438790bc45ef5d55b, type: 3}
       propertyPath: m_Name
-      value: bossCell
+      value: bossCell Variant
       objectReference: {fileID: 0}
     - target: {fileID: 1766114459308562573, guid: 9e29a52581a5504438790bc45ef5d55b, type: 3}
       propertyPath: m_Sprite
@@ -128,6 +128,14 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2952308542357973969, guid: 9e29a52581a5504438790bc45ef5d55b, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4204159518139560447, guid: 9e29a52581a5504438790bc45ef5d55b, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4872233083552018759, guid: 9e29a52581a5504438790bc45ef5d55b, type: 3}
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}

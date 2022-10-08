@@ -31,6 +31,8 @@ public class GridCell : MonoBehaviour
     public Text amountLabel;
     public int amount;
 
+    public Image HPBK;
+
 
     public void freeze()
     {
@@ -110,6 +112,19 @@ public class GridCell : MonoBehaviour
         {
 
             equipRenderer.sprite = Resources.Load<Sprite>("cell/" + "empty");
+        }
+
+        if (cellInfo.isEnemy())
+        {
+            HPBK.gameObject.SetActive(true);
+        }else
+        {
+            if (HPBK)
+            {
+                HPBK.gameObject.SetActive(false);
+
+            }
+
         }
     }
 

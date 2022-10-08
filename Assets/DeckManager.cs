@@ -1,3 +1,4 @@
+using Pool;
 using Sinbad;
 using System.Collections;
 using System.Collections.Generic;
@@ -22,9 +23,19 @@ public class DeckManager : Singleton<DeckManager>
     {
 
         stageInfos = CsvUtil.LoadObjects<StageInfo>("stage");
-        addStageCards(0);
-    }
 
+
+        addCardUntilBoss();
+    }
+    void addCardUntilBoss()
+    {
+        while (!currentDeck.Contains("motherBear"))
+        {
+            createAndShuffleCards();
+
+        }
+        cardInTotal = currentDeck.Count;
+    }
     void addStageCards(int index)
     {
         addStageCards(stageInfos[index]);
@@ -36,24 +47,32 @@ public class DeckManager : Singleton<DeckManager>
         addDictionaryToDeck(info.cards);
         stageInfos.Remove(info);
     }
-
+    public float getProgress()
+    {
+        return 1 - ((float)(currentDeck.Count+waitDeck.Count)/ (float)cardInTotal);
+    }
     public void createAndShuffleCards()
     {
         round++;
         Debug.Log("start deck round " + round);
         addDeckByRound();
 
-        currentDeck.Clear();
+        //currentDeck.Clear();
+        List<string> tempDeck = new List<string>();
+        initCurrentDeck(tempDeck);
 
-        initCurrentDeck();
-
-        if (wouldShuffle && round != 2)
+        if (wouldShuffle)
         {
 
-            currentDeck.Shuffle();
+            tempDeck.Shuffle();
+        }
+        foreach(var d in tempDeck)
+        {
+            currentDeck.Add(d);
         }
 
     }
+    int cardInTotal = 0;
     public string drawCard(bool canDrawWaitingDeck,bool isBoss = false)
     {
         int test = 100;
@@ -63,12 +82,14 @@ public class DeckManager : Singleton<DeckManager>
             var cardInfo = CellManager.Instance.getInfo(card);
             if (!GridController.Instance.hasEqualOrMoreCardsWithType(cardInfo.type,cardInfo.maxCount))
             {
+                EventPool.Trigger("updateProgress");
                 return card;
             }
 
             test--;
             if (test <= 0)
             {
+                EventPool.Trigger("updateProgress");
                 Debug.LogError("?");
                 return card;
             }
@@ -103,7 +124,7 @@ public class DeckManager : Singleton<DeckManager>
             var card = drawCard(false);
 
             var cardInfo = CellManager.Instance.getInfo(card);
-            if (!cardInfo.isEnemy())
+            if (!cardInfo.isEnemy() && !cardInfo.isBoss())
             {
                 return card;
             }
@@ -173,14 +194,14 @@ public class DeckManager : Singleton<DeckManager>
 
         fullDeck.Add(n);
     }
-    public void initCurrentDeck()
+    public void initCurrentDeck(List<string> deck)
     {
         //
-        if (currentDeck.Count == 0)
+        if (deck.Count == 0)
         {
             foreach (var value in fullDeck)
             {
-                currentDeck.Add(value);
+                deck.Add(value);
             }
         }
         else

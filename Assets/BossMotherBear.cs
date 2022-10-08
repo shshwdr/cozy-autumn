@@ -24,11 +24,11 @@ public class BossMotherBear : Boss
 
     public override void init(string type)
     {
+        base.init(type);
         GridController.Instance.boss = this;
         enemyCell = bossCell.GetComponent<EnemyCell>();
 
         var info = CellManager.Instance.getInfo(type);
-        enemyCell.init(type,info.categoryValue);
         originPosition = bossCell.transform.position;
         GetComponentInChildren<CounterDown>(true).gameObject.SetActive(false);
 
@@ -50,6 +50,10 @@ public class BossMotherBear : Boss
         {
             PopupManager.Instance.showEvent("A Huge Mother Bear shows up:'You hurt my baby bear! How dare you!!!","Fight!");
         }
+
+        enemyCell.init(type, info.categoryValue);
+        setAmount(enemyCell.hp);
+
     }
 
     public override void getKilled()
@@ -121,12 +125,12 @@ public class BossMotherBear : Boss
                     else
                     {
 
-                        // get attack from character
-                        if (isNextToPlayer())
-                        {
+                        //// get attack from character
+                        //if (isNextToPlayer())
+                        //{
 
-                            StartCoroutine(enemyCell.activeAttack(false, false));
-                        }
+                        //    StartCoroutine(enemyCell.activeAttack(false, false));
+                        //}
                     }
 
 
