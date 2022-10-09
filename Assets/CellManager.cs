@@ -64,10 +64,10 @@ public class CellManager : Singleton<CellManager>
     public CellInfo getInfo(string type)
     {
 
-        if (type.StartsWith("leaf"))
-        {
-            type = "leaf";
-        }
+        //if (type.StartsWith("leaf"))
+        //{
+        //    type = "leaf";
+        //}
         var typeSplit = type.Split('_');
         if (typeSplit.Length > 1)
         {

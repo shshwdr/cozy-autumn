@@ -13,9 +13,6 @@ public class GridController : Singleton<GridController>
     public float cellSize = 2;
 
 
-    //public List<int> moveCountToLeaf;
-    //int currentLeafIndex = 0;
-
    public  int moveCount = 0;
     public Transform bossParent;
 
@@ -56,7 +53,6 @@ public class GridController : Singleton<GridController>
         // initMainBoard();
         StartCoroutine(test());
 
-        //bk.Find("leaf" + currentLeafIndex).GetComponent<ParticleSystem>().Play();
         AchievementManager.Instance.clearAll();
     }
 
@@ -77,44 +73,8 @@ public class GridController : Singleton<GridController>
     void step()
     {
         moveCount++;
-        //if(currentLeafIndex<moveCountToLeaf.Count && moveCount >= moveCountToLeaf[currentLeafIndex])
-        //{
-        //    currentLeafIndex++;
-        //    updateLeafFalling();
-        //}
     }
     public Transform bk;
-    void updateLeafFalling()
-    {
-        Debug.Log("update leaf " + currentLeafIndex);
-        var parent = bk.Find("leaf" + currentLeafIndex);
-        foreach(var child in parent.GetComponentsInChildren<ParticleSystem>())
-        {
-            child.Play();
-        }
-        if (currentLeafIndex > 0)
-        {
-
-            var parent2 = bk.Find("leaf" + (currentLeafIndex-1));
-            foreach (var child in parent2.GetComponentsInChildren<ParticleSystem>())
-            {
-                child.Stop();
-            }
-        }
-        var sky = bk.Find("sky");
-        if (currentLeafIndex >= 6)
-        {
-            DOTween.To(() => sky.GetComponent<SpriteRenderer>().color, x => sky.GetComponent<SpriteRenderer>().color = x, new Color(255,255,255), 1);
-
-            
-        }
-        else if (currentLeafIndex >= 4)
-        {
-            //turn color of key to grey 209
-
-            DOTween.To(() => sky.GetComponent<SpriteRenderer>().color, x => sky.GetComponent<SpriteRenderer>().color = x, new Color(188, 188, 188), 1);
-        }
-    }
 
     private void OnDestroy()
     {
@@ -204,7 +164,7 @@ public class GridController : Singleton<GridController>
                 }
                 else
                 {
-                    generateCell(index, "leaf"+ currentLeafIndex);
+                    addEmpty(index);
                 }
                 index++;
 
@@ -446,7 +406,7 @@ public class GridController : Singleton<GridController>
 
     public void addEmpty(int index)
     {
-        generateCell(index, "leaf"+ currentLeafIndex);
+        generateCell(index, StageManager.Instance.getCurrentInfo().leafName);
     }
 
     int freezeCount()

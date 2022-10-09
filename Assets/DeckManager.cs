@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StageInfo {
+public class StageCardInfo {
     public Dictionary<string, int> cards;
     public int triggerRound;
 }
@@ -16,7 +16,7 @@ public class DeckManager : Singleton<DeckManager>
     List<string> fullDeck = new List<string>();
     List<string> waitDeck = new List<string>();
     List<string> currentDeck = new List<string>();
-    List<StageInfo> stageInfos;
+    List<StageCardInfo> stageInfos;
     int round = -1;
 
     string stageName = "bearForest";
@@ -24,7 +24,7 @@ public class DeckManager : Singleton<DeckManager>
     void Start()
     {
 
-        stageInfos = CsvUtil.LoadObjects<StageInfo>(StageManager.Instance.currentStage);
+        stageInfos = CsvUtil.LoadObjects<StageCardInfo>(StageManager.Instance.currentStage);
 
 
         addCardUntilBoss();
@@ -43,7 +43,7 @@ public class DeckManager : Singleton<DeckManager>
         addStageCards(stageInfos[index]);
     }
 
-    void addStageCards(StageInfo info)
+    void addStageCards(StageCardInfo info)
     {
 
         addDictionaryToDeck(info.cards);
@@ -214,7 +214,7 @@ public class DeckManager : Singleton<DeckManager>
 
     void addDeckByRound()
     {
-        var temp = new List<StageInfo>(stageInfos);
+        var temp = new List<StageCardInfo>(stageInfos);
         foreach(var stageInfo in temp)
         {
             if (round >= stageInfo.triggerRound)
