@@ -3,17 +3,18 @@ using Doozy.Examples;
 using Pool;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Rendering;
 
 public class GridController : Singleton<GridController>
 {
     public int cellCountX = 3;
-    public int cellCountY= 3;
+    public int cellCountY = 3;
     public float cellSize = 2;
 
 
-   public  int moveCount = 0;
+    public int moveCount = 0;
     public Transform bossParent;
 
     List<Transform> cellParents = new List<Transform>();
@@ -22,7 +23,7 @@ public class GridController : Singleton<GridController>
     GridCell allyCell;
     GridEmpty emptyCell;
     public int playerCellIndex { get { return playerCell.index; } }
-    public int allyCellIndex { get { return allyCell? allyCell.index:-1; } }
+    public int allyCellIndex { get { return allyCell ? allyCell.index : -1; } }
     int emptyCellIndex { get { return emptyCell.index; } }
 
     int originalPlayerCell = 4;
@@ -43,10 +44,11 @@ public class GridController : Singleton<GridController>
     public GameObject fireVFX;
 
     public Boss boss;
+    int lastIndex = -1;
 
 
     public float animTime = 1f;
-   public  bool isMoving = false;
+    public bool isMoving = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -84,7 +86,7 @@ public class GridController : Singleton<GridController>
 
     public void showDangerousCell(string dangerName, List<int> indices)
     {
-        foreach(var index in indices)
+        foreach (var index in indices)
         {
             cellParents[index].GetComponent<GridBackground>().addDangerous(dangerName);
         }
@@ -116,22 +118,22 @@ public class GridController : Singleton<GridController>
         //find player
         yield return StartCoroutine(enemy.activeAttack(true));
 
-            //move player to a safe place
-            if (dangerousIndices.Contains(emptyCellIndex))
+        //move player to a safe place
+        if (dangerousIndices.Contains(emptyCellIndex))
+        {
+            for (int i = 0; i < 9; i++)
             {
-                for (int i = 0; i < 9; i++)
+                if (!dangerousIndices.Contains(i))
                 {
-                    if (!dangerousIndices.Contains(i))
-                    {
-                        yield return StartCoroutine(exchangeCard(playerCell, i));
-                    }
+                    yield return StartCoroutine(exchangeCard(playerCell, i));
                 }
             }
-            else
-            {
-                yield return StartCoroutine(exchangeCard(playerCell, emptyCellIndex));
-            }
-       
+        }
+        else
+        {
+            yield return StartCoroutine(exchangeCard(playerCell, emptyCellIndex));
+        }
+
     }
 
     void initMainBoard()
@@ -176,7 +178,7 @@ public class GridController : Singleton<GridController>
         StartCoroutine(showCells());
     }
 
-    
+
     bool isTwoIndexCrossAdjacent(int i, int j)
     {
         var ix = i / cellCountX;
@@ -191,7 +193,7 @@ public class GridController : Singleton<GridController>
         return false;
     }
 
-    int getIndex(int x,int y)
+    int getIndex(int x, int y)
     {
         return x * cellCountX + y;
     }
@@ -203,13 +205,13 @@ public class GridController : Singleton<GridController>
         var ix = i / cellCountX;
         var iy = i % cellCountY;
 
-        if (ix-1 >= 0)
+        if (ix - 1 >= 0)
         {
             res.Add(getIndex(ix - 1, iy));
         }
         if (iy - 1 >= 0)
         {
-            res.Add(getIndex(ix, iy-1));
+            res.Add(getIndex(ix, iy - 1));
         }
 
         if (ix + 1 < cellCountX)
@@ -225,15 +227,15 @@ public class GridController : Singleton<GridController>
         return res;
     }
 
-    void addIndices(List<int>  indices, int x, int y)
+    void addIndices(List<int> indices, int x, int y)
     {
-        if(x>=0&&x< cellCountX && y >= 0 && y < cellCountY)
+        if (x >= 0 && x < cellCountX && y >= 0 && y < cellCountY)
         {
             indices.Add(x * cellCountX + y);
         }
     }
 
-    public List<GridCell> adjacentType(int i,string type)
+    public List<GridCell> adjacentType(int i, string type)
     {
         List<GridCell> res = new List<GridCell>();
         var ix = i / cellCountX;
@@ -245,7 +247,7 @@ public class GridController : Singleton<GridController>
         addIndices(indices, ix, iy + 1);
         foreach (var cell in FindObjectsOfType<GridCell>())
         {
-            if (indices.Contains(cell.index) && isType(cell, type) )
+            if (indices.Contains(cell.index) && isType(cell, type))
             {
                 res.Add(cell);
             }
@@ -258,8 +260,8 @@ public class GridController : Singleton<GridController>
 
         yield return StartCoroutine(hideCells());
 
-       // mainBoard.gameObject.SetActive(false);
-        StartCoroutine( ShopGridController.Instance.getIntoShop());
+        // mainBoard.gameObject.SetActive(false);
+        StartCoroutine(ShopGridController.Instance.getIntoShop());
     }
 
 
@@ -269,13 +271,17 @@ public class GridController : Singleton<GridController>
         yield return StartCoroutine(showCells());
     }
 
-        bool isType(GridCell cell, string type)
+    bool isType(GridCell cell, string type)
     {
-        if(type == "ice")
+        if (type == "ice")
         {
             return cell.isFreezed;
         }
-        if(!cell || cell.cellInfo == null)
+        if(type == "empty")
+        {
+            return cell.index == emptyCellIndex || cell.cellInfo.isEmpty();
+        }
+        if (!cell || cell.cellInfo == null)
         {
             Debug.LogError("?");
         }
@@ -294,7 +300,7 @@ public class GridController : Singleton<GridController>
         addIndices(indices, ix, iy + 1);
         foreach (var cell in FindObjectsOfType<GridCell>())
         {
-            if (indices.Contains(cell.index) && isType(cell,type))
+            if (indices.Contains(cell.index) && isType(cell, type))
             {
                 return true;
             }
@@ -313,7 +319,7 @@ public class GridController : Singleton<GridController>
 
     public bool isCharacterAround(int index)
     {
-        return isPlayerAround (index) || isAllyAround(index);
+        return isPlayerAround(index) || isAllyAround(index);
     }
 
     public bool isAllyAround(int index)
@@ -334,7 +340,55 @@ public class GridController : Singleton<GridController>
     {
         return getAdjacentCells(allyCellIndex);
     }
+    public List<EnemyCell> getEnemies(int index, string attackMode)
+    {
+        List<EnemyCell> res = new List<EnemyCell>();
+        var allEnemies = GameObject.FindObjectsOfType<EnemyCell>();
 
+        int x = index / cellCountX;
+        int y = index % cellCountY;
+        if (attackMode == "")
+        {
+            foreach(var enemy in allEnemies)
+            {
+                if(enemy.GetComponent<GridCell>() )
+                {
+                    var enemyIndex = enemy.GetComponent<GridCell>().index;
+
+                    int ex = enemyIndex / cellCountX;
+                    int ey = enemyIndex % cellCountY;
+                    if((ex == x && Mathf.Abs(ey - y) == 1)||
+                        (ey == y && Mathf.Abs(ex - x) == 1))
+                    {
+                        res.Add(enemy);
+                    }
+                }
+            }
+        }
+        else if (attackMode == "fullScreen")
+        {
+            return allEnemies.ToList();
+        }
+        else if (attackMode == "range")
+        {
+            foreach (var enemy in allEnemies)
+            {
+                if (enemy.GetComponent<GridCell>())
+                {
+                    var enemyIndex = enemy.GetComponent<GridCell>().index;
+
+                    int ex = enemyIndex / cellCountX;
+                    int ey = enemyIndex % cellCountY;
+                    if ((ex == x ) ||
+                        (ey == y ))
+                    {
+                        res.Add(enemy);
+                    }
+                }
+            }
+        }
+        return res;
+    }
     public List<GridCell> getAdjacentCells(int index)
     {
 
@@ -357,7 +411,7 @@ public class GridController : Singleton<GridController>
 
     public Transform getAllyTransform()
     {
-        return allyCell? allyCell.transform:null;
+        return allyCell ? allyCell.transform : null;
     }
 
     public GridCell getAllyGridCell()
@@ -367,7 +421,7 @@ public class GridController : Singleton<GridController>
     GameObject generateCell(int index, string type, int amount = -1)
     {
         GameObject res;
-        if(type == "empty")
+        if (type == "empty")
         {
 
             res = Instantiate(emptyPrefab, cellParents[index].position, Quaternion.identity, cellParents[index]);
@@ -383,7 +437,7 @@ public class GridController : Singleton<GridController>
             res = Instantiate(itemPrefab, cellParents[index].position, Quaternion.identity, cellParents[index]);
         }
 
-      //  res.transform.localScale = Vector3.one;
+        //  res.transform.localScale = Vector3.one;
         res.transform.DOPunchScale(Vector3.one, animTime);
 
         var typeSplit = type.Split('_');
@@ -556,18 +610,18 @@ public class GridController : Singleton<GridController>
     }
 
 
-    public IEnumerator triggerTrapOnCell(int i,EnemyCell cell)
+    public IEnumerator triggerTrapOnCell(int i, EnemyCell cell)
     {
         yield return null;
-            var trap = cellParents[i].GetComponentInChildren<GridItem>();
-            bool combination = trap != null && (trap.cellInfo.type.Contains("trap") || trap.cellInfo.type.Contains("Trap"));
-            if (combination)
-            {
-                yield return StartCoroutine(trapCellCalculation(cell, trap));
-            }
+        var trap = cellParents[i].GetComponentInChildren<GridItem>();
+        bool combination = trap != null && trap.cellInfo.isTrap();
+        if (combination)
+        {
+            yield return StartCoroutine(trapCellCalculation(cell, trap));
+        }
     }
 
-    IEnumerator characterAttack(GridCell characterCell,int index)
+    IEnumerator characterAttack(GridCell characterCell, int index)
     {
         yield return null;
         if (!characterCell)
@@ -578,21 +632,24 @@ public class GridController : Singleton<GridController>
         {
             bool attackWithWeapon = false;
 
+            var equipmentInfo = CellManager.Instance.getInfo(characterCell.equipment);
+            List<EnemyCell> attackableList  = getEnemies(index, equipmentInfo.attackMode);
+            
 
             int damage = characterCell.equipementDamage;
-            foreach (var cell in getAdjacentCells(index))
+            foreach (var cell in attackableList)
             {
-                if (cell.cellInfo.isEnemy() && cell.GetComponent<EnemyCell>().canBeAttacked())
+                if ( cell.canBeAttacked())
                 {
 
-                    damage = Mathf.Min(damage, cell.amount);
+                    damage = Mathf.Min(damage, cell.hp);
                     attackWithWeapon = true;
                 }
             }
 
-            foreach (var cell in getAdjacentCells(index))
+            foreach (var cell in attackableList)
             {
-                if (cell.cellInfo.isEnemy() && cell.GetComponent<EnemyCell>().canBeAttacked())
+                if (cell.GetComponent<EnemyCell>().canBeAttacked())
                 {
 
                     cell.GetComponent<EnemyCell>().getDamage(damage);
@@ -603,12 +660,12 @@ public class GridController : Singleton<GridController>
                     }
 
                     var go = Instantiate(Resources.Load<GameObject>("effect/attack"), cellParents[characterCell.index].transform.position, Quaternion.identity);
-                    go.transform.DOMove(cellParents[cell.index].transform.position, GridController.Instance.animTime + 0.1f);
+                    go.transform.DOMove(cell.transform.position, GridController.Instance.animTime + 0.1f);
                     Destroy(go, 1f);
 
 
                     var go2 = Instantiate(Resources.Load<GameObject>("effect/attack"), cellParents[characterCell.index].transform.position, Quaternion.identity);
-                    go2.transform.DOMove(cellParents[cell.index].transform.position, GridController.Instance.animTime + 0.1f);
+                    go2.transform.DOMove(cell.transform.position, GridController.Instance.animTime + 0.1f);
                     go2.GetComponentInChildren<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/" + characterCell.equipment);
                     go2.GetComponentInChildren<SpriteRenderer>().sortingOrder = 1;
                     Destroy(go2, 1f);
@@ -627,12 +684,12 @@ public class GridController : Singleton<GridController>
 
     IEnumerator attackAndMove()
     {
-       // yield break;
+        // yield break;
         //  cellParents[cell.index].GetComponentsInChildren<GridItem>()
         //calculate hot place
         for (int i = 0; i < cellParents.Count; i++)
         {
-            foreach(var cell in cellParents[i].GetComponentsInChildren<GridCell>())
+            foreach (var cell in cellParents[i].GetComponentsInChildren<GridCell>())
             {
 
                 //check if cell is on hot cell
@@ -648,9 +705,9 @@ public class GridController : Singleton<GridController>
         {
             foreach (var cell in cellParents[i].GetComponentsInChildren<GridCell>())
             {
-                if(cell != null && cell.cellInfo.isEnemy() && cell.GetComponent<EnemyCell>().canBeAttacked())
+                if (cell != null && cell.cellInfo.isEnemy() && cell.GetComponent<EnemyCell>().canBeAttacked())
                 {
-                    yield return StartCoroutine( triggerTrapOnCell(i,cell.GetComponent<EnemyCell>()));
+                    yield return StartCoroutine(triggerTrapOnCell(i, cell.GetComponent<EnemyCell>()));
                 }
             }
         }
@@ -677,19 +734,36 @@ public class GridController : Singleton<GridController>
 
         for (int i = 0; i < cellParents.Count; i++)
         {
-            
+
             foreach (var cell in cellParents[i].GetComponentsInChildren<GridCell>())
             {
                 if (cell.cellInfo.isEnemy() && !cell.isFreezed && cell.GetComponent<EnemyCell>().willMove())
                 {
 
                     yield return StartCoroutine(cell.GetComponent<EnemyCell>().startMove());
-                    
+
                 }
                 if (cell.cellInfo.isEnemy())
                 {
 
                     cell.GetComponent<EnemyCell>().finishedMove();
+                }
+                if(!cell.cellInfo.isEnemy() && cell.cellInfo.moveMode > 0 && cell.index!=lastIndex)
+                {
+                    var emptyCellsAround = adjacentType(cell.index, "empty");
+                    if (emptyCellsAround.Count > 0)
+                    {
+                        yield return StartCoroutine(exchangeCard(cell, emptyCellsAround[0].index));
+                        cell.decreaseAmount();
+                        lastIndex = cell.index;
+                        if (cell.amount <= 0)
+                        {
+
+                            destroy(cell.gameObject);
+                            //generate new item in target position, generate empty in origin position
+                            addEmpty(cell.index);
+                        }
+                    }
                 }
             }
         }
@@ -715,7 +789,7 @@ public class GridController : Singleton<GridController>
     {
         var targetCell = emptyCell.transform.parent.GetComponentInChildren<GridItem>();
         var cell2String = targetCell ? targetCell.type : "empty";
-        if (cell && cell.cellInfo!=null && cell.cellInfo.isPlayer())
+        if (cell && cell.cellInfo != null && cell.cellInfo.isPlayer())
         {
             if (cell2String == "empty")
             {
@@ -732,7 +806,8 @@ public class GridController : Singleton<GridController>
             else if (cell2String == "bat")
             {
                 return "playerEquipbat";
-            }else if(targetCell&&cellParents[targetCell.index].GetComponent<GridBackground>().isHot)
+            }
+            else if (targetCell && cellParents[targetCell.index].GetComponent<GridBackground>().isHot)
             {
                 return "playerOnHot";
             }
@@ -748,7 +823,7 @@ public class GridController : Singleton<GridController>
 
 
 
-            return combination !=null ? combination.rules:null;
+            return combination != null ? combination.rules : null;
         }
         return null;
 
@@ -756,15 +831,15 @@ public class GridController : Singleton<GridController>
 
     public bool hasEqualOrMoreCardsWithType(string type, int count)
     {
-        if(count == 0)
+        if (count == 0)
         {
             return false;
         }
         GridCell[] cells = GameObject.FindObjectsOfType<GridCell>();
         int t = 0;
-        foreach(GridCell c in cells)
+        foreach (GridCell c in cells)
         {
-            if(c.cellInfo!=null && c.cellInfo.type== type)
+            if (c.cellInfo != null && c.cellInfo.type == type)
             {
                 t++;
             }
@@ -794,7 +869,7 @@ public class GridController : Singleton<GridController>
         EventPool.Trigger("moveAStep");
         yield break;
     }
-    
+
     IEnumerator exploreCellAnim(GridCell cell)
     {
         yield return null;
@@ -804,8 +879,8 @@ public class GridController : Singleton<GridController>
             isMoving = false;
             yield break;
         }
-            //draw card
-            string card = "";
+        //draw card
+        string card = "";
 
         if (boss)
         {
@@ -820,6 +895,7 @@ public class GridController : Singleton<GridController>
 
         }
 
+        lastIndex = cell.index;
         Debug.Log("draw card " + card);
         var cardInfo = CellManager.Instance.getInfo(card);
         var freezedCellCount = freezeCount();
@@ -943,19 +1019,20 @@ public class GridController : Singleton<GridController>
         }
 
 
-        yield return  StartCoroutine(moveOthers());
+        yield return StartCoroutine(moveOthers());
 
     }
     IEnumerator moveCellAnim(GridCell cell, bool forceMove)
     {
+        lastIndex = -1;
         TextWhenShowCell.Instance.hideText();
-       yield return null;
         AchievementManager.Instance.clear("round");
-        //if is moving player, consume
-        if(!cell || cell.cellInfo == null)
+        yield return null;
+        if (!cell || cell.cellInfo == null)
         {
             Debug.LogError("???");
         }
+        //if is moving player, consume
         if (cell.cellInfo.isPlayer())
         {
             ResourceManager.Instance.consumeResource("nut", 1, cell.transform.position);
@@ -963,7 +1040,7 @@ public class GridController : Singleton<GridController>
         }
         if (cell.cellInfo.isAlly())
         {
-            ResourceManager.Instance.consumeResource("nut", 1, cell.transform.position);
+            //ResourceManager.Instance.consumeResource("nut", 1, cell.transform.position);
             //RulePopupManager.Instance.showRule("playerMove");
         }
 
@@ -972,14 +1049,7 @@ public class GridController : Singleton<GridController>
         //move current cell to position
         var originEmptyIndex = emptyCellIndex;
         var originalMovingCellIndex = cell.index;
-
-
-
-        var emptyPosition = cellParents[originEmptyIndex].position;
-
-
-        bool willGetIntoShop = false;
-
+        var willGetIntoShop = false;
         var targetCell = cellParents[originEmptyIndex].GetComponentInChildren<GridItem>();
         var cell1String = cell.type;
         var cell2String = targetCell ? targetCell.type : "empty";
@@ -1042,9 +1112,11 @@ public class GridController : Singleton<GridController>
                 if (targetCell.cellInfo.isResource())
                 {
 
-                    SFXManager.Instance.play("collect" + targetCell.cellInfo.categoryDetail);
+                    //SFXManager.Instance.play("collect" + targetCell.cellInfo.categoryDetail);
+                    SFXManager.Instance.play("collect" + "nut");
                     var resource = new List<PairInfo<int>>() { };
-                    resource.Add(new PairInfo<int>(targetCell.cellInfo.categoryDetail, targetCell.amount));
+                    //resource.Add(new PairInfo<int>(targetCell.cellInfo.categoryDetail, targetCell.amount));
+                    resource.Add(new PairInfo<int>("nut", targetCell.amount));
                     CollectionManager.Instance.AddCoins(targetCell.transform.position, resource);
                     destroy(targetCell.gameObject);
 
@@ -1062,9 +1134,9 @@ public class GridController : Singleton<GridController>
                 }
                 else if (targetCell.cellInfo.isWeapon())
                 {
-                    cell.GetComponent<GridCell>().equip(cell2String,targetCell.cellInfo.categoryValue);
+                    cell.GetComponent<GridCell>().equip(cell2String, targetCell.cellInfo.categoryValue);
 
-                    RulePopupManager.Instance.showRule("playerEquip" + cell2String);
+                    //RulePopupManager.Instance.showRule("playerEquip" + cell2String);
                     destroy(targetCell.gameObject);
                 }
                 else if (targetCell.cellInfo.type == "shop")
@@ -1083,119 +1155,125 @@ public class GridController : Singleton<GridController>
         else
         {
             hasPlayerMoved = false;
-            //calculate combination result
-            var combination = CombinationManager.Instance.getCombinationResult(cell1String, cell2String);
-            if (combination != null)
+
+            //check if current card is splitable, if so, check if the next split can combine on empty place
+            if (cell.cellInfo.isSplitable())
             {
-
-                yield return StartCoroutine(exchangeCard(cell, emptyCellIndex));
-                if (combination.rules!=null && combination.rules.Length > 0)
+                if (cell.cellInfo.categoryDetail.Count <= 0)
                 {
-
-                    RulePopupManager.Instance.showRule(combination.rules);
+                    Debug.LogError("category detail of " + cell.cellInfo.type + " not set");
                 }
-                foreach (var pair in combination.result)
+                var nextSplitItem = cell.cellInfo.categoryDetail[0];
+
+
+                //calculate combination result
+                var combination = CombinationManager.Instance.getCombinationResult(nextSplitItem, cell2String);
+                if(combination == null)
                 {
-                    switch (pair.Key)
+
+                    combination = CombinationManager.Instance.getCombinationResult(cell2String, nextSplitItem);
+                }
+                if (combination != null)
+                {
+                    //yield return StartCoroutine(exchangeCard(cell, emptyCellIndex));
+                    if (combination.rules != null && combination.rules.Length > 0)
                     {
-                        //case "resource":
 
-                        //    var resource = new List<PairInfo<int>>() { };
-                        //    CellInfo info = CellManager.Instance.getInfo(cell2String);
-
-                        //    resource.Add(new PairInfo<int>(info.categoryDetail, int.Parse(pair.Value)));
-                        //    CollectionManager.Instance.AddCoins(transform.position, resource);
-                        //    break;
-                        //case "destroy1":
-                        //    cell.decreaseAmount();
-                        //    if (cell.amount == 0)
-                        //    {
-
-                        //        addEmpty(originEmptyIndex);
-                        //        destroy(cell.gameObject);
-                        //    }
-                        //    break;
-                        case "destroy2":
-                            destroy(targetCell.gameObject);
-                            break;
-                        case "addHot":
-                            break;
-                        case "generate1":
-                            cell.decreaseAmount();
-                            if (cell.amount == 0)
-                            {
-
-                                //generate new item in target position, generate empty in origin position
-                                addEmpty(originalMovingCellIndex);
-                            }
-                            else
-                            {
-                                generateCell(originalMovingCellIndex, cell.type, cell.amount);
-                            }
-                            destroy(cell.gameObject);
-                            if (targetCell && targetCell.type == pair.Value)
-                            {
-                                targetCell.addAmount();
-                            }
-                            else
-                            {
-                                generateCell(originEmptyIndex, pair.Value);
-                            }
-
-                            moveCard(emptyCell, originEmptyIndex);
-
-                            SFXManager.Instance.play("showup");
-                            break;
-                        case "generate2":
-                            //generate new item in original position
-                            //addEmpty(originEmptyIndex);
-                            //destroy(cell.gameObject);
-
-                            if (cellParents[originalMovingCellIndex].GetComponentInChildren<GridItem>())
-                            {
-                                destroy( cellParents[originalMovingCellIndex].GetComponentInChildren<GridItem>().gameObject);
-                            }
-
-                            generateCell(originalMovingCellIndex, pair.Value);
-
-                            SFXManager.Instance.play("showup");
-                            break;
-                        case "increaseObjectHP":
-                            cell.GetComponent<FireCell>().addHp(int.Parse(pair.Value));
-                            break;
-                        case "trap":
-
-                            break;
-                        default:
-                            Debug.LogError("not support combination restul " + pair.Key);
-                            break;
+                        RulePopupManager.Instance.showRule(combination.rules);
                     }
+                    foreach (var pair in combination.result)
+                    {
+                        switch (pair.Key)
+                        {
+                            case "destroy2":
+                                destroy(targetCell.gameObject);
+                                break;
+                            case "addHot":
+                                break;
+                            case "generate1":
+                                cell.decreaseAmount();
+
+                                if (cell.amount <= 0)
+                                {
+
+                                    destroy(cell.gameObject);
+                                    //generate new item in target position, generate empty in origin position
+                                    addEmpty(originalMovingCellIndex);
+                                }
+                                else
+                                {
+                                    //generateCell(originalMovingCellIndex, cell.type, cell.amount);
+                                }
+                                //create a new split item and move to target and destroy
+                                var tempCell = generateCell(originalMovingCellIndex, pair.Value, 1);
+                                StartCoroutine( moveCardAnim(tempCell.GetComponent<GridCell>(), originEmptyIndex));
+                                //destroy(cell.gameObject);
+                                if (targetCell && targetCell.type == pair.Value)
+                                {
+                                    targetCell.addAmount();
+                                }
+                                else
+                                {
+                                    //generateCell(originEmptyIndex, pair.Value);
+                                }
+
+                                //moveCard(emptyCell, originEmptyIndex);
+
+                                SFXManager.Instance.play("showup");
+                                break;
+                            case "generate2":
+                                //generate new item in original position
+                                //addEmpty(originEmptyIndex);
+                                //destroy(cell.gameObject);
+
+                                if (cellParents[originalMovingCellIndex].GetComponentInChildren<GridItem>())
+                                {
+                                    destroy(cellParents[originalMovingCellIndex].GetComponentInChildren<GridItem>().gameObject);
+                                }
+
+                                generateCell(originalMovingCellIndex, pair.Value);
+
+                                SFXManager.Instance.play("showup");
+                                break;
+                            case "increaseObjectHP":
+                                cell.GetComponent<FireCell>().addHp(int.Parse(pair.Value));
+                                break;
+                            default:
+                                Debug.LogError("not support combination restul " + pair.Key);
+                                break;
+                        }
+                    }
+                    yield return StartCoroutine(moveOthers());
+                    yield break;
                 }
+
             }
-            else
+
+            
+           // else
             {
 
-               // if (canDrawCard) {
-                    //generate cell, if already a cell, don't generate and add it back to the deck.
-                    if (cell.cellInfo.isEmpty())
-                    {
+                // if (canDrawCard) {
+                //generate cell, if already a cell, don't generate and add it back to the deck.
+                if (cell.cellInfo.isEmpty())
+                {
 
 
-                        yield return StartCoroutine(exploreCellAnim(cell));
+                    yield return StartCoroutine(exploreCellAnim(cell));
 
                     yield break;
 
                 }
-                    else
-                    {
-                        yield return StartCoroutine(exchangeCard(cell, emptyCellIndex));
-                        // DeckManager.Instance.waitingCards(card);
-                    }
+                else
+                {
+                    yield return StartCoroutine(exchangeCard(cell, emptyCellIndex));
+                    // DeckManager.Instance.waitingCards(card);
+                }
                 //}
-               // else
-               // {
-               //     yield return StartCoroutine(exchangeCard(cell, emptyCellIndex));
-               // }
+                // else
+                // {
+                //     yield return StartCoroutine(exchangeCard(cell, emptyCellIndex));
+                // }
 
 
 
@@ -1259,8 +1337,8 @@ public class GridController : Singleton<GridController>
 
 
         yield return StartCoroutine(moveOthers());
-       //// yield break;
-       // finishMove();
+        //// yield break;
+        // finishMove();
 
 
 
@@ -1270,7 +1348,7 @@ public class GridController : Singleton<GridController>
 
     public int getTargetIndexToPlayer(int index)
     {
-        if(index == playerCellIndex)
+        if (index == playerCellIndex)
         {
             Debug.LogError("on the same position as player " + index);
         }
@@ -1281,7 +1359,7 @@ public class GridController : Singleton<GridController>
         int py = playerCellIndex % cellCountY;
         int newx = x;
         int newy = y;
-        if(x== px)
+        if (x == px)
         {
             newy = (int)(Mathf.Sign(py - y)) + y;
         }
@@ -1291,7 +1369,7 @@ public class GridController : Singleton<GridController>
             newx = (int)(Mathf.Sign(px - x)) + x;
         }
         int res = (newx * cellCountX + newy);
-        Debug.Log("get target " + x+" "+ y+" "+ px+" "+ py+" "+newx+" "+newy+" "+ res);
+        Debug.Log("get target " + x + " " + y + " " + px + " " + py + " " + newx + " " + newy + " " + res);
 
 
         if (res < 0 || res > 8)
@@ -1313,6 +1391,19 @@ public class GridController : Singleton<GridController>
         cell.transform.position = cellPosition;
     }
 
+    IEnumerator moveCardAnim(GridCell cell, int index)
+    {
+
+        SFXManager.Instance.play("cardmove");
+
+        cell.transform.DOMove(cellParents[index].position, animTime);
+
+        cell.index = index;
+        cell.transform.parent = cellParents[index];
+        yield return new WaitForSeconds(animTime);
+       // destroy(cell.gameObject);
+    }
+
     public IEnumerator exchangeCard(GridCell cell1, int cell2Index)
     {
         SFXManager.Instance.play("cardmove");
@@ -1320,13 +1411,13 @@ public class GridController : Singleton<GridController>
         isMoving = true;
         if (cell1.index == cell2Index)
         {
-            Debug.Log("that's not correct "+ cell2Index);
+            Debug.Log("that's not correct " + cell2Index);
         }
 
         var cell1Index = cell1.index;
         var cell2s = cellParents[cell2Index].GetComponentsInChildren<GridCell>();
         GridCell cell2 = null;
-        foreach(var c in cell2s)
+        foreach (var c in cell2s)
         {
             if (c.GetComponent<GridItem>())
             {
@@ -1338,7 +1429,7 @@ public class GridController : Singleton<GridController>
             }
             cell2 = c;
         }
-        if(cell2 == null)
+        if (cell2 == null)
         {
             Debug.Log("cell2 is null");
         }
@@ -1354,7 +1445,7 @@ public class GridController : Singleton<GridController>
         cell2.transform.parent = cellParents[cell2.index];
         Debug.Log("cell1 " + cell2Index + " cell2 " + cell1Index);
         yield return new WaitForSeconds(animTime);
-        if(originalIsMoving == false)
+        if (originalIsMoving == false)
         {
 
             isMoving = false;
@@ -1367,7 +1458,7 @@ public class GridController : Singleton<GridController>
         foreach (var cell in cellParents)
         {
             cell.transform.localScale = Vector3.zero;
-                }
+        }
 
         foreach (var cell in cellParents)
         {
@@ -1418,17 +1509,6 @@ public class GridController : Singleton<GridController>
         }
         switch (card)
         {
-            case "nut":
-            case "bat":
-                generateCell(index, card);
-                break;
-            case "trap":
-
-                if (itemCount(card) < 3)
-                {
-                    generateCell(index, "trap");
-                }
-                break;
             case "shop":
 
                 if (itemCount(card) < 1)
@@ -1436,7 +1516,10 @@ public class GridController : Singleton<GridController>
                     generateCell(index, "shop");
                 }
                 break;
-
+            default:
+                //normally this would not get triggered, mostly for testing
+                generateCell(index, card);
+                break;
 
         }
     }

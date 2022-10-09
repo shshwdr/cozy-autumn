@@ -7,7 +7,7 @@ public class CellInfo {
     public string type;
     public int cellType;
     public string categoryType;
-    public string categoryDetail;
+    public List< string> categoryDetail;
     public int maxCount;
     public Dictionary<int, string> textWhenFirstMeet;
     public int showTime = 0;
@@ -21,11 +21,14 @@ public class CellInfo {
     public bool isAlly() { return categoryType == "ally"; }
     public bool isResource() { return categoryType == "resource"; }
     public bool isWeapon() { return categoryType == "weapon"; }
+    public bool isTrap() { return categoryType == "trap"; }
+    public bool isSplitable() { return categoryType == "splitable"; }
 
     public int categoryValue;
 
 
     public string requireResourcePerStep;
+    public string attackMode;
     public string requireResource;
     public int attackPerStep; 
     public int attack; 

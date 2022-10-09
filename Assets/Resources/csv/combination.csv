@@ -1,8 +1,8 @@
 ﻿type1,type2,result,generation,rules
-branch,stone,generate1:axe|destroy2:0,axe,branch+stone
-branch,empty,generate1:stick,stick,branchToStick
-branch,nut,generate1:birdTrap|destroy2:0,birdTrap,branch+nut
-branch,stick,generate1:bat|destroy2:0,bat,branch+Stick
+stick,stone,generate1:axe|destroy2:0,axe,branch+stone
+stick,empty,generate1:stick,stick,branchToStick
+stick,nut,generate1:birdTrap|destroy2:0,birdTrap,branch+nut
+stick,stick,generate1:bat|destroy2:0,bat,branch+Stick
 boulder,nut,generate1:openedNut|destroy2:0,edibleNut,Boulder+nut
 boulder,stick,generate1:axe|destroy2:0,axe,boulder+stick
 boulder,empty,generate1:stone,stone,boulder+empty
@@ -12,8 +12,9 @@ fire,stick,addHot:1|increaseObjectHP:4|destroy2:0,,fire+stick
 fire,stone,addHot:1|increaseObjectHP:-3|destroy2:0,,fire+stone
 fire,birdTrap,addHot:1|increaseObjectHP:7|destroy2:0,,fire+birdTrap
 fire,trap,addHot:1,,
-nutOnTree,empty,generate1:nut,,
-nutOnTree,stick,generate1:birdTrap|destroy2:0,,
-nutOnTree,nut,generate1:nut,,
-tumbleweed,empty,generate1:hay,,
-tumbleweed,hay,generate1:ropeWeapon|destroy2:0,,
+nut,empty,generate1:nut,,
+nut,nut,generate1:nut,,
+hay,empty,generate1:hay,,
+hay,hay,generate1:ropeWeapon|destroy2:0,,
+hay,stick,generate1:scarecrow|destroy2:0,,
+hay,nut,generate1:ropeTrap|destroy2:0,,
