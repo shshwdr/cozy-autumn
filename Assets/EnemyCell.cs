@@ -247,7 +247,7 @@ public class EnemyCell : MonoBehaviour
         {
             SFXManager.Instance.play("attack");
             playAttackEffect(attackee);
-            RulePopupManager.Instance.showRule("playerNextTo" + info.type);
+            //RulePopupManager.Instance.showRule("playerNextTo" + info.type);
             //Instantiate(Resources.Load("effect/attack"), GridController.Instance.getPlayerTransform().position, Quaternion.identity);
 
             if (attackee.cellInfo.isPlayer())

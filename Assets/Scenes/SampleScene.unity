@@ -11275,7 +11275,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8e3644bf9e792348a1aea4b380908d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wouldShuffle: 1
+  wouldShuffle: 0
 --- !u!1 &251557016
 GameObject:
   m_ObjectHideFlags: 0
@@ -33741,7 +33741,7 @@ SpriteRenderer:
   m_Size: {x: 5.12, y: 5.12}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
+  m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1001 &1001322904
@@ -83978,7 +83978,6 @@ MonoBehaviour:
   cellCountX: 3
   cellCountY: 3
   cellSize: 2.1
-  moveCountToLeaf: 140000004600000078000000aa000000c8000000f0000000
   moveCount: 0
   bossParent: {fileID: 1976897155}
   snakeChance: 13
