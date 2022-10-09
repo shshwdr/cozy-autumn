@@ -13,8 +13,8 @@ public class GridController : Singleton<GridController>
     public float cellSize = 2;
 
 
-    public List<int> moveCountToLeaf;
-    int currentLeafIndex = 0;
+    //public List<int> moveCountToLeaf;
+    //int currentLeafIndex = 0;
 
    public  int moveCount = 0;
     public Transform bossParent;
@@ -56,7 +56,7 @@ public class GridController : Singleton<GridController>
         // initMainBoard();
         StartCoroutine(test());
 
-        bk.Find("leaf" + currentLeafIndex).GetComponent<ParticleSystem>().Play();
+        //bk.Find("leaf" + currentLeafIndex).GetComponent<ParticleSystem>().Play();
         AchievementManager.Instance.clearAll();
     }
 
@@ -77,11 +77,11 @@ public class GridController : Singleton<GridController>
     void step()
     {
         moveCount++;
-        if(currentLeafIndex<moveCountToLeaf.Count && moveCount >= moveCountToLeaf[currentLeafIndex])
-        {
-            currentLeafIndex++;
-            updateLeafFalling();
-        }
+        //if(currentLeafIndex<moveCountToLeaf.Count && moveCount >= moveCountToLeaf[currentLeafIndex])
+        //{
+        //    currentLeafIndex++;
+        //    updateLeafFalling();
+        //}
     }
     public Transform bk;
     void updateLeafFalling()

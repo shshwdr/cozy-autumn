@@ -18,11 +18,13 @@ public class DeckManager : Singleton<DeckManager>
     List<string> currentDeck = new List<string>();
     List<StageInfo> stageInfos;
     int round = -1;
+
+    string stageName = "bearForest";
     // Start is called before the first frame update
     void Start()
     {
 
-        stageInfos = CsvUtil.LoadObjects<StageInfo>("stage");
+        stageInfos = CsvUtil.LoadObjects<StageInfo>(StageManager.Instance.currentStage);
 
 
         addCardUntilBoss();
