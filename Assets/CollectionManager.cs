@@ -191,7 +191,7 @@ public class CollectionManager : Singleton<CollectionManager>
 
             MoveSource(collectedCoinPosition, worldPos, pair.Key, pair.Value, () =>
             {
-				ResourceManager.Instance.addResource(pair.Key, 1);
+				//ResourceManager.Instance.addResource(pair.Key, 1);
                 //PlantsManager.Instance.currentResource[pair.Key] += 1;
                 //BeeManager.Instance.updateGenerateTime();
                 //PestManager.Instance.updateGenerateTime();

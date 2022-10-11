@@ -256,10 +256,14 @@ public class EnemyCell : MonoBehaviour
     }
     public IEnumerator heal(EnemyCell healer)
     {
+        return heal(healer, healer.cell.cellInfo.attack);
+    }
 
+    public IEnumerator heal(EnemyCell healer, int healAmount)
+    {
         SFXManager.Instance.play("heal");
         playHealEffect(healer);
-        hp += healer.cell.cellInfo.attack;
+        hp += healAmount;
         if (cell)
         {
 
@@ -267,7 +271,8 @@ public class EnemyCell : MonoBehaviour
         }
         yield return new WaitForSeconds(GridController.Instance.animTime);
     }
-    bool attack(GridCell attackee, bool canAttack)
+
+        bool attack(GridCell attackee, bool canAttack)
     {
         if (canAttack && !isDead)
         {
@@ -279,7 +284,8 @@ public class EnemyCell : MonoBehaviour
             if (attackee.cellInfo.isPlayer())
             {
 
-                takeResource(info.requireResource, getAttack);
+                attackee.decreaseAmount(getAttack);
+                //takeResource(info.requireResource, getAttack);
             }
             else
             {
@@ -451,8 +457,9 @@ public class EnemyCell : MonoBehaviour
                         if (adjacentCell.cellInfo.isSplitable())
                         {
                             var nextSplit = GridController.Instance.getNextSplit(adjacentCell);
-                            yield return StartCoroutine(GridController.Instance.removeSplit(adjacentCell, nextSplit));
                             hasStolen = true;
+                            yield return StartCoroutine(GridController.Instance.removeSplit(adjacentCell, cell.index, nextSplit));
+                            yield return StartCoroutine(heal(this, 1));
                             break;
                         }
                     }
@@ -471,7 +478,7 @@ public class EnemyCell : MonoBehaviour
                             transform.DOShakeScale(0.2f, 0.2f);
 
 
-                            takeResource(info.requireResourcePerStep, info.attackPerStep);
+                            //takeResource(info.requireResourcePerStep, info.attackPerStep);
                         }
                     }
                 }
@@ -484,20 +491,20 @@ public class EnemyCell : MonoBehaviour
 
     void takeResource(string res, int value)
     {
-        var resValue = ResourceManager.Instance.getAmount(res);
-        if (resValue >= value || res == "nut")
+        //var resValue = ResourceManager.Instance.getAmount(res);
+        //if (resValue >= value || res == "nut")
 
-        {
-            ResourceManager.Instance.consumeResource(res, value,transform.position);
-        }
-        else
-        {
+        //{
+        //    ResourceManager.Instance.consumeResource(res, value,transform.position);
+        //}
+        //else
+        //{
 
-            ResourceManager.Instance.consumeResource(res, resValue, transform.position);
+        //    ResourceManager.Instance.consumeResource(res, resValue, transform.position);
 
 
-            ResourceManager.Instance.consumeResource("nut", (value - resValue) * 2, transform.position);
-        }
+        //    ResourceManager.Instance.consumeResource("nut", (value - resValue) * 2, transform.position);
+        //}
     }
     bool hasAttacked = false;
 

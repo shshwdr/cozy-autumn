@@ -1,5 +1,5 @@
 ﻿type,cellType,categoryType,categoryValue,categoryDetail,requireResourcePerStep,requireResource,attackPerStep,attack,moveMode,destoryOthers,enemyPoints,attackMode,stayMode,maxCount,textWhenFirstMeet
-player,1,player,1,,,,,,,,,,,,
+player,1,player,20,,,,,,,,,,,,
 branch,1,splitable,2,stick,,,,,,,,,,,
 fire,1,,,,,,,,,,,,,,
 nut,,resource,0,,,,,,,,,,,,

@@ -280,7 +280,8 @@ public class GridCell : MonoBehaviour
                 //GridController.Instance.exploreCell(this);
                 GridController.Instance.moveCell(this,true);
 
-                ResourceManager.Instance.consumeResource("nut", 1, transform.position);
+                GridController.Instance.playerCell.decreaseAmount(1);
+                //ResourceManager.Instance.consumeResource("nut", 1, transform.position);
             }
             else
             {

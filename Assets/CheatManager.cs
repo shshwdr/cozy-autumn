@@ -31,16 +31,17 @@ public class CheatManager : Singleton<CheatManager>
         {
             if (Input.GetKeyDown(KeyCode.P))
             {
-                ResourceManager.Instance.addResource("nut", 10);
+                GridController.Instance.playerCell.addAmount(10);
+                //ResourceManager.Instance.addResource("nut", 10);
             }
-            if (Input.GetKeyDown(KeyCode.O))
-            {
-                ResourceManager.Instance.addResource("stick", 10);
-            }
-            if (Input.GetKeyDown(KeyCode.I))
-            {
-                ResourceManager.Instance.addResource("stone", 10);
-            }
+            //if (Input.GetKeyDown(KeyCode.O))
+            //{
+            //    ResourceManager.Instance.addResource("stick", 10);
+            //}
+            //if (Input.GetKeyDown(KeyCode.I))
+            //{
+            //    ResourceManager.Instance.addResource("stone", 10);
+            //}
             if (Input.GetKeyDown(KeyCode.L))
             {
                 _wontDie = true;

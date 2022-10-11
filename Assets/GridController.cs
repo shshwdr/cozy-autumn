@@ -19,7 +19,7 @@ public class GridController : Singleton<GridController>
 
     List<Transform> cellParents = new List<Transform>();
 
-    GridCell playerCell;
+    public GridCell playerCell;
     GridCell allyCell;
     GridEmpty emptyCell;
     public int playerCellIndex { get { return playerCell.index; } }
@@ -576,7 +576,7 @@ public class GridController : Singleton<GridController>
             {
 
                 RulePopupManager.Instance.showRule("playerOnHot");
-                ResourceManager.Instance.consumeResource("nut", 3, cell.transform.position);
+                //ResourceManager.Instance.consumeResource("nut", 3, cell.transform.position);
 
                 SFXManager.Instance.play("shortburn");
 
@@ -1041,7 +1041,7 @@ public class GridController : Singleton<GridController>
         return cell.cellInfo.categoryDetail[0];
     }
 
-    public IEnumerator removeSplit(GridCell cell,string nextSplit)
+    public IEnumerator removeSplit(GridCell cell,int targetIndex, string nextSplit)
     {
         cell.decreaseAmount();
 
@@ -1058,7 +1058,8 @@ public class GridController : Singleton<GridController>
         }
         //create a new split item and move to target and destroy
         var tempCell = generateCell(cell.index, nextSplit, -1);
-        yield return StartCoroutine(moveCardAnim(tempCell.GetComponent<GridCell>(), cell.index));
+        tempCell.GetComponent<GridCell>().renderer.sortingOrder += 100;
+        yield return StartCoroutine(moveCardAnim(tempCell.GetComponent<GridCell>(), targetIndex));
         Destroy(tempCell, animTime);
     }
     IEnumerator moveCellAnim(GridCell cell, bool forceMove)
@@ -1072,9 +1073,11 @@ public class GridController : Singleton<GridController>
             Debug.LogError("???");
         }
         //if is moving player, consume
-        if (cell.cellInfo.isPlayer())
+        if (cell.cellInfo.isPlayer() || cell.cellInfo.isAlly())
         {
-            ResourceManager.Instance.consumeResource("nut", 1, cell.transform.position);
+
+            cell.decreaseAmount(1);
+            //ResourceManager.Instance.consumeResource("nut", 1, cell.transform.position);
             RulePopupManager.Instance.showRule("playerMove");
         }
         if (cell.cellInfo.isAlly())
