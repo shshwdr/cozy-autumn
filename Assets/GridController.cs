@@ -278,7 +278,7 @@ public class GridController : Singleton<GridController>
         {
             return cell.isFreezed;
         }
-        if(type == "empty")
+        if (type == "empty")
         {
             return cell.index == emptyCellIndex || cell.cellInfo.isEmpty();
         }
@@ -328,7 +328,7 @@ public class GridController : Singleton<GridController>
         return (allyCellIndex != -1 && isTwoIndexCrossAdjacent(index, allyCellIndex));
     }
 
-    public int distance(int i1,int i2)
+    public int distance(int i1, int i2)
     {
         int x1 = i1 / cellCountX;
         int y1 = i1 % cellCountY;
@@ -358,15 +358,15 @@ public class GridController : Singleton<GridController>
         int y = index % cellCountY;
         if (attackMode == "")
         {
-            foreach(var enemy in allEnemies)
+            foreach (var enemy in allEnemies)
             {
-                if(enemy.GetComponent<GridCell>() )
+                if (enemy.GetComponent<GridCell>())
                 {
                     var enemyIndex = enemy.GetComponent<GridCell>().index;
 
                     int ex = enemyIndex / cellCountX;
                     int ey = enemyIndex % cellCountY;
-                    if((ex == x && Mathf.Abs(ey - y) == 1)||
+                    if ((ex == x && Mathf.Abs(ey - y) == 1) ||
                         (ey == y && Mathf.Abs(ex - x) == 1))
                     {
                         res.Add(enemy);
@@ -388,8 +388,8 @@ public class GridController : Singleton<GridController>
 
                     int ex = enemyIndex / cellCountX;
                     int ey = enemyIndex % cellCountY;
-                    if ((ex == x ) ||
-                        (ey == y ))
+                    if ((ex == x) ||
+                        (ey == y))
                     {
                         res.Add(enemy);
                     }
@@ -642,13 +642,13 @@ public class GridController : Singleton<GridController>
             bool attackWithWeapon = false;
 
             var equipmentInfo = CellManager.Instance.getInfo(characterCell.equipment);
-            List<EnemyCell> attackableList  = getEnemies(index, equipmentInfo.attackMode);
-            
+            List<EnemyCell> attackableList = getEnemies(index, equipmentInfo.attackMode);
+
 
             int damage = characterCell.equipementDamage;
             foreach (var cell in attackableList)
             {
-                if ( cell.canBeAttacked())
+                if (cell.canBeAttacked())
                 {
 
                     damage = Mathf.Min(damage, cell.hp);
@@ -757,7 +757,7 @@ public class GridController : Singleton<GridController>
 
                     cell.GetComponent<EnemyCell>().finishedMove();
                 }
-                if(!cell.cellInfo.isEnemy() && cell.cellInfo.moveMode > 0 && cell.index!=lastIndex)
+                if (!cell.cellInfo.isEnemy() && cell.cellInfo.moveMode > 0 && cell.index != lastIndex)
                 {
                     var emptyCellsAround = adjacentType(cell.index, "empty");
                     if (emptyCellsAround.Count > 0)
@@ -1035,6 +1035,32 @@ public class GridController : Singleton<GridController>
         yield return StartCoroutine(moveOthers());
 
     }
+
+    public string getNextSplit(GridCell cell)
+    {
+        return cell.cellInfo.categoryDetail[0];
+    }
+
+    public IEnumerator removeSplit(GridCell cell,string nextSplit)
+    {
+        cell.decreaseAmount();
+
+        if (cell.amount <= 0)
+        {
+
+            destroy(cell.gameObject);
+            //generate new item in target position, generate empty in origin position
+            addEmpty(cell.index);
+        }
+        else
+        {
+            //generateCell(originalMovingCellIndex, cell.type, cell.amount);
+        }
+        //create a new split item and move to target and destroy
+        var tempCell = generateCell(cell.index, nextSplit, -1);
+        yield return StartCoroutine(moveCardAnim(tempCell.GetComponent<GridCell>(), cell.index));
+        Destroy(tempCell, animTime);
+    }
     IEnumerator moveCellAnim(GridCell cell, bool forceMove)
     {
         lastIndex = -1;
@@ -1176,7 +1202,7 @@ public class GridController : Singleton<GridController>
                 {
                     Debug.LogError("category detail of " + cell.cellInfo.type + " not set");
                 }
-                var nextSplitItem = cell.cellInfo.categoryDetail[0];
+                var nextSplitItem = getNextSplit(cell);
 
 
                 //calculate combination result

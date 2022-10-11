@@ -241,6 +241,32 @@ public class EnemyCell : MonoBehaviour
     //    }
     //    return false;
     //}
+
+    void playHealEffect(EnemyCell healer)
+    {
+
+        if (isDead)
+        {
+            return;
+        }
+        var go = Instantiate(Resources.Load<GameObject>("effect/healEffect"), transform.position, Quaternion.identity);
+        go.transform.DOMove(healer.transform.position, GridController.Instance.animTime + 0.1f);
+        Destroy(go, 1f);
+        SFXManager.Instance.play("scream");
+    }
+    public IEnumerator heal(EnemyCell healer)
+    {
+
+        SFXManager.Instance.play("heal");
+        playHealEffect(healer);
+        hp += healer.cell.cellInfo.attack;
+        if (cell)
+        {
+
+            cell.setAmount(hp);
+        }
+        yield return new WaitForSeconds(GridController.Instance.animTime);
+    }
     bool attack(GridCell attackee, bool canAttack)
     {
         if (canAttack && !isDead)
@@ -371,6 +397,8 @@ public class EnemyCell : MonoBehaviour
     {
         return !isDead && !isFirst;
     }
+
+
     public IEnumerator startAttack()
     {
         if (isDead)
@@ -401,20 +429,54 @@ public class EnemyCell : MonoBehaviour
                 countDownObject.initCount(attackCountDown);
             }
 
-            if (GridController.Instance.isCharacterAround(GetComponent<GridCell>().index) || attackCountDown == 0)
+            if(info.attackMode == "heal")
             {
-                yield return StartCoroutine(activeAttack());
+                //heal enemies
+                foreach (var adjacentCell in GridController.Instance.getAdjacentCells(cell.index))
+                {
+                    if (adjacentCell.GetComponent<EnemyCell>())
+                    {
+                        yield return StartCoroutine( adjacentCell.GetComponent<EnemyCell>().heal(this));
+                    }
+                }
             }
             else
             {
-                if (info.attackPerStep > 0)
+                bool hasStolen = false;
+                if(info.attackMode == "steal")
                 {
-
-                    transform.DOShakeScale(0.2f, 0.2f);
-
-
-                    takeResource(info.requireResourcePerStep, info.attackPerStep);
+                    //try steal around
+                    foreach (var adjacentCell in GridController.Instance.getAdjacentCells(cell.index))
+                    {
+                        if (adjacentCell.cellInfo.isSplitable())
+                        {
+                            var nextSplit = GridController.Instance.getNextSplit(adjacentCell);
+                            yield return StartCoroutine(GridController.Instance.removeSplit(adjacentCell, nextSplit));
+                            hasStolen = true;
+                            break;
+                        }
+                    }
                 }
+                if (!hasStolen)
+                {
+                    if (GridController.Instance.isCharacterAround(GetComponent<GridCell>().index) || attackCountDown == 0)
+                    {
+                        yield return StartCoroutine(activeAttack());
+                    }
+                    else
+                    {
+                        if (info.attackPerStep > 0)
+                        {
+
+                            transform.DOShakeScale(0.2f, 0.2f);
+
+
+                            takeResource(info.requireResourcePerStep, info.attackPerStep);
+                        }
+                    }
+                }
+
+                
             }
         }
 
