@@ -31,7 +31,7 @@ public class DeckManager : Singleton<DeckManager>
     }
     void addCardUntilBoss()
     {
-        while (round<=StageManager.Instance.getCurrentInfo().stopRound)
+        while (round<StageManager.Instance.getCurrentInfo().stopRound)
         {
             createAndShuffleCards();
 
@@ -57,6 +57,12 @@ public class DeckManager : Singleton<DeckManager>
     {
         round++;
         Debug.Log("start deck round " + round);
+
+        if(round> StageManager.Instance.getCurrentInfo().stopRound)
+        {
+            AchievementManager.Instance.ShowAchievement(StageManager.Instance.getCurrentInfo().stageName + "Finish");
+        }
+
         addDeckByRound();
 
         //currentDeck.Clear();

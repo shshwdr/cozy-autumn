@@ -99,8 +99,7 @@ public class GridCell : MonoBehaviour
 
         if (cellInfo.isEnemy())
         {
-
-            gameObject.AddComponent<EnemyCell>().init(type,amount);
+            gameObject.AddComponent<EnemyCell>().init(type);
             bk.GetComponent<SpriteRenderer>().color = Color.red;
         }
 

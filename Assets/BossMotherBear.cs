@@ -51,7 +51,7 @@ public class BossMotherBear : Boss
             PopupManager.Instance.showEvent("A Huge Mother Bear shows up:'You hurt my baby bear! How dare you!!!","Fight!");
         }
 
-        enemyCell.init(type, info.categoryValue);
+        enemyCell.init(type);
         setAmount(enemyCell.hp);
 
     }

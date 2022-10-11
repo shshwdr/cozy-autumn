@@ -8,15 +8,14 @@ using UnityEngine.UI;
 public class EnemyCell : MonoBehaviour
 {
 
-    public int hp = 1;
     public bool isDead = false;
-    GridCell cell;
+    public GridCell cell;
     CellInfo info;
     bool isFirst = true;
     bool hasBeenAttacked = false;
     public bool isBoss = false;
-
-    int getAttack { get { return hp; } }
+    public int hp { get { return cell.amount; } }
+    int getAttack { get { return cell.amount; } }
 
 
     int attackCountDown = 10000;
@@ -24,27 +23,15 @@ public class EnemyCell : MonoBehaviour
     CounterDown countDownObject;
     CanvasGroup explainPanel;
     bool hasUpdatedDescription = false;
-    public void init(string type,int a)
+    public void init(string type)
     {
         info = CellManager.Instance.getInfo(type);
 
         SFXManager.Instance.play(type + "show");
         explainPanel = GetComponentInChildren<CanvasGroup>();
         updateDescription();
-        hp = a;
 
         cell = GetComponent<GridCell>();
-        if (cell)
-        {
-
-            cell.setAmount(hp);
-        }
-       var  bossCell=GetComponentInParent<Boss>();
-        if (bossCell)
-        {
-
-            bossCell.setAmount(hp);
-        }
     }
 
     public void finishedMove()
@@ -195,21 +182,10 @@ public class EnemyCell : MonoBehaviour
             return;
         }
 
-        hp -= x;
-        if(hp <= 0)
+        cell.decreaseAmount(x);
+        if(cell.amount <= 0)
         {
             die();
-        }
-        if (cell)
-        {
-
-            cell.setAmount(hp);
-        }
-        var bossCell = GetComponentInParent<Boss>();
-        if (bossCell)
-        {
-
-            bossCell.setAmount(hp);
         }
 
         SFXManager.Instance.play("animalLose");
@@ -249,8 +225,8 @@ public class EnemyCell : MonoBehaviour
         {
             return;
         }
-        var go = Instantiate(Resources.Load<GameObject>("effect/healEffect"), transform.position, Quaternion.identity);
-        go.transform.DOMove(healer.transform.position, GridController.Instance.animTime + 0.1f);
+        var go = Instantiate(Resources.Load<GameObject>("effect/healEffect"), healer.transform.position , Quaternion.identity);
+        go.transform.DOMove(transform.position, GridController.Instance.animTime + 0.1f);
         Destroy(go, 1f);
         SFXManager.Instance.play("scream");
     }
@@ -263,12 +239,7 @@ public class EnemyCell : MonoBehaviour
     {
         SFXManager.Instance.play("heal");
         playHealEffect(healer);
-        hp += healAmount;
-        if (cell)
-        {
-
-            cell.setAmount(hp);
-        }
+        cell.addAmount(healAmount);
         yield return new WaitForSeconds(GridController.Instance.animTime);
     }
 

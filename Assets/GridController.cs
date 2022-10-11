@@ -662,6 +662,13 @@ public class GridController : Singleton<GridController>
                 {
 
                     cell.GetComponent<EnemyCell>().getDamage(damage);
+
+                    if(cell.cell.cellInfo.attackMode == "reflection")
+                    {
+                        //need reflection animation
+                        characterCell.decreaseAmount(damage / 2);
+                    }
+
                     if (characterCell.equipment != null)
                     {
 
@@ -1158,8 +1165,9 @@ public class GridController : Singleton<GridController>
                     SFXManager.Instance.play("collect" + "nut");
                     var resource = new List<PairInfo<int>>() { };
                     //resource.Add(new PairInfo<int>(targetCell.cellInfo.categoryDetail, targetCell.amount));
-                    resource.Add(new PairInfo<int>("nut", targetCell.amount));
-                    CollectionManager.Instance.AddCoins(targetCell.transform.position, resource);
+                    //resource.Add(new PairInfo<int>("nut", targetCell.amount));
+                    //CollectionManager.Instance.AddCoins(targetCell.transform.position, resource);
+                    cell.GetComponent<GridCell>().addAmount(targetCell.amount);
                     destroy(targetCell.gameObject);
 
                     switch (targetCell.type)
