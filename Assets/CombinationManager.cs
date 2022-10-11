@@ -10,6 +10,10 @@ public class CombinationInfo
     public Dictionary<string,string> result;
     public string rules;
     public string achievement;
+
+    public int addValue1;
+    public int addValue2;
+
 }
 
 
@@ -17,6 +21,7 @@ public class CombinationInfo
 public class CombinationManager : Singleton<CombinationManager>
 {
     Dictionary<string, List<CombinationInfo>> combinationDict = new Dictionary<string, List<CombinationInfo>>();
+    Dictionary<string, List<CombinationInfo>> combinationDict2 = new Dictionary<string, List<CombinationInfo>>();
     // Start is called before the first frame update
     void Start()
     {
@@ -31,8 +36,38 @@ public class CombinationManager : Singleton<CombinationManager>
             }
             combinationDict[info.type1].Add(info);
 
+
+            if (!combinationDict2.ContainsKey(info.type2))
+            {
+                combinationDict2[info.type2] = new List<CombinationInfo>();
+            }
+            combinationDict2[info.type2].Add(info);
+
         }
     }
+
+    public int getCombinationAddValue(string resource, string result)
+    {
+        foreach (var info in combinationDict[resource])
+        {
+            if (info.result.ContainsKey("generate1")&& info.result["generate1"]== result)
+            {
+                return info.addValue1;
+            }
+        }
+
+
+        foreach (var info in combinationDict2[resource])
+        {
+            if (info.result.ContainsKey("generate1") && info.result["generate1"] == result)
+            {
+                return info.addValue2;
+            }
+        }
+
+        return -1;
+    }
+
     public CombinationInfo getCombinationResult(string type1,string type2)
     {
         if (!combinationDict.ContainsKey(type1))

@@ -162,6 +162,7 @@ public class GridController : Singleton<GridController>
                 else if (originalPlayerCell == index)
                 {
                     playerCell = generateCell(index, "player").GetComponent<GridCell>();
+                    playerCell.renderer.sprite = Resources.Load<Sprite>("cell/" + CharacterManager.Instance.currentChar);
 
                 }
                 else
@@ -327,6 +328,14 @@ public class GridController : Singleton<GridController>
         return (allyCellIndex != -1 && isTwoIndexCrossAdjacent(index, allyCellIndex));
     }
 
+    public int distance(int i1,int i2)
+    {
+        int x1 = i1 / cellCountX;
+        int y1 = i1 % cellCountY;
+        int x2 = i2 / cellCountX;
+        int y2 = i2 % cellCountY;
+        return Mathf.Abs(x1 - x2) + Mathf.Abs(y1 - y2);
+    }
     public bool isPlayerAround(int index)
     {
         return isTwoIndexCrossAdjacent(index, playerCellIndex);
@@ -764,6 +773,10 @@ public class GridController : Singleton<GridController>
                             addEmpty(cell.index);
                         }
                     }
+                    else
+                    {
+                        cell.failedToMove();
+                    }
                 }
             }
         }
@@ -1085,7 +1098,7 @@ public class GridController : Singleton<GridController>
                 //else 
                 if (targetCell.cellInfo.isWeapon())
                 {
-                    cell.GetComponent<GridCell>().equip(cell2String, targetCell.cellInfo.categoryValue);
+                    cell.GetComponent<GridCell>().equip(cell2String, targetCell.amount);
 
                     RulePopupManager.Instance.showRule("playerEquip" + cell2String);
                     destroy(targetCell.gameObject);
@@ -1134,7 +1147,7 @@ public class GridController : Singleton<GridController>
                 }
                 else if (targetCell.cellInfo.isWeapon())
                 {
-                    cell.GetComponent<GridCell>().equip(cell2String, targetCell.cellInfo.categoryValue);
+                    cell.GetComponent<GridCell>().equip(cell2String, targetCell.amount);
 
                     //RulePopupManager.Instance.showRule("playerEquip" + cell2String);
                     destroy(targetCell.gameObject);
@@ -1167,11 +1180,20 @@ public class GridController : Singleton<GridController>
 
 
                 //calculate combination result
+                int valueAdd = 0;
                 var combination = CombinationManager.Instance.getCombinationResult(nextSplitItem, cell2String);
                 if(combination == null)
                 {
 
                     combination = CombinationManager.Instance.getCombinationResult(cell2String, nextSplitItem);
+                    if (combination!=null)
+                    {
+                        valueAdd += combination.addValue2 * 1 + combination.addValue1 * (targetCell ? targetCell.amount : 0);
+                    }
+                }
+                else
+                {
+                    valueAdd += combination.addValue1 * 1 + combination.addValue2 * (targetCell ? targetCell.amount : 0);
                 }
                 if (combination != null)
                 {
@@ -1205,16 +1227,22 @@ public class GridController : Singleton<GridController>
                                     //generateCell(originalMovingCellIndex, cell.type, cell.amount);
                                 }
                                 //create a new split item and move to target and destroy
-                                var tempCell = generateCell(originalMovingCellIndex, pair.Value, 1);
-                                StartCoroutine( moveCardAnim(tempCell.GetComponent<GridCell>(), originEmptyIndex));
+                                var tempCell = generateCell(originalMovingCellIndex, nextSplitItem, -1);
+                                yield return StartCoroutine( moveCardAnim(tempCell.GetComponent<GridCell>(), originEmptyIndex));
+                                Destroy(tempCell, animTime);
                                 //destroy(cell.gameObject);
                                 if (targetCell && targetCell.type == pair.Value)
                                 {
-                                    targetCell.addAmount();
+                                    targetCell.addAmount(combination.addValue2);
                                 }
                                 else
                                 {
-                                    //generateCell(originEmptyIndex, pair.Value);
+                                    //if (tempCell)
+                                    //{
+
+                                    //    tempCell.GetComponent<GridCell>().addAmount(valueAdd);
+                                    //}
+                                    generateCell(originEmptyIndex, pair.Value,CellManager.Instance.getInfo(pair.Value).categoryValue+valueAdd);
                                 }
 
                                 //moveCard(emptyCell, originEmptyIndex);
@@ -1246,7 +1274,43 @@ public class GridController : Singleton<GridController>
                     yield return StartCoroutine(moveOthers());
                     yield break;
                 }
+                else
+                {
+                    //check if cell2 is made by cell
+                    if (targetCell)
+                    {
+                        int addValue = CombinationManager.Instance.getCombinationAddValue(nextSplitItem, targetCell.type);
+                        if (addValue > 0)
+                        {
+                            //move one item to target cell
+                            cell.decreaseAmount();
 
+                            if (cell.amount <= 0)
+                            {
+
+                                destroy(cell.gameObject);
+                                //generate new item in target position, generate empty in origin position
+                                addEmpty(originalMovingCellIndex);
+                            }
+                            else
+                            {
+                                //generateCell(originalMovingCellIndex, cell.type, cell.amount);
+                            }
+                            //create a new split item and move to target and destroy
+                            var tempCell = generateCell(originalMovingCellIndex, nextSplitItem, -1);
+                            StartCoroutine(moveCardAnim(tempCell.GetComponent<GridCell>(), originEmptyIndex));
+                            Destroy(tempCell, animTime);
+
+                            targetCell.GetComponent<GridCell>().addAmount(addValue);
+
+                            SFXManager.Instance.play("showup");
+
+                            
+                    yield return StartCoroutine(moveOthers());
+                    yield break;
+                        }
+                    }
+                }
             }
 
             

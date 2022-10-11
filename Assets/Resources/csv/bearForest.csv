@@ -4,5 +4,5 @@ branch:1,1,,2
 weasel_3:1|nutOnTree:1|empty:1,2,,3
 babyBear_3:1|empty:1|weasel_5:1,3,,3
 babyBear_3:1|branch:1,4,,1
-motherBear:1,5,,2
+weasel_7|babyBear_5:1,5,,2
 empty:1|nutOnTree:1|hedgehog:1,100000,,

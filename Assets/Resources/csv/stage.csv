@@ -1,3 +1,4 @@
-﻿stageName,displayName,leafName,unlockByAchievement
-bearForest,Bear Forest,leaf,
-grassland,Grassland,grass,
+﻿stageName,displayName,leafName,unlockByAchievement,stopRound
+bearForest,Bear Forest,leaf,,6
+grassland,Grassland,grass,,6
+farmland,Farmland,farm,,6

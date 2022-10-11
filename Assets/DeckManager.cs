@@ -31,7 +31,7 @@ public class DeckManager : Singleton<DeckManager>
     }
     void addCardUntilBoss()
     {
-        while (!currentDeck.Contains("motherBear"))
+        while (round<=StageManager.Instance.getCurrentInfo().stopRound)
         {
             createAndShuffleCards();
 

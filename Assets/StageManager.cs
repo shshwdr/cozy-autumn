@@ -8,7 +8,7 @@ public class StageInfo
     public string stageName;
     public string displayName;
     public string leafName;
-
+    public int stopRound;
 }
 
 public class StageManager : Singleton<StageManager>
@@ -17,10 +17,6 @@ public class StageManager : Singleton<StageManager>
     public string currentStage = "bearForest";
     Dictionary<string, StageInfo> stageInfoDict = new Dictionary<string, StageInfo>();
 
-    public void setCurrentStage(string na)
-    {
-        currentStage = na;
-    }
     // Start is called before the first frame update
     void Start()
     {
@@ -32,6 +28,10 @@ public class StageManager : Singleton<StageManager>
         }
     }
 
+    public void setCurrentStage(string na)
+    {
+        currentStage = na;
+    }
     public StageInfo getStageInfo(string name)
     {
         if (!stageInfoDict.ContainsKey(name))

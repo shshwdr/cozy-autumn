@@ -286,11 +286,26 @@ public class EnemyCell : MonoBehaviour
         }
         else
         {
-            if (ally && GridController.Instance.isAllyAround(GetComponent<GridCell>().index) && attack(ally, canAttack))
+            if (ally &&( GridController.Instance.isAllyAround(GetComponent<GridCell>().index)) && attack(ally, canAttack))
             {
 
             }
-            else if (player && GridController.Instance.isPlayerAround(GetComponent<GridCell>().index) && attack(player, canAttack)) { }
+            else if (player &&(GridController.Instance.isPlayerAround(GetComponent<GridCell>().index) )&& attack(player, canAttack)) { } 
+            else
+            {
+                //find out the closest one between ally and player and attack
+                var d1 = GridController.Instance.distance(ally.index, cell.index);
+                var d2 = GridController.Instance.distance(player.index, cell.index);
+                if (d1 > d2)
+                {
+                    attack(player, canAttack);
+                }
+                else
+                {
+                    attack(ally, canAttack);
+
+                }
+            }
 
         }
 

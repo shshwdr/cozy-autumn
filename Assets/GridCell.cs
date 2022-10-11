@@ -78,20 +78,22 @@ public class GridCell : MonoBehaviour
         }
         else
         {
-            if (cellInfo.categoryValue > 0)
-            {
-                amount = cellInfo.categoryValue;
-                amountLabel.gameObject.SetActive(true);
-            }
-            else
-            {
-                amount = 1;
-                if (amountLabel)
-                {
+            amount = cellInfo.categoryValue;
 
-                    amountLabel.gameObject.SetActive(false);
-                }
-            }
+            //if (cellInfo.categoryValue > 0)
+            //{
+            //    amount = cellInfo.categoryValue;
+            //    amountLabel.gameObject.SetActive(true);
+            //}
+            //else
+            //{
+            //    amount = 1;
+            //    if (amountLabel)
+            //    {
+
+            //        amountLabel.gameObject.SetActive(false);
+            //    }
+            //}
         }
 
 
@@ -151,9 +153,9 @@ public class GridCell : MonoBehaviour
         amount = x;
         updateAmount();
     }
-    public void addAmount()
+    public void addAmount(int x = 1)
     {
-        amount += 1;
+        amount += x;
         updateAmount();
     }
     public void decreaseAmount(int x = 1)
