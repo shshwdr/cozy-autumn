@@ -20,7 +20,7 @@ public class ShopGridController : Singleton<ShopGridController>
     GameObject counterCell;
 
    public  bool isMoving = false;
-    int playerCellIndex { get { return playerCell.index; } }
+    int playerCellIndex { get { return 0; } }// return playerCell.index; } }
     int originalPlayerCell = 5;
 
 
@@ -182,47 +182,47 @@ public class ShopGridController : Singleton<ShopGridController>
         
         
 
-        //move current cell to position
-        var originEmptyIndex = emptyCell;
-        var movingCellIndex = cell.index;
-        var emptyPosition = cellParents[originEmptyIndex].position;
-        //cell.GetComponent<SortingGroup>().sortingOrder = 100;
-        cell.transform.DOMove(emptyPosition, GridController.Instance.animTime);
+       // //move current cell to position
+       // var originEmptyIndex = emptyCell;
+       // var movingCellIndex = cell.index;
+       // var emptyPosition = cellParents[originEmptyIndex].position;
+       // //cell.GetComponent<SortingGroup>().sortingOrder = 100;
+       // cell.transform.DOMove(emptyPosition, GridController.Instance.animTime);
 
-       // generateShopCell(movingCellIndex, "counter", false);
+       //// generateShopCell(movingCellIndex, "counter", false);
 
-        yield return new WaitForSeconds(GridController.Instance.animTime);
+       // yield return new WaitForSeconds(GridController.Instance.animTime);
 
-        if(cell == playerCell)
-        {
-            //leave shop
-            emptyCell = movingCellIndex;
-            cell.index = originEmptyIndex;
-            Destroy(counterCell);
-            counterCell = generateShopCell(emptyCell, "counter", false);
-            StartCoroutine( leaveShop());
-        }else if (cell.isShop)
-        {
-            //buy it
-            ShopManager.Instance.purchase(cell.type);
-            generateShopCell(movingCellIndex, "leaf", false);
-            destroy(cell.gameObject);
+       // if(cell == playerCell)
+       // {
+       //     //leave shop
+       //     emptyCell = movingCellIndex;
+       //     cell.index = originEmptyIndex;
+       //     Destroy(counterCell);
+       //     counterCell = generateShopCell(emptyCell, "counter", false);
+       //     StartCoroutine( leaveShop());
+       // }else if (cell.isShop)
+       // {
+       //     //buy it
+       //     ShopManager.Instance.purchase(cell.type);
+       //     generateShopCell(movingCellIndex, "leaf", false);
+       //     destroy(cell.gameObject);
 
-        }
+       // }
 
 
-        cell.transform.parent = cellParents[originEmptyIndex];
-        cell.index = originEmptyIndex;
+       // cell.transform.parent = cellParents[originEmptyIndex];
+       // cell.index = originEmptyIndex;
 
-        var targetCell = cellParents[originEmptyIndex].GetComponentInChildren<GridItem>();
-        var cell1String = cell.type;
-        var cell2String = targetCell ? targetCell.type : "empty";
+       // var targetCell = cellParents[originEmptyIndex].GetComponentInChildren<GridItem>();
+       // var cell1String = cell.type;
+       // var cell2String = targetCell ? targetCell.type : "empty";
         
 
-        yield return new WaitForSeconds(GridController.Instance.animTime);
-        //EventPool.Trigger("moveAStep");
+       // yield return new WaitForSeconds(GridController.Instance.animTime);
+       // //EventPool.Trigger("moveAStep");
 
-        finishMove();
+       // finishMove();
 
 
 

@@ -61,7 +61,7 @@ public class CellManager : Singleton<CellManager>
         cellInfoDict[type].showTime++;
         if (cellInfoDict[type].textWhenFirstMeet !=null&& cellInfoDict[type].textWhenFirstMeet.ContainsKey(cellInfoDict[type].showTime))
         {
-            TextWhenShowCell.Instance.showText(cellInfoDict[type].textWhenFirstMeet[cellInfoDict[type].showTime]);
+            //TextWhenShowCell.Instance.showText(cellInfoDict[type].textWhenFirstMeet[cellInfoDict[type].showTime]);
         }
     }
     public CellInfo getInfo(string type)

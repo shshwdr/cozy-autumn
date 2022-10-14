@@ -30,39 +30,39 @@ public class FireCell : MonoBehaviour
 
     public void getDamage(int x)
     {
-        hp -= 1;
-        cell.setAmount(hp);
-        if (hp <= 0)
-        {
-            GridController.Instance.addEmpty(GetComponent<GridCell>().index);
-            GetComponent<Collider2D>().enabled = false;
-            isDead = true;
-            transform.DOShakeScale(0.3f, GridController.Instance.animTime);
-            Destroy(gameObject, GridController.Instance.animTime);
-        }
+        //hp -= 1;
+        //cell.setAmount(hp);
+        //if (hp <= 0)
+        //{
+        //    GridController.Instance.addEmpty(GetComponent<GridCell>().index);
+        //    GetComponent<Collider2D>().enabled = false;
+        //    isDead = true;
+        //    transform.DOShakeScale(0.3f, GridController.Instance.animTime);
+        //    Destroy(gameObject, GridController.Instance.animTime);
+        //}
     }
     void stepAttack()
     {
-        if (isDead)
-        {
-            return;
-        }
-        //if ice nearby, clear it and cost
-        var iceAround = GridController.Instance.adjacentType(cell.index, "ice");
-        foreach(var c in iceAround)
-        {
-            if (!c.GetComponent<GridItem>() && !c.GetComponent<GridBackground>() && !c.GetComponent<GridEmpty>())
-            {
+        //if (isDead)
+        //{
+        //    return;
+        //}
+        ////if ice nearby, clear it and cost
+        //var iceAround = GridController.Instance.adjacentType(cell.index, "ice");
+        //foreach(var c in iceAround)
+        //{
+        //    if (!c.GetComponent<GridItem>() && !c.GetComponent<GridBackground>() && !c.GetComponent<GridEmpty>())
+        //    {
 
-                c.thaw();
+        //        c.thaw();
 
-                RulePopupManager.Instance.showRule("iceThaw");
-                SFXManager.Instance.play("icemelt");
-                FindObjectOfType<AchievementManager>().ShowAchievement("melt");
-                FindObjectOfType<AchievementManager>().ShowAchievement("melt2");
-            }
-            //getDamage(1);
-        }
+        //        RulePopupManager.Instance.showRule("iceThaw");
+        //        SFXManager.Instance.play("icemelt");
+        //        FindObjectOfType<AchievementManager>().ShowAchievement("melt");
+        //        FindObjectOfType<AchievementManager>().ShowAchievement("melt2");
+        //    }
+        //    //getDamage(1);
+        //}
     }
 
     

@@ -8,7 +8,7 @@ using Pool;
 
 public class GridCell : MonoBehaviour
 {
-    public int index;
+    public Vector2 index;
     public SpriteRenderer renderer;
 
     public GameObject bk;
@@ -57,7 +57,7 @@ public class GridCell : MonoBehaviour
     }
 
 
-    public  void init(string _type,int i,int _amount)
+    public  void init(string _type,Vector2 i,int _amount)
     {
         CellManager.Instance.showCell(_type);
         type = _type;
@@ -264,7 +264,7 @@ public class GridCell : MonoBehaviour
     float longPressTime = 0.3f;
     public virtual void OnMouseUp()
     {
-
+        return;
         if (!isMouseDown)
         {
             return;
@@ -307,6 +307,7 @@ public class GridCell : MonoBehaviour
     
     private void OnMouseOver()
     {
+        return;
         Debug.Log("just over");
         if (isMouseDown)
         {
@@ -336,6 +337,7 @@ public class GridCell : MonoBehaviour
 
     public virtual void OnMouseDown()
     {
+        return;
         if (!EventSystem.current.IsPointerOverGameObject())
         {
 

@@ -22,9 +22,11 @@ public class GridController : Singleton<GridController>
     public GridCell playerCell;
     GridCell allyCell;
     GridEmpty emptyCell;
-    public int playerCellIndex { get { return playerCell.index; } }
-    public int allyCellIndex { get { return allyCell ? allyCell.index : -1; } }
-    int emptyCellIndex { get { return emptyCell.index; } }
+    public int playerCellIndex { get { return 0; } }// return playerCell.index;
+                                                    // 
+    public int allyCellIndex { get { return 0; } }//
+                                                  //return allyCell ? allyCell.index : -1; } }
+    int emptyCellIndex { get { return 0; } }// return emptyCell.index; } }
 
     int originalPlayerCell = 4;
     int originalEmptyCell = 0;
@@ -239,20 +241,20 @@ public class GridController : Singleton<GridController>
     public List<GridCell> adjacentType(int i, string type)
     {
         List<GridCell> res = new List<GridCell>();
-        var ix = i / cellCountX;
-        var iy = i % cellCountY;
-        List<int> indices = new List<int>();
-        addIndices(indices, ix - 1, iy);
-        addIndices(indices, ix + 1, iy);
-        addIndices(indices, ix, iy - 1);
-        addIndices(indices, ix, iy + 1);
-        foreach (var cell in FindObjectsOfType<GridCell>())
-        {
-            if (indices.Contains(cell.index) && isType(cell, type))
-            {
-                res.Add(cell);
-            }
-        }
+        //var ix = i / cellCountX;
+        //var iy = i % cellCountY;
+        //List<int> indices = new List<int>();
+        //addIndices(indices, ix - 1, iy);
+        //addIndices(indices, ix + 1, iy);
+        //addIndices(indices, ix, iy - 1);
+        //addIndices(indices, ix, iy + 1);
+        //foreach (var cell in FindObjectsOfType<GridCell>())
+        //{
+        //    if (indices.Contains(cell.index) && isType(cell, type))
+        //    {
+        //        res.Add(cell);
+        //    }
+        //}
         return res;
     }
 
@@ -274,38 +276,39 @@ public class GridController : Singleton<GridController>
 
     bool isType(GridCell cell, string type)
     {
-        if (type == "ice")
-        {
-            return cell.isFreezed;
-        }
-        if (type == "empty")
-        {
-            return cell.index == emptyCellIndex || cell.cellInfo.isEmpty();
-        }
-        if (!cell || cell.cellInfo == null)
-        {
-            Debug.LogError("?");
-        }
-        return cell.cellInfo.type == type;
+        return true;
+        //if (type == "ice")
+        //{
+        //    return cell.isFreezed;
+        //}
+        //if (type == "empty")
+        //{
+        //    return cell.index == emptyCellIndex || cell.cellInfo.isEmpty();
+        //}
+        //if (!cell || cell.cellInfo == null)
+        //{
+        //    Debug.LogError("?");
+        //}
+        //return cell.cellInfo.type == type;
     }
 
     bool isAdjacentToType(int i, string type)
     {
 
-        var ix = i / cellCountX;
-        var iy = i % cellCountY;
-        List<int> indices = new List<int>();
-        addIndices(indices, ix - 1, iy);
-        addIndices(indices, ix + 1, iy);
-        addIndices(indices, ix, iy - 1);
-        addIndices(indices, ix, iy + 1);
-        foreach (var cell in FindObjectsOfType<GridCell>())
-        {
-            if (indices.Contains(cell.index) && isType(cell, type))
-            {
-                return true;
-            }
-        }
+        //var ix = i / cellCountX;
+        //var iy = i % cellCountY;
+        //List<int> indices = new List<int>();
+        //addIndices(indices, ix - 1, iy);
+        //addIndices(indices, ix + 1, iy);
+        //addIndices(indices, ix, iy - 1);
+        //addIndices(indices, ix, iy + 1);
+        //foreach (var cell in FindObjectsOfType<GridCell>())
+        //{
+        //    if (indices.Contains(cell.index) && isType(cell, type))
+        //    {
+        //        return true;
+        //    }
+        //}
         return false;
     }
     bool isAdjacentToIce(int i)
@@ -352,50 +355,50 @@ public class GridController : Singleton<GridController>
     public List<EnemyCell> getEnemies(int index, string attackMode)
     {
         List<EnemyCell> res = new List<EnemyCell>();
-        var allEnemies = GameObject.FindObjectsOfType<EnemyCell>();
+        //var allEnemies = GameObject.FindObjectsOfType<EnemyCell>();
 
-        int x = index / cellCountX;
-        int y = index % cellCountY;
-        if (attackMode == "")
-        {
-            foreach (var enemy in allEnemies)
-            {
-                if (enemy.GetComponent<GridCell>())
-                {
-                    var enemyIndex = enemy.GetComponent<GridCell>().index;
+        //int x = index / cellCountX;
+        //int y = index % cellCountY;
+        //if (attackMode == "")
+        //{
+        //    foreach (var enemy in allEnemies)
+        //    {
+        //        if (enemy.GetComponent<GridCell>())
+        //        {
+        //            var enemyIndex = enemy.GetComponent<GridCell>().index;
 
-                    int ex = enemyIndex / cellCountX;
-                    int ey = enemyIndex % cellCountY;
-                    if ((ex == x && Mathf.Abs(ey - y) == 1) ||
-                        (ey == y && Mathf.Abs(ex - x) == 1))
-                    {
-                        res.Add(enemy);
-                    }
-                }
-            }
-        }
-        else if (attackMode == "fullScreen")
-        {
-            return allEnemies.ToList();
-        }
-        else if (attackMode == "range")
-        {
-            foreach (var enemy in allEnemies)
-            {
-                if (enemy.GetComponent<GridCell>())
-                {
-                    var enemyIndex = enemy.GetComponent<GridCell>().index;
+        //            int ex = enemyIndex / cellCountX;
+        //            int ey = enemyIndex % cellCountY;
+        //            if ((ex == x && Mathf.Abs(ey - y) == 1) ||
+        //                (ey == y && Mathf.Abs(ex - x) == 1))
+        //            {
+        //                res.Add(enemy);
+        //            }
+        //        }
+        //    }
+        //}
+        //else if (attackMode == "fullScreen")
+        //{
+        //    return allEnemies.ToList();
+        //}
+        //else if (attackMode == "range")
+        //{
+        //    foreach (var enemy in allEnemies)
+        //    {
+        //        if (enemy.GetComponent<GridCell>())
+        //        {
+        //            var enemyIndex = enemy.GetComponent<GridCell>().index;
 
-                    int ex = enemyIndex / cellCountX;
-                    int ey = enemyIndex % cellCountY;
-                    if ((ex == x) ||
-                        (ey == y))
-                    {
-                        res.Add(enemy);
-                    }
-                }
-            }
-        }
+        //            int ex = enemyIndex / cellCountX;
+        //            int ey = enemyIndex % cellCountY;
+        //            if ((ex == x) ||
+        //                (ey == y))
+        //            {
+        //                res.Add(enemy);
+        //            }
+        //        }
+        //    }
+        //}
         return res;
     }
     public List<GridCell> getAdjacentCells(int index)
@@ -429,34 +432,34 @@ public class GridController : Singleton<GridController>
     }
     GameObject generateCell(int index, string type, int amount = -1)
     {
-        GameObject res;
-        if (type == "empty")
-        {
+        GameObject res = null;
+        //if (type == "empty")
+        //{
 
-            res = Instantiate(emptyPrefab, cellParents[index].position, Quaternion.identity, cellParents[index]);
-        }
-        else if (CellManager.Instance.isCell(type))
-        {
+        //    res = Instantiate(emptyPrefab, cellParents[index].position, Quaternion.identity, cellParents[index]);
+        //}
+        //else if (CellManager.Instance.isCell(type))
+        //{
 
-            res = Instantiate(cellPrefab, cellParents[index].position, Quaternion.identity, cellParents[index]);
-        }
-        else
-        {
+        //    res = Instantiate(cellPrefab, cellParents[index].position, Quaternion.identity, cellParents[index]);
+        //}
+        //else
+        //{
 
-            res = Instantiate(itemPrefab, cellParents[index].position, Quaternion.identity, cellParents[index]);
-        }
+        //    res = Instantiate(itemPrefab, cellParents[index].position, Quaternion.identity, cellParents[index]);
+        //}
 
-        //  res.transform.localScale = Vector3.one;
-        res.transform.DOPunchScale(Vector3.one, animTime);
+        ////  res.transform.localScale = Vector3.one;
+        //res.transform.DOPunchScale(Vector3.one, animTime);
 
-        var typeSplit = type.Split('_');
-        if (typeSplit.Length > 1)
-        {
-            type = typeSplit[0];
-            amount = int.Parse(typeSplit[1]);
-        }
+        //var typeSplit = type.Split('_');
+        //if (typeSplit.Length > 1)
+        //{
+        //    type = typeSplit[0];
+        //    amount = int.Parse(typeSplit[1]);
+        //}
 
-        res.GetComponent<GridCell>().init(type, index, amount);
+        //res.GetComponent<GridCell>().init(type, index, amount);
         return res;
     }
 
@@ -571,51 +574,51 @@ public class GridController : Singleton<GridController>
     IEnumerator hotCellCalculation(GridCell cell)
     {
         yield return null;
-        {
-            if (cell && cell.GetComponent<GridCell>().cellInfo.isPlayer())
-            {
+    //    {
+    //        if (cell && cell.GetComponent<GridCell>().cellInfo.isPlayer())
+    //        {
 
-                RulePopupManager.Instance.showRule("playerOnHot");
-                //ResourceManager.Instance.consumeResource("nut", 3, cell.transform.position);
+    //            RulePopupManager.Instance.showRule("playerOnHot");
+    //            //ResourceManager.Instance.consumeResource("nut", 3, cell.transform.position);
 
-                SFXManager.Instance.play("shortburn");
+    //            SFXManager.Instance.play("shortburn");
 
-                SFXManager.Instance.play("scream");
-                Instantiate(fireVFX, cellParents[cell.index].position, Quaternion.identity);
-                yield return new WaitForSeconds(animTime);
-            }
-            else if (cell && cell.GetComponent<GridCell>().cellInfo.isEnemy() && cell.GetComponent<EnemyCell>().canBeAttacked())
-            {
-                RulePopupManager.Instance.showRule("enemyOnHot");
-                cell.GetComponent<EnemyCell>().getDamage(5);
-                SFXManager.Instance.play("shortburn");
-                Instantiate(fireVFX, cellParents[cell.index].position, Quaternion.identity);
-                yield return new WaitForSeconds(animTime);
-            }
+    //            SFXManager.Instance.play("scream");
+    //            Instantiate(fireVFX, cellParents[cell.index].position, Quaternion.identity);
+    //            yield return new WaitForSeconds(animTime);
+    //        }
+    //        else if (cell && cell.GetComponent<GridCell>().cellInfo.isEnemy() && cell.GetComponent<EnemyCell>().canBeAttacked())
+    //        {
+    //            RulePopupManager.Instance.showRule("enemyOnHot");
+    //            cell.GetComponent<EnemyCell>().getDamage(5);
+    //            SFXManager.Instance.play("shortburn");
+    //            Instantiate(fireVFX, cellParents[cell.index].position, Quaternion.identity);
+    //            yield return new WaitForSeconds(animTime);
+    //        }
 
-            else if (cell && cell.GetComponent<GridCell>().cellInfo.type == "branch")
-            {
-                //generate a fire
-                generateCell(cell.index, "fire");
-                SFXManager.Instance.play("shortburn");
-                destroy(cell.gameObject);
-                Instantiate(fireVFX, cellParents[cell.index].position, Quaternion.identity);
-                yield return new WaitForSeconds(animTime);
+    //        else if (cell && cell.GetComponent<GridCell>().cellInfo.type == "branch")
+    //        {
+    //            //generate a fire
+    //            generateCell(cell.index, "fire");
+    //            SFXManager.Instance.play("shortburn");
+    //            destroy(cell.gameObject);
+    //            Instantiate(fireVFX, cellParents[cell.index].position, Quaternion.identity);
+    //            yield return new WaitForSeconds(animTime);
 
-            }
-            else if (cell && cell.GetComponent<GridCell>().cellInfo.type == "nut")
-            {
+    //        }
+    //        else if (cell && cell.GetComponent<GridCell>().cellInfo.type == "nut")
+    //        {
 
-                RulePopupManager.Instance.showRule("fire+nut");
-                generateCell(cell.index, "cookedNut");
-                SFXManager.Instance.play("shortburn");
-                destroy(cell.gameObject);
-                Instantiate(fireVFX, cellParents[cell.index].position, Quaternion.identity);
-                yield return new WaitForSeconds(animTime);
-            }
+    //            RulePopupManager.Instance.showRule("fire+nut");
+    //            generateCell(cell.index, "cookedNut");
+    //            SFXManager.Instance.play("shortburn");
+    //            destroy(cell.gameObject);
+    //            Instantiate(fireVFX, cellParents[cell.index].position, Quaternion.identity);
+    //            yield return new WaitForSeconds(animTime);
+    //        }
 
 
-        }
+    //    }
     }
 
 
@@ -633,218 +636,219 @@ public class GridController : Singleton<GridController>
     IEnumerator characterAttack(GridCell characterCell, int index)
     {
         yield return null;
-        if (!characterCell)
-        {
-            yield break;
-        }
-        if (characterCell.hasEquipment())
-        {
-            bool attackWithWeapon = false;
+        //if (!characterCell)
+        //{
+        //    yield break;
+        //}
+        //if (characterCell.hasEquipment())
+        //{
+        //    bool attackWithWeapon = false;
 
-            var equipmentInfo = CellManager.Instance.getInfo(characterCell.equipment);
-            List<EnemyCell> attackableList = getEnemies(index, equipmentInfo.attackMode);
-
-
-            int damage = characterCell.equipementDamage;
-            foreach (var cell in attackableList)
-            {
-                if (cell.canBeAttacked())
-                {
-
-                    damage = Mathf.Min(damage, cell.hp);
-                    attackWithWeapon = true;
-                }
-            }
-
-            foreach (var cell in attackableList)
-            {
-                if (cell.GetComponent<EnemyCell>().canBeAttacked())
-                {
-
-                    cell.GetComponent<EnemyCell>().getDamage(damage);
-
-                    if(cell.cell.cellInfo.attackMode == "reflection")
-                    {
-                        //need reflection animation
-                        characterCell.decreaseAmount(damage / 2);
-                    }
-
-                    if (characterCell.equipment != null)
-                    {
-
-                        SFXManager.Instance.play("hit" + characterCell.equipment);
-                    }
-
-                    var go = Instantiate(Resources.Load<GameObject>("effect/attack"), cellParents[characterCell.index].transform.position, Quaternion.identity);
-                    go.transform.DOMove(cell.transform.position, GridController.Instance.animTime + 0.1f);
-                    Destroy(go, 1f);
+        //    var equipmentInfo = CellManager.Instance.getInfo(characterCell.equipment);
+        //    List<EnemyCell> attackableList = getEnemies(index, equipmentInfo.attackMode);
 
 
-                    var go2 = Instantiate(Resources.Load<GameObject>("effect/attack"), cellParents[characterCell.index].transform.position, Quaternion.identity);
-                    go2.transform.DOMove(cell.transform.position, GridController.Instance.animTime + 0.1f);
-                    go2.GetComponentInChildren<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/" + characterCell.equipment);
-                    go2.GetComponentInChildren<SpriteRenderer>().sortingOrder = 1;
-                    Destroy(go2, 1f);
+        //    int damage = characterCell.equipementDamage;
+        //    foreach (var cell in attackableList)
+        //    {
+        //        if (cell.canBeAttacked())
+        //        {
 
-                    FindObjectOfType<AchievementManager>().ShowAchievement("slash2");
-                    yield return new WaitForSeconds(animTime);
-                }
-            }
-            if (attackWithWeapon)
-            {
-                characterCell.attackWithEquipement(damage);
-                FindObjectOfType<AchievementManager>().ShowAchievement("slash");
-            }
-        }
+        //            damage = Mathf.Min(damage, cell.hp);
+        //            attackWithWeapon = true;
+        //        }
+        //    }
+
+        //    foreach (var cell in attackableList)
+        //    {
+        //        if (cell.GetComponent<EnemyCell>().canBeAttacked())
+        //        {
+
+        //            cell.GetComponent<EnemyCell>().getDamage(damage);
+
+        //            if(cell.cell.cellInfo.attackMode == "reflection")
+        //            {
+        //                //need reflection animation
+        //                characterCell.decreaseAmount(damage / 2);
+        //            }
+
+        //            if (characterCell.equipment != null)
+        //            {
+
+        //                SFXManager.Instance.play("hit" + characterCell.equipment);
+        //            }
+
+        //            var go = Instantiate(Resources.Load<GameObject>("effect/attack"), cellParents[characterCell.index].transform.position, Quaternion.identity);
+        //            go.transform.DOMove(cell.transform.position, GridController.Instance.animTime + 0.1f);
+        //            Destroy(go, 1f);
+
+
+        //            var go2 = Instantiate(Resources.Load<GameObject>("effect/attack"), cellParents[characterCell.index].transform.position, Quaternion.identity);
+        //            go2.transform.DOMove(cell.transform.position, GridController.Instance.animTime + 0.1f);
+        //            go2.GetComponentInChildren<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/" + characterCell.equipment);
+        //            go2.GetComponentInChildren<SpriteRenderer>().sortingOrder = 1;
+        //            Destroy(go2, 1f);
+
+        //            FindObjectOfType<AchievementManager>().ShowAchievement("slash2");
+        //            yield return new WaitForSeconds(animTime);
+        //        }
+        //    }
+        //    if (attackWithWeapon)
+        //    {
+        //        characterCell.attackWithEquipement(damage);
+        //        FindObjectOfType<AchievementManager>().ShowAchievement("slash");
+        //    }
+        //}
     }
 
     IEnumerator attackAndMove()
     {
+        yield return null;
         // yield break;
         //  cellParents[cell.index].GetComponentsInChildren<GridItem>()
         //calculate hot place
-        for (int i = 0; i < cellParents.Count; i++)
-        {
-            foreach (var cell in cellParents[i].GetComponentsInChildren<GridCell>())
-            {
+        //for (int i = 0; i < cellParents.Count; i++)
+        //{
+        //    foreach (var cell in cellParents[i].GetComponentsInChildren<GridCell>())
+        //    {
 
-                //check if cell is on hot cell
-                if (cell && cellParents[cell.index].GetComponent<GridBackground>().isHot && canBeHeated(cell))
-                {
-                    yield return StartCoroutine(hotCellCalculation(cell));
-                }
-            }
-        }
+        //        //check if cell is on hot cell
+        //        if (cell && cellParents[cell.index].GetComponent<GridBackground>().isHot && canBeHeated(cell))
+        //        {
+        //            yield return StartCoroutine(hotCellCalculation(cell));
+        //        }
+        //    }
+        //}
 
-        //calculate trap
-        for (int i = 0; i < cellParents.Count; i++)
-        {
-            foreach (var cell in cellParents[i].GetComponentsInChildren<GridCell>())
-            {
-                if (cell != null && cell.cellInfo.isEnemy() && cell.GetComponent<EnemyCell>().canBeAttacked())
-                {
-                    yield return StartCoroutine(triggerTrapOnCell(i, cell.GetComponent<EnemyCell>()));
-                }
-            }
-        }
+        ////calculate trap
+        //for (int i = 0; i < cellParents.Count; i++)
+        //{
+        //    foreach (var cell in cellParents[i].GetComponentsInChildren<GridCell>())
+        //    {
+        //        if (cell != null && cell.cellInfo.isEnemy() && cell.GetComponent<EnemyCell>().canBeAttacked())
+        //        {
+        //            yield return StartCoroutine(triggerTrapOnCell(i, cell.GetComponent<EnemyCell>()));
+        //        }
+        //    }
+        //}
 
-        //calculate player attack
-        yield return StartCoroutine(characterAttack(allyCell, allyCellIndex));
-        yield return StartCoroutine(characterAttack(playerCell, playerCellIndex));
+        ////calculate player attack
+        //yield return StartCoroutine(characterAttack(allyCell, allyCellIndex));
+        //yield return StartCoroutine(characterAttack(playerCell, playerCellIndex));
 
-        //calcualte enemy attack
+        ////calcualte enemy attack
 
-        for (int i = 0; i < cellParents.Count; i++)
-        {
-            foreach (var cell in cellParents[i].GetComponentsInChildren<GridCell>())
-            {
-                if (cell.cellInfo.isEnemy() && cell.GetComponent<EnemyCell>().willAttack())
-                {
+        //for (int i = 0; i < cellParents.Count; i++)
+        //{
+        //    foreach (var cell in cellParents[i].GetComponentsInChildren<GridCell>())
+        //    {
+        //        if (cell.cellInfo.isEnemy() && cell.GetComponent<EnemyCell>().willAttack())
+        //        {
 
-                    yield return StartCoroutine(cell.GetComponent<EnemyCell>().startAttack());
-                }
-            }
-        }
-        //calculate enemy move
+        //            yield return StartCoroutine(cell.GetComponent<EnemyCell>().startAttack());
+        //        }
+        //    }
+        //}
+        ////calculate enemy move
 
 
-        for (int i = 0; i < cellParents.Count; i++)
-        {
+        //for (int i = 0; i < cellParents.Count; i++)
+        //{
 
-            foreach (var cell in cellParents[i].GetComponentsInChildren<GridCell>())
-            {
-                if (cell.cellInfo.isEnemy() && !cell.isFreezed && cell.GetComponent<EnemyCell>().willMove())
-                {
+        //    foreach (var cell in cellParents[i].GetComponentsInChildren<GridCell>())
+        //    {
+        //        if (cell.cellInfo.isEnemy() && !cell.isFreezed && cell.GetComponent<EnemyCell>().willMove())
+        //        {
 
-                    yield return StartCoroutine(cell.GetComponent<EnemyCell>().startMove());
+        //            yield return StartCoroutine(cell.GetComponent<EnemyCell>().startMove());
 
-                }
-                if (cell.cellInfo.isEnemy())
-                {
+        //        }
+        //        if (cell.cellInfo.isEnemy())
+        //        {
 
-                    cell.GetComponent<EnemyCell>().finishedMove();
-                }
-                if (!cell.cellInfo.isEnemy() && cell.cellInfo.moveMode > 0 && cell.index != lastIndex)
-                {
-                    var emptyCellsAround = adjacentType(cell.index, "empty");
-                    if (emptyCellsAround.Count > 0)
-                    {
-                        yield return StartCoroutine(exchangeCard(cell, emptyCellsAround[0].index));
-                        cell.decreaseAmount();
-                        lastIndex = cell.index;
-                        if (cell.amount <= 0)
-                        {
+        //            cell.GetComponent<EnemyCell>().finishedMove();
+        //        }
+        //        if (!cell.cellInfo.isEnemy() && cell.cellInfo.moveMode > 0 && cell.index != lastIndex)
+        //        {
+        //            var emptyCellsAround = adjacentType(cell.index, "empty");
+        //            if (emptyCellsAround.Count > 0)
+        //            {
+        //                yield return StartCoroutine(exchangeCard(cell, emptyCellsAround[0].index));
+        //                cell.decreaseAmount();
+        //                lastIndex = cell.index;
+        //                if (cell.amount <= 0)
+        //                {
 
-                            destroy(cell.gameObject);
-                            //generate new item in target position, generate empty in origin position
-                            addEmpty(cell.index);
-                        }
-                    }
-                    else
-                    {
-                        cell.failedToMove();
-                    }
-                }
-            }
-        }
+        //                    destroy(cell.gameObject);
+        //                    //generate new item in target position, generate empty in origin position
+        //                    addEmpty(cell.index);
+        //                }
+        //            }
+        //            else
+        //            {
+        //                cell.failedToMove();
+        //            }
+        //        }
+        //    }
+        //}
 
-        //re calculate fire
+        ////re calculate fire
 
-        for (int i = 0; i < cellParents.Count; i++)
-        {
-            foreach (var cell in cellParents[i].GetComponentsInChildren<GridCell>())
-            {
+        //for (int i = 0; i < cellParents.Count; i++)
+        //{
+        //    foreach (var cell in cellParents[i].GetComponentsInChildren<GridCell>())
+        //    {
 
-                //check if cell is on hot cell
-                if (cell && cellParents[cell.index].GetComponent<GridBackground>().isHot && cell.cellInfo.isEnemy())
-                {
-                    yield return StartCoroutine(hotCellCalculation(cell));
-                }
-            }
-        }
+        //        //check if cell is on hot cell
+        //        if (cell && cellParents[cell.index].GetComponent<GridBackground>().isHot && cell.cellInfo.isEnemy())
+        //        {
+        //            yield return StartCoroutine(hotCellCalculation(cell));
+        //        }
+        //    }
+        //}
 
     }
 
     public string combineResult(GridCell cell)
     {
-        var targetCell = emptyCell.transform.parent.GetComponentInChildren<GridItem>();
-        var cell2String = targetCell ? targetCell.type : "empty";
-        if (cell && cell.cellInfo != null && cell.cellInfo.isPlayer())
-        {
-            if (cell2String == "empty")
-            {
-                return "playerMove";
-            }
-            else if (cell2String == "nut")
-            {
-                return "playerToNut";
-            }
-            else if (cell2String == "axe")
-            {
-                return "playerEquipaxe";
-            }
-            else if (cell2String == "bat")
-            {
-                return "playerEquipbat";
-            }
-            else if (targetCell && cellParents[targetCell.index].GetComponent<GridBackground>().isHot)
-            {
-                return "playerOnHot";
-            }
-        }
-        else
-        {
+        //var targetCell = emptyCell.transform.parent.GetComponentInChildren<GridItem>();
+        //var cell2String = targetCell ? targetCell.type : "empty";
+        //if (cell && cell.cellInfo != null && cell.cellInfo.isPlayer())
+        //{
+        //    if (cell2String == "empty")
+        //    {
+        //        return "playerMove";
+        //    }
+        //    else if (cell2String == "nut")
+        //    {
+        //        return "playerToNut";
+        //    }
+        //    else if (cell2String == "axe")
+        //    {
+        //        return "playerEquipaxe";
+        //    }
+        //    else if (cell2String == "bat")
+        //    {
+        //        return "playerEquipbat";
+        //    }
+        //    else if (targetCell && cellParents[targetCell.index].GetComponent<GridBackground>().isHot)
+        //    {
+        //        return "playerOnHot";
+        //    }
+        //}
+        //else
+        //{
 
-            if (!cell || cell.cellInfo == null)
-            {
-                return null;
-            }
-            var combination = CombinationManager.Instance.getCombinationResult(cell.cellInfo.type, cell2String);
+        //    if (!cell || cell.cellInfo == null)
+        //    {
+        //        return null;
+        //    }
+        //    var combination = CombinationManager.Instance.getCombinationResult(cell.cellInfo.type, cell2String);
 
 
 
-            return combination != null ? combination.rules : null;
-        }
+        //    return combination != null ? combination.rules : null;
+        //}
         return null;
 
     }
@@ -893,153 +897,153 @@ public class GridController : Singleton<GridController>
     IEnumerator exploreCellAnim(GridCell cell)
     {
         yield return null;
-        if (!cell.cellInfo.isEmpty())
-        {
-            cell.failedToMove();
-            isMoving = false;
-            yield break;
-        }
-        //draw card
-        string card = "";
+        //if (!cell.cellInfo.isEmpty())
+        //{
+        //    cell.failedToMove();
+        //    isMoving = false;
+        //    yield break;
+        //}
+        ////draw card
+        //string card = "";
 
-        if (boss)
-        {
+        //if (boss)
+        //{
 
-            card = DeckManager.Instance.drawBossCard();
-        }
-        else
-        {
-            //draw a card
-            card = DeckManager.Instance.drawCard(cell.cellInfo.isEmpty());
-
-
-        }
-
-        lastIndex = cell.index;
-        Debug.Log("draw card " + card);
-        var cardInfo = CellManager.Instance.getInfo(card);
-        var freezedCellCount = freezeCount();
-        if (cardInfo.type == "ice")
-        {
-            //if has ice, don't add
-            if (freezedCellCount == 0)
-            {
-                RulePopupManager.Instance.showRule("ice");
-                List<GridCell> canFreezeCells = new List<GridCell>();
-                foreach (var c in GameObject.FindObjectsOfType<GridCell>())
-                {
-                    if (c.cellInfo.type != "fire" && !isAdjacentToFire(c.index) && !c.GetComponent<GridItem>() && !c.GetComponent<GridBackground>() && !c.GetComponent<GridEmpty>())
-                    {
-                        canFreezeCells.Add(c);
-                    }
-                }
-
-                if (canFreezeCells.Count > 0)
-                {
-                    var freeCell = Utils.randomList(canFreezeCells);
-                    freeCell.freeze();
-
-                    SFXManager.Instance.play("iceshowup");
-                }
-            }
-        }
-        else if (GameObject.FindObjectsOfType<GridCell>().Length > 0)
-        {
-            //ice spread
-
-            if (ShopManager.Instance.hasPurchased("fire") && Random.Range(0, 2) > 0)
-            {
-            }
-            else
-            {
-                foreach (var c in GameObject.FindObjectsOfType<GridCell>())
-                {
-                    if (!c.GetComponent<GridItem>() && !c.GetComponent<ShopCell>() && c.cellInfo.type != "fire" && !isAdjacentToFire(c.index) && !c.isFreezed && isAdjacentToIce(c.index) && !c.GetComponent<GridItem>() && !c.GetComponent<GridBackground>() && !c.GetComponent<GridEmpty>())
-                    {
-                        c.freeze();
-
-                        SFXManager.Instance.play("icespread");
-                        RulePopupManager.Instance.showRule("iceSpread");
-                        //if freezed everything, game over
-
-                        freezedCellCount = freezeCount();
-                        if (freezedCellCount >= 8)
-                        {
-
-                            GameManager.Instance.gameover();
-                            AchievementManager.Instance.clear("freezeToDeath");
-                        }
-                        break;
-                    }
-                }
-
-            }
-        }
-
-        // if it is cell card, don't move it, but destroy and replace it to the cell card
-        // empty position not change.
-        if (cardInfo.isBoss())
-        {
-            // if it is boss, just create boss and do  nothing
-
-            var go2 = Instantiate(Resources.Load<GameObject>("boss/" + cardInfo.type), bossParent.position, Quaternion.identity, bossParent);
-            go2.GetComponent<Boss>().init(cardInfo.type);
+        //    card = DeckManager.Instance.drawBossCard();
+        //}
+        //else
+        //{
+        //    //draw a card
+        //    card = DeckManager.Instance.drawCard(cell.cellInfo.isEmpty());
 
 
-            go2.transform.DOPunchScale(Vector3.one, animTime);
+        //}
 
-            yield return new WaitForSeconds(GridController.Instance.animTime);
-            finishMove();
-            step();
-            EventPool.Trigger("moveAStep");
+        //lastIndex = cell.index;
+        //Debug.Log("draw card " + card);
+        //var cardInfo = CellManager.Instance.getInfo(card);
+        //var freezedCellCount = freezeCount();
+        //if (cardInfo.type == "ice")
+        //{
+        //    //if has ice, don't add
+        //    if (freezedCellCount == 0)
+        //    {
+        //        RulePopupManager.Instance.showRule("ice");
+        //        List<GridCell> canFreezeCells = new List<GridCell>();
+        //        foreach (var c in GameObject.FindObjectsOfType<GridCell>())
+        //        {
+        //            if (c.cellInfo.type != "fire" && !isAdjacentToFire(c.index) && !c.GetComponent<GridItem>() && !c.GetComponent<GridBackground>() && !c.GetComponent<GridEmpty>())
+        //            {
+        //                canFreezeCells.Add(c);
+        //            }
+        //        }
+
+        //        if (canFreezeCells.Count > 0)
+        //        {
+        //            var freeCell = Utils.randomList(canFreezeCells);
+        //            freeCell.freeze();
+
+        //            SFXManager.Instance.play("iceshowup");
+        //        }
+        //    }
+        //}
+        //else if (GameObject.FindObjectsOfType<GridCell>().Length > 0)
+        //{
+        //    //ice spread
+
+        //    if (ShopManager.Instance.hasPurchased("fire") && Random.Range(0, 2) > 0)
+        //    {
+        //    }
+        //    else
+        //    {
+        //        foreach (var c in GameObject.FindObjectsOfType<GridCell>())
+        //        {
+        //            if (!c.GetComponent<GridItem>() && !c.GetComponent<ShopCell>() && c.cellInfo.type != "fire" && !isAdjacentToFire(c.index) && !c.isFreezed && isAdjacentToIce(c.index) && !c.GetComponent<GridItem>() && !c.GetComponent<GridBackground>() && !c.GetComponent<GridEmpty>())
+        //            {
+        //                c.freeze();
+
+        //                SFXManager.Instance.play("icespread");
+        //                RulePopupManager.Instance.showRule("iceSpread");
+        //                //if freezed everything, game over
+
+        //                freezedCellCount = freezeCount();
+        //                if (freezedCellCount >= 8)
+        //                {
+
+        //                    GameManager.Instance.gameover();
+        //                    AchievementManager.Instance.clear("freezeToDeath");
+        //                }
+        //                break;
+        //            }
+        //        }
+
+        //    }
+        //}
+
+        //// if it is cell card, don't move it, but destroy and replace it to the cell card
+        //// empty position not change.
+        //if (cardInfo.isBoss())
+        //{
+        //    // if it is boss, just create boss and do  nothing
+
+        //    var go2 = Instantiate(Resources.Load<GameObject>("boss/" + cardInfo.type), bossParent.position, Quaternion.identity, bossParent);
+        //    go2.GetComponent<Boss>().init(cardInfo.type);
 
 
-            DeckManager.Instance.removeAllCardFromDeck(card);
+        //    go2.transform.DOPunchScale(Vector3.one, animTime);
 
-            yield break;
-        }
-
-        if (card == "empty")
-        {
-
-            yield return StartCoroutine(exchangeCard(cell, emptyCellIndex));
-        }
-        else
-        {
-            Debug.Log("generate " + card);
-            //generate a snake
-            var go = generateCell(cell.index, card);
-            destroy(cell.gameObject);
+        //    yield return new WaitForSeconds(GridController.Instance.animTime);
+        //    finishMove();
+        //    step();
+        //    EventPool.Trigger("moveAStep");
 
 
-            if (cardInfo.isAlly())
-            {
-                if (allyCell)
-                {
-                    Debug.LogError("does not support multiple ally now");
-                }
-                else
-                {
-                    allyCell = go.GetComponent<GridCell>();
-                }
-            }
+        //    DeckManager.Instance.removeAllCardFromDeck(card);
 
-            //destory what's underground when spawn enemy.. comment for now.
-            if (go.GetComponent<GridCell>().cellInfo.isEnemy())
-            {
-                //foreach (var item in cellParents[cell.index].GetComponentsInChildren<GridItem>())
-                //{
-                //    Destroy(item.gameObject);
-                //}
-            }
-            else
-            {
-                SFXManager.Instance.play("showup");
-            }
-        }
+        //    yield break;
+        //}
+
+        //if (card == "empty")
+        //{
+
+        //    yield return StartCoroutine(exchangeCard(cell, emptyCellIndex));
+        //}
+        //else
+        //{
+        //    Debug.Log("generate " + card);
+        //    //generate a snake
+        //    var go = generateCell(cell.index, card);
+        //    destroy(cell.gameObject);
 
 
-        yield return StartCoroutine(moveOthers());
+        //    if (cardInfo.isAlly())
+        //    {
+        //        if (allyCell)
+        //        {
+        //            Debug.LogError("does not support multiple ally now");
+        //        }
+        //        else
+        //        {
+        //            allyCell = go.GetComponent<GridCell>();
+        //        }
+        //    }
+
+        //    //destory what's underground when spawn enemy.. comment for now.
+        //    if (go.GetComponent<GridCell>().cellInfo.isEnemy())
+        //    {
+        //        //foreach (var item in cellParents[cell.index].GetComponentsInChildren<GridItem>())
+        //        //{
+        //        //    Destroy(item.gameObject);
+        //        //}
+        //    }
+        //    else
+        //    {
+        //        SFXManager.Instance.play("showup");
+        //    }
+        //}
+
+
+        //yield return StartCoroutine(moveOthers());
 
     }
 
@@ -1050,396 +1054,397 @@ public class GridController : Singleton<GridController>
 
     public IEnumerator removeSplit(GridCell cell,int targetIndex, string nextSplit)
     {
-        cell.decreaseAmount();
+        yield return null;
+        //cell.decreaseAmount();
 
-        if (cell.amount <= 0)
-        {
+        //if (cell.amount <= 0)
+        //{
 
-            destroy(cell.gameObject);
-            //generate new item in target position, generate empty in origin position
-            addEmpty(cell.index);
-        }
-        else
-        {
-            //generateCell(originalMovingCellIndex, cell.type, cell.amount);
-        }
-        //create a new split item and move to target and destroy
-        var tempCell = generateCell(cell.index, nextSplit, -1);
-        tempCell.GetComponent<GridCell>().renderer.sortingOrder += 100;
-        yield return StartCoroutine(moveCardAnim(tempCell.GetComponent<GridCell>(), targetIndex));
-        Destroy(tempCell, animTime);
+        //    destroy(cell.gameObject);
+        //    //generate new item in target position, generate empty in origin position
+        //    addEmpty(cell.index);
+        //}
+        //else
+        //{
+        //    //generateCell(originalMovingCellIndex, cell.type, cell.amount);
+        //}
+        ////create a new split item and move to target and destroy
+        //var tempCell = generateCell(cell.index, nextSplit, -1);
+        //tempCell.GetComponent<GridCell>().renderer.sortingOrder += 100;
+        //yield return StartCoroutine(moveCardAnim(tempCell.GetComponent<GridCell>(), targetIndex));
+        //Destroy(tempCell, animTime);
     }
     IEnumerator moveCellAnim(GridCell cell, bool forceMove)
     {
-        lastIndex = -1;
-        TextWhenShowCell.Instance.hideText();
-        AchievementManager.Instance.clear("round");
+        //lastIndex = -1;
+        //TextWhenShowCell.Instance.hideText();
+        //AchievementManager.Instance.clear("round");
         yield return null;
-        if (!cell || cell.cellInfo == null)
-        {
-            Debug.LogError("???");
-        }
-        //if is moving player, consume
-        if (cell.cellInfo.isPlayer() || cell.cellInfo.isAlly())
-        {
+        //if (!cell || cell.cellInfo == null)
+        //{
+        //    Debug.LogError("???");
+        //}
+        ////if is moving player, consume
+        //if (cell.cellInfo.isPlayer() || cell.cellInfo.isAlly())
+        //{
 
-            cell.decreaseAmount(1);
-            //ResourceManager.Instance.consumeResource("nut", 1, cell.transform.position);
-            RulePopupManager.Instance.showRule("playerMove");
-        }
-        if (cell.cellInfo.isAlly())
-        {
-            //ResourceManager.Instance.consumeResource("nut", 1, cell.transform.position);
-            //RulePopupManager.Instance.showRule("playerMove");
-        }
-
-
-
-        //move current cell to position
-        var originEmptyIndex = emptyCellIndex;
-        var originalMovingCellIndex = cell.index;
-        var willGetIntoShop = false;
-        var targetCell = cellParents[originEmptyIndex].GetComponentInChildren<GridItem>();
-        var cell1String = cell.type;
-        var cell2String = targetCell ? targetCell.type : "empty";
-
-        if (cell.GetComponent<GridCell>().cellInfo.isAlly())
-        {
-            yield return StartCoroutine(exchangeCard(cell, emptyCellIndex));
-
-            SFXManager.Instance.play("squirrelmove");
-            if (targetCell)
-            {
-                //if (targetCell.cellInfo.isResource())
-                //{
-
-                //    SFXManager.Instance.play("collect" + targetCell.cellInfo.categoryDetail);
-                //    var resource = new List<PairInfo<int>>() { };
-                //    resource.Add(new PairInfo<int>(targetCell.cellInfo.categoryDetail, targetCell.amount));
-                //    CollectionManager.Instance.AddCoins(targetCell.transform.position, resource);
-                //    destroy(targetCell.gameObject);
-
-                //    switch (targetCell.type)
-                //    {
-                //        case "nut":
-
-                //            RulePopupManager.Instance.showRule("playerToNut");
-                //            break;
-                //        case "cookedNut":
-                //            RulePopupManager.Instance.showRule("eatHotNut");
-                //            break;
-                //    }
-
-                //}
-                //else 
-                if (targetCell.cellInfo.isWeapon())
-                {
-                    cell.GetComponent<GridCell>().equip(cell2String, targetCell.amount);
-
-                    RulePopupManager.Instance.showRule("playerEquip" + cell2String);
-                    destroy(targetCell.gameObject);
-                }
-                //else if (targetCell.cellInfo.type == "shop")
-                //{
-
-                //    destroy(targetCell.gameObject);
-                //    StartCoroutine(getIntoShop());
-                //    willGetIntoShop = true;
-                //}
-            }
-        }
-        else if (cell.GetComponent<GridCell>().cellInfo.isPlayer())
-        {
-            yield return StartCoroutine(exchangeCard(cell, emptyCellIndex));
-
-            AchievementManager.Instance.clear("move");
-            hasPlayerMoved = true;
-
-            SFXManager.Instance.play("squirrelmove");
-            if (targetCell)
-            {
-                if (targetCell.cellInfo.isResource())
-                {
-
-                    //SFXManager.Instance.play("collect" + targetCell.cellInfo.categoryDetail);
-                    SFXManager.Instance.play("collect" + "nut");
-                    var resource = new List<PairInfo<int>>() { };
-                    //resource.Add(new PairInfo<int>(targetCell.cellInfo.categoryDetail, targetCell.amount));
-                    //resource.Add(new PairInfo<int>("nut", targetCell.amount));
-                    //CollectionManager.Instance.AddCoins(targetCell.transform.position, resource);
-                    cell.GetComponent<GridCell>().addAmount(targetCell.amount);
-                    destroy(targetCell.gameObject);
-
-                    switch (targetCell.type)
-                    {
-                        case "nut":
-
-                            RulePopupManager.Instance.showRule("playerToNut");
-                            break;
-                        case "cookedNut":
-                            RulePopupManager.Instance.showRule("eatHotNut");
-                            break;
-                    }
-
-                }
-                else if (targetCell.cellInfo.isWeapon())
-                {
-                    cell.GetComponent<GridCell>().equip(cell2String, targetCell.amount);
-
-                    //RulePopupManager.Instance.showRule("playerEquip" + cell2String);
-                    destroy(targetCell.gameObject);
-                }
-                else if (targetCell.cellInfo.type == "shop")
-                {
-
-                    destroy(targetCell.gameObject);
-                    yield return StartCoroutine(getIntoShop());
-                    willGetIntoShop = true;
-                }
-            }
-        }
-        else if (forceMove)
-        {
-            yield return StartCoroutine(exchangeCard(cell, emptyCellIndex));
-        }
-        else
-        {
-            hasPlayerMoved = false;
-
-            //check if current card is splitable, if so, check if the next split can combine on empty place
-            if (cell.cellInfo.isSplitable())
-            {
-                if (cell.cellInfo.categoryDetail.Count <= 0)
-                {
-                    Debug.LogError("category detail of " + cell.cellInfo.type + " not set");
-                }
-                var nextSplitItem = getNextSplit(cell);
+        //    cell.decreaseAmount(1);
+        //    //ResourceManager.Instance.consumeResource("nut", 1, cell.transform.position);
+        //    RulePopupManager.Instance.showRule("playerMove");
+        //}
+        //if (cell.cellInfo.isAlly())
+        //{
+        //    //ResourceManager.Instance.consumeResource("nut", 1, cell.transform.position);
+        //    //RulePopupManager.Instance.showRule("playerMove");
+        //}
 
 
-                //calculate combination result
-                int valueAdd = 0;
-                var combination = CombinationManager.Instance.getCombinationResult(nextSplitItem, cell2String);
-                if(combination == null)
-                {
 
-                    combination = CombinationManager.Instance.getCombinationResult(cell2String, nextSplitItem);
-                    if (combination!=null)
-                    {
-                        valueAdd += combination.addValue2 * 1 + combination.addValue1 * (targetCell ? targetCell.amount : 0);
-                    }
-                }
-                else
-                {
-                    valueAdd += combination.addValue1 * 1 + combination.addValue2 * (targetCell ? targetCell.amount : 0);
-                }
-                if (combination != null)
-                {
-                    //yield return StartCoroutine(exchangeCard(cell, emptyCellIndex));
-                    if (combination.rules != null && combination.rules.Length > 0)
-                    {
+        ////move current cell to position
+        //var originEmptyIndex = emptyCellIndex;
+        //var originalMovingCellIndex = cell.index;
+        //var willGetIntoShop = false;
+        //var targetCell = cellParents[originEmptyIndex].GetComponentInChildren<GridItem>();
+        //var cell1String = cell.type;
+        //var cell2String = targetCell ? targetCell.type : "empty";
 
-                        RulePopupManager.Instance.showRule(combination.rules);
-                    }
-                    foreach (var pair in combination.result)
-                    {
-                        switch (pair.Key)
-                        {
-                            case "destroy2":
-                                destroy(targetCell.gameObject);
-                                break;
-                            case "addHot":
-                                break;
-                            case "generate1":
-                                cell.decreaseAmount();
+        //if (cell.GetComponent<GridCell>().cellInfo.isAlly())
+        //{
+        //    yield return StartCoroutine(exchangeCard(cell, emptyCellIndex));
 
-                                if (cell.amount <= 0)
-                                {
+        //    SFXManager.Instance.play("squirrelmove");
+        //    if (targetCell)
+        //    {
+        //        //if (targetCell.cellInfo.isResource())
+        //        //{
 
-                                    destroy(cell.gameObject);
-                                    //generate new item in target position, generate empty in origin position
-                                    addEmpty(originalMovingCellIndex);
-                                }
-                                else
-                                {
-                                    //generateCell(originalMovingCellIndex, cell.type, cell.amount);
-                                }
-                                //create a new split item and move to target and destroy
-                                var tempCell = generateCell(originalMovingCellIndex, nextSplitItem, -1);
-                                yield return StartCoroutine( moveCardAnim(tempCell.GetComponent<GridCell>(), originEmptyIndex));
-                                Destroy(tempCell, animTime);
-                                //destroy(cell.gameObject);
-                                if (targetCell && targetCell.type == pair.Value)
-                                {
-                                    targetCell.addAmount(combination.addValue2);
-                                }
-                                else
-                                {
-                                    //if (tempCell)
-                                    //{
+        //        //    SFXManager.Instance.play("collect" + targetCell.cellInfo.categoryDetail);
+        //        //    var resource = new List<PairInfo<int>>() { };
+        //        //    resource.Add(new PairInfo<int>(targetCell.cellInfo.categoryDetail, targetCell.amount));
+        //        //    CollectionManager.Instance.AddCoins(targetCell.transform.position, resource);
+        //        //    destroy(targetCell.gameObject);
 
-                                    //    tempCell.GetComponent<GridCell>().addAmount(valueAdd);
-                                    //}
-                                    generateCell(originEmptyIndex, pair.Value,CellManager.Instance.getInfo(pair.Value).categoryValue+valueAdd);
-                                }
+        //        //    switch (targetCell.type)
+        //        //    {
+        //        //        case "nut":
 
-                                //moveCard(emptyCell, originEmptyIndex);
+        //        //            RulePopupManager.Instance.showRule("playerToNut");
+        //        //            break;
+        //        //        case "cookedNut":
+        //        //            RulePopupManager.Instance.showRule("eatHotNut");
+        //        //            break;
+        //        //    }
 
-                                SFXManager.Instance.play("showup");
-                                break;
-                            case "generate2":
-                                //generate new item in original position
-                                //addEmpty(originEmptyIndex);
-                                //destroy(cell.gameObject);
+        //        //}
+        //        //else 
+        //        if (targetCell.cellInfo.isWeapon())
+        //        {
+        //            cell.GetComponent<GridCell>().equip(cell2String, targetCell.amount);
 
-                                if (cellParents[originalMovingCellIndex].GetComponentInChildren<GridItem>())
-                                {
-                                    destroy(cellParents[originalMovingCellIndex].GetComponentInChildren<GridItem>().gameObject);
-                                }
+        //            RulePopupManager.Instance.showRule("playerEquip" + cell2String);
+        //            destroy(targetCell.gameObject);
+        //        }
+        //        //else if (targetCell.cellInfo.type == "shop")
+        //        //{
 
-                                generateCell(originalMovingCellIndex, pair.Value);
+        //        //    destroy(targetCell.gameObject);
+        //        //    StartCoroutine(getIntoShop());
+        //        //    willGetIntoShop = true;
+        //        //}
+        //    }
+        //}
+        //else if (cell.GetComponent<GridCell>().cellInfo.isPlayer())
+        //{
+        //    yield return StartCoroutine(exchangeCard(cell, emptyCellIndex));
 
-                                SFXManager.Instance.play("showup");
-                                break;
-                            case "increaseObjectHP":
-                                cell.GetComponent<FireCell>().addHp(int.Parse(pair.Value));
-                                break;
-                            default:
-                                Debug.LogError("not support combination restul " + pair.Key);
-                                break;
-                        }
-                    }
-                    yield return StartCoroutine(moveOthers());
-                    yield break;
-                }
-                else
-                {
-                    //check if cell2 is made by cell
-                    if (targetCell)
-                    {
-                        int addValue = CombinationManager.Instance.getCombinationAddValue(nextSplitItem, targetCell.type);
-                        if (addValue > 0)
-                        {
-                            //move one item to target cell
-                            cell.decreaseAmount();
+        //    AchievementManager.Instance.clear("move");
+        //    hasPlayerMoved = true;
 
-                            if (cell.amount <= 0)
-                            {
+        //    SFXManager.Instance.play("squirrelmove");
+        //    if (targetCell)
+        //    {
+        //        if (targetCell.cellInfo.isResource())
+        //        {
 
-                                destroy(cell.gameObject);
-                                //generate new item in target position, generate empty in origin position
-                                addEmpty(originalMovingCellIndex);
-                            }
-                            else
-                            {
-                                //generateCell(originalMovingCellIndex, cell.type, cell.amount);
-                            }
-                            //create a new split item and move to target and destroy
-                            var tempCell = generateCell(originalMovingCellIndex, nextSplitItem, -1);
-                            StartCoroutine(moveCardAnim(tempCell.GetComponent<GridCell>(), originEmptyIndex));
-                            Destroy(tempCell, animTime);
+        //            //SFXManager.Instance.play("collect" + targetCell.cellInfo.categoryDetail);
+        //            SFXManager.Instance.play("collect" + "nut");
+        //            var resource = new List<PairInfo<int>>() { };
+        //            //resource.Add(new PairInfo<int>(targetCell.cellInfo.categoryDetail, targetCell.amount));
+        //            //resource.Add(new PairInfo<int>("nut", targetCell.amount));
+        //            //CollectionManager.Instance.AddCoins(targetCell.transform.position, resource);
+        //            cell.GetComponent<GridCell>().addAmount(targetCell.amount);
+        //            destroy(targetCell.gameObject);
 
-                            targetCell.GetComponent<GridCell>().addAmount(addValue);
+        //            switch (targetCell.type)
+        //            {
+        //                case "nut":
 
-                            SFXManager.Instance.play("showup");
+        //                    RulePopupManager.Instance.showRule("playerToNut");
+        //                    break;
+        //                case "cookedNut":
+        //                    RulePopupManager.Instance.showRule("eatHotNut");
+        //                    break;
+        //            }
+
+        //        }
+        //        else if (targetCell.cellInfo.isWeapon())
+        //        {
+        //            cell.GetComponent<GridCell>().equip(cell2String, targetCell.amount);
+
+        //            //RulePopupManager.Instance.showRule("playerEquip" + cell2String);
+        //            destroy(targetCell.gameObject);
+        //        }
+        //        else if (targetCell.cellInfo.type == "shop")
+        //        {
+
+        //            destroy(targetCell.gameObject);
+        //            yield return StartCoroutine(getIntoShop());
+        //            willGetIntoShop = true;
+        //        }
+        //    }
+        //}
+        //else if (forceMove)
+        //{
+        //    yield return StartCoroutine(exchangeCard(cell, emptyCellIndex));
+        //}
+        //else
+        //{
+        //    hasPlayerMoved = false;
+
+        //    //check if current card is splitable, if so, check if the next split can combine on empty place
+        //    if (cell.cellInfo.isSplitable())
+        //    {
+        //        if (cell.cellInfo.categoryDetail.Count <= 0)
+        //        {
+        //            Debug.LogError("category detail of " + cell.cellInfo.type + " not set");
+        //        }
+        //        var nextSplitItem = getNextSplit(cell);
+
+
+        //        //calculate combination result
+        //        int valueAdd = 0;
+        //        var combination = CombinationManager.Instance.getCombinationResult(nextSplitItem, cell2String);
+        //        if(combination == null)
+        //        {
+
+        //            combination = CombinationManager.Instance.getCombinationResult(cell2String, nextSplitItem);
+        //            if (combination!=null)
+        //            {
+        //                valueAdd += combination.addValue2 * 1 + combination.addValue1 * (targetCell ? targetCell.amount : 0);
+        //            }
+        //        }
+        //        else
+        //        {
+        //            valueAdd += combination.addValue1 * 1 + combination.addValue2 * (targetCell ? targetCell.amount : 0);
+        //        }
+        //        if (combination != null)
+        //        {
+        //            //yield return StartCoroutine(exchangeCard(cell, emptyCellIndex));
+        //            if (combination.rules != null && combination.rules.Length > 0)
+        //            {
+
+        //                RulePopupManager.Instance.showRule(combination.rules);
+        //            }
+        //            foreach (var pair in combination.result)
+        //            {
+        //                switch (pair.Key)
+        //                {
+        //                    case "destroy2":
+        //                        destroy(targetCell.gameObject);
+        //                        break;
+        //                    case "addHot":
+        //                        break;
+        //                    case "generate1":
+        //                        cell.decreaseAmount();
+
+        //                        if (cell.amount <= 0)
+        //                        {
+
+        //                            destroy(cell.gameObject);
+        //                            //generate new item in target position, generate empty in origin position
+        //                            addEmpty(originalMovingCellIndex);
+        //                        }
+        //                        else
+        //                        {
+        //                            //generateCell(originalMovingCellIndex, cell.type, cell.amount);
+        //                        }
+        //                        //create a new split item and move to target and destroy
+        //                        var tempCell = generateCell(originalMovingCellIndex, nextSplitItem, -1);
+        //                        yield return StartCoroutine( moveCardAnim(tempCell.GetComponent<GridCell>(), originEmptyIndex));
+        //                        Destroy(tempCell, animTime);
+        //                        //destroy(cell.gameObject);
+        //                        if (targetCell && targetCell.type == pair.Value)
+        //                        {
+        //                            targetCell.addAmount(combination.addValue2);
+        //                        }
+        //                        else
+        //                        {
+        //                            //if (tempCell)
+        //                            //{
+
+        //                            //    tempCell.GetComponent<GridCell>().addAmount(valueAdd);
+        //                            //}
+        //                            generateCell(originEmptyIndex, pair.Value,CellManager.Instance.getInfo(pair.Value).categoryValue+valueAdd);
+        //                        }
+
+        //                        //moveCard(emptyCell, originEmptyIndex);
+
+        //                        SFXManager.Instance.play("showup");
+        //                        break;
+        //                    case "generate2":
+        //                        //generate new item in original position
+        //                        //addEmpty(originEmptyIndex);
+        //                        //destroy(cell.gameObject);
+
+        //                        if (cellParents[originalMovingCellIndex].GetComponentInChildren<GridItem>())
+        //                        {
+        //                            destroy(cellParents[originalMovingCellIndex].GetComponentInChildren<GridItem>().gameObject);
+        //                        }
+
+        //                        generateCell(originalMovingCellIndex, pair.Value);
+
+        //                        SFXManager.Instance.play("showup");
+        //                        break;
+        //                    case "increaseObjectHP":
+        //                        cell.GetComponent<FireCell>().addHp(int.Parse(pair.Value));
+        //                        break;
+        //                    default:
+        //                        Debug.LogError("not support combination restul " + pair.Key);
+        //                        break;
+        //                }
+        //            }
+        //            yield return StartCoroutine(moveOthers());
+        //            yield break;
+        //        }
+        //        else
+        //        {
+        //            //check if cell2 is made by cell
+        //            if (targetCell)
+        //            {
+        //                int addValue = CombinationManager.Instance.getCombinationAddValue(nextSplitItem, targetCell.type);
+        //                if (addValue > 0)
+        //                {
+        //                    //move one item to target cell
+        //                    cell.decreaseAmount();
+
+        //                    if (cell.amount <= 0)
+        //                    {
+
+        //                        destroy(cell.gameObject);
+        //                        //generate new item in target position, generate empty in origin position
+        //                        addEmpty(originalMovingCellIndex);
+        //                    }
+        //                    else
+        //                    {
+        //                        //generateCell(originalMovingCellIndex, cell.type, cell.amount);
+        //                    }
+        //                    //create a new split item and move to target and destroy
+        //                    var tempCell = generateCell(originalMovingCellIndex, nextSplitItem, -1);
+        //                    StartCoroutine(moveCardAnim(tempCell.GetComponent<GridCell>(), originEmptyIndex));
+        //                    Destroy(tempCell, animTime);
+
+        //                    targetCell.GetComponent<GridCell>().addAmount(addValue);
+
+        //                    SFXManager.Instance.play("showup");
 
                             
-                    yield return StartCoroutine(moveOthers());
-                    yield break;
-                        }
-                    }
-                }
-            }
+        //            yield return StartCoroutine(moveOthers());
+        //            yield break;
+        //                }
+        //            }
+        //        }
+        //    }
 
             
-           // else
-            {
+        //   // else
+        //    {
 
-                // if (canDrawCard) {
-                //generate cell, if already a cell, don't generate and add it back to the deck.
-                if (cell.cellInfo.isEmpty())
-                {
-
-
-                    yield return StartCoroutine(exploreCellAnim(cell));
-
-                    yield break;
-
-                }
-                else
-                {
-                    yield return StartCoroutine(exchangeCard(cell, emptyCellIndex));
-                    // DeckManager.Instance.waitingCards(card);
-                }
-                //}
-                // else
-                // {
-                //     yield return StartCoroutine(exchangeCard(cell, emptyCellIndex));
-                // }
+        //        // if (canDrawCard) {
+        //        //generate cell, if already a cell, don't generate and add it back to the deck.
+        //        if (cell.cellInfo.isEmpty())
+        //        {
 
 
+        //            yield return StartCoroutine(exploreCellAnim(cell));
 
-                //cell.transform.DOMove(emptyPosition, animTime);
-                // generate(originalMovingCellIndex, card);
-                // yield return new WaitForSeconds(animTime);
+        //            yield break;
+
+        //        }
+        //        else
+        //        {
+        //            yield return StartCoroutine(exchangeCard(cell, emptyCellIndex));
+        //            // DeckManager.Instance.waitingCards(card);
+        //        }
+        //        //}
+        //        // else
+        //        // {
+        //        //     yield return StartCoroutine(exchangeCard(cell, emptyCellIndex));
+        //        // }
 
 
+
+        //        //cell.transform.DOMove(emptyPosition, animTime);
+        //        // generate(originalMovingCellIndex, card);
+        //        // yield return new WaitForSeconds(animTime);
 
 
 
 
-                //StartCoroutine(moveOthers());
-                // yield break;
-            }
-
-            // if generate new item on new position, don't update emptyCell
-            //if (combination != null && combination.result.ContainsKey("generate1"))
-            //{
-
-            //}
-            //else
-            //{
-            //    emptyCell = movingCellIndex;
-
-            //}
 
 
-        }
+        //        //StartCoroutine(moveOthers());
+        //        // yield break;
+        //    }
+
+        //    // if generate new item on new position, don't update emptyCell
+        //    //if (combination != null && combination.result.ContainsKey("generate1"))
+        //    //{
+
+        //    //}
+        //    //else
+        //    //{
+        //    //    emptyCell = movingCellIndex;
+
+        //    //}
 
 
-
-        if (cell.cellInfo.type == "fire")
-        {
-            cell.GetComponent<FireCell>().getDamage(1);
-
-            cellParents[originalMovingCellIndex].GetComponent<GridBackground>().heat();
-            Instantiate(fireVFX, cellParents[originalMovingCellIndex].position, Quaternion.identity);
-
-            RulePopupManager.Instance.showRule("fireMove");
-        }
-
-
-        //yield return new WaitForSeconds(animTime);
-
-        //if (boss)
-        //{
-
-        //    yield return StartCoroutine(boss.onNextStep());
-        //}
-
-        //if (!willGetIntoShop)
-        //{
-
-        //    yield return StartCoroutine(attackAndMove());
-        //    step();
-        //    EventPool.Trigger("moveAStep");
         //}
 
 
 
+        //if (cell.cellInfo.type == "fire")
+        //{
+        //    cell.GetComponent<FireCell>().getDamage(1);
 
-        yield return StartCoroutine(moveOthers());
-        //// yield break;
-        // finishMove();
+        //    cellParents[originalMovingCellIndex].GetComponent<GridBackground>().heat();
+        //    Instantiate(fireVFX, cellParents[originalMovingCellIndex].position, Quaternion.identity);
+
+        //    RulePopupManager.Instance.showRule("fireMove");
+        //}
+
+
+        ////yield return new WaitForSeconds(animTime);
+
+        ////if (boss)
+        ////{
+
+        ////    yield return StartCoroutine(boss.onNextStep());
+        ////}
+
+        ////if (!willGetIntoShop)
+        ////{
+
+        ////    yield return StartCoroutine(attackAndMove());
+        ////    step();
+        ////    EventPool.Trigger("moveAStep");
+        ////}
+
+
+
+
+        //yield return StartCoroutine(moveOthers());
+        ////// yield break;
+        //// finishMove();
 
 
 
@@ -1484,73 +1489,75 @@ public class GridController : Singleton<GridController>
     void moveCard(GridCell cell, int index)
     {
 
-        SFXManager.Instance.play("cardmove");
-        cell.index = index;
-        cell.transform.parent = cellParents[index];
+        //SFXManager.Instance.play("cardmove");
+        //cell.index = index;
+        //cell.transform.parent = cellParents[index];
 
-        var cellPosition = cellParents[index].position;
-        cell.transform.position = cellPosition;
+        //var cellPosition = cellParents[index].position;
+        //cell.transform.position = cellPosition;
     }
 
     IEnumerator moveCardAnim(GridCell cell, int index)
     {
 
-        SFXManager.Instance.play("cardmove");
+        yield return null;
+        //SFXManager.Instance.play("cardmove");
 
-        cell.transform.DOMove(cellParents[index].position, animTime);
+        //cell.transform.DOMove(cellParents[index].position, animTime);
 
-        cell.index = index;
-        cell.transform.parent = cellParents[index];
-        yield return new WaitForSeconds(animTime);
-       // destroy(cell.gameObject);
+        //cell.index = index;
+        //cell.transform.parent = cellParents[index];
+        //yield return new WaitForSeconds(animTime);
+        // destroy(cell.gameObject);
     }
 
     public IEnumerator exchangeCard(GridCell cell1, int cell2Index)
     {
-        SFXManager.Instance.play("cardmove");
-        var originalIsMoving = isMoving;
-        isMoving = true;
-        if (cell1.index == cell2Index)
-        {
-            Debug.Log("that's not correct " + cell2Index);
-        }
+        yield return null;
+        //SFXManager.Instance.play("cardmove");
+        //var originalIsMoving = isMoving;
+        //isMoving = true;
+        //if (cell1.index == cell2Index)
+        //{
+        //    Debug.Log("that's not correct " + cell2Index);
+        //}
 
-        var cell1Index = cell1.index;
-        var cell2s = cellParents[cell2Index].GetComponentsInChildren<GridCell>();
-        GridCell cell2 = null;
-        foreach (var c in cell2s)
-        {
-            if (c.GetComponent<GridItem>())
-            {
-                continue;
-            }
-            if (c.GetComponent<EnemyCell>() && c.GetComponent<EnemyCell>().isDead)
-            {
-                continue;
-            }
-            cell2 = c;
-        }
-        if (cell2 == null)
-        {
-            Debug.Log("cell2 is null");
-        }
-        var cell1Position = cellParents[cell1Index].position;
-        var cell2Position = cellParents[cell2Index].position;
-        //cell.GetComponent<SortingGroup>().sortingOrder = 100;
-        cell1.transform.DOMove(cell2Position, animTime);
-        cell2.transform.DOMove(cell1Position, animTime);
-        cell1.index = cell2Index;
-        cell2.index = cell1Index;
+        //var cell1Index = cell1.index;
+        //var cell2s = cellParents[cell2Index].GetComponentsInChildren<GridCell>();
+        //GridCell cell2 = null;
+        //foreach (var c in cell2s)
+        //{
+        //    if (c.GetComponent<GridItem>())
+        //    {
+        //        continue;
+        //    }
+        //    if (c.GetComponent<EnemyCell>() && c.GetComponent<EnemyCell>().isDead)
+        //    {
+        //        continue;
+        //    }
+        //    cell2 = c;
+        //}
+        //if (cell2 == null)
+        //{
+        //    Debug.Log("cell2 is null");
+        //}
+        //var cell1Position = cellParents[cell1Index].position;
+        //var cell2Position = cellParents[cell2Index].position;
+        ////cell.GetComponent<SortingGroup>().sortingOrder = 100;
+        //cell1.transform.DOMove(cell2Position, animTime);
+        //cell2.transform.DOMove(cell1Position, animTime);
+        //cell1.index = cell2Index;
+        //cell2.index = cell1Index;
 
-        cell1.transform.parent = cellParents[cell1.index];
-        cell2.transform.parent = cellParents[cell2.index];
-        Debug.Log("cell1 " + cell2Index + " cell2 " + cell1Index);
-        yield return new WaitForSeconds(animTime);
-        if (originalIsMoving == false)
-        {
+        //cell1.transform.parent = cellParents[cell1.index];
+        //cell2.transform.parent = cellParents[cell2.index];
+        //Debug.Log("cell1 " + cell2Index + " cell2 " + cell1Index);
+        //yield return new WaitForSeconds(animTime);
+        //if (originalIsMoving == false)
+        //{
 
-            isMoving = false;
-        }
+        //    isMoving = false;
+        //}
     }
 
     float cellAnimInterval = 0.05f;

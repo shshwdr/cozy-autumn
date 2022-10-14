@@ -148,31 +148,31 @@ public class EnemyCell : MonoBehaviour
 
     void die()
     {
-        if (!isDead)
-        {
-            if (!isBoss)
-            {
+        //if (!isDead)
+        //{
+        //    if (!isBoss)
+        //    {
 
-                GridController.Instance.addEmpty(GetComponent<GridCell>().index);
-            }
-            else
-            {
-                GetComponentInParent<Boss>().getKilled();
-            }
-            GetComponent<Collider2D>().enabled = false;
-            isDead = true;
-            transform.DOShakeScale(0.3f, GridController.Instance.animTime);
-            Destroy(gameObject, GridController.Instance.animTime + 0.1f);
-            foreach (var render in GetComponentsInChildren<SpriteRenderer>())
-            {
-                render.sortingOrder = 100000;
-            }
+        //        GridController.Instance.addEmpty(GetComponent<GridCell>().index);
+        //    }
+        //    else
+        //    {
+        //        GetComponentInParent<Boss>().getKilled();
+        //    }
+        //    GetComponent<Collider2D>().enabled = false;
+        //    isDead = true;
+        //    transform.DOShakeScale(0.3f, GridController.Instance.animTime);
+        //    Destroy(gameObject, GridController.Instance.animTime + 0.1f);
+        //    foreach (var render in GetComponentsInChildren<SpriteRenderer>())
+        //    {
+        //        render.sortingOrder = 100000;
+        //    }
 
-            if (AchievementManager.Instance.hasAchievement("dead" + info.type))
-            {
-                AchievementManager.Instance.ShowAchievement("dead" + info.type);
-            }
-        }
+        //    if (AchievementManager.Instance.hasAchievement("dead" + info.type))
+        //    {
+        //        AchievementManager.Instance.ShowAchievement("dead" + info.type);
+        //    }
+        //}
     }
 
     public void getDamage(int x)
@@ -270,59 +270,60 @@ public class EnemyCell : MonoBehaviour
     public IEnumerator activeAttack(bool forceAttack = false, bool canAttack = true)
     {
 
-        if (isDead)
-        {
-            yield break;
-        }
-        //if player has weapon, unequip weapon and die
-        var player = GridController.Instance.getPlayerTransform().GetComponent<GridCell>();
-        var ally = GridController.Instance.getAllyGridCell();
-        //logic need to change if enemy has more than one hp
-        //if (ally && GridController.Instance.isAllyAround(GetComponent<GridCell>().index) && beAttack(ally, forceAttack))
+        yield return null;
+        //if (isDead)
         //{
-        //} else if (player && GridController.Instance.isPlayerAround(GetComponent<GridCell>().index) && beAttack(player, forceAttack))
+        //    yield break;
+        //}
+        ////if player has weapon, unequip weapon and die
+        //var player = GridController.Instance.getPlayerTransform().GetComponent<GridCell>();
+        //var ally = GridController.Instance.getAllyGridCell();
+        ////logic need to change if enemy has more than one hp
+        ////if (ally && GridController.Instance.isAllyAround(GetComponent<GridCell>().index) && beAttack(ally, forceAttack))
+        ////{
+        ////} else if (player && GridController.Instance.isPlayerAround(GetComponent<GridCell>().index) && beAttack(player, forceAttack))
+        ////{
+        ////}else 
+        //if (!ally)
         //{
-        //}else 
-        if (!ally)
-        {
-            attack(player, canAttack);
-        }
-        else
-        {
-            if (ally &&( GridController.Instance.isAllyAround(GetComponent<GridCell>().index)) && attack(ally, canAttack))
-            {
+        //    attack(player, canAttack);
+        //}
+        //else
+        //{
+        //    if (ally &&( GridController.Instance.isAllyAround(GetComponent<GridCell>().index)) && attack(ally, canAttack))
+        //    {
 
-            }
-            else if (player &&(GridController.Instance.isPlayerAround(GetComponent<GridCell>().index) )&& attack(player, canAttack)) { } 
-            else
-            {
-                //find out the closest one between ally and player and attack
-                var d1 = GridController.Instance.distance(ally.index, cell.index);
-                var d2 = GridController.Instance.distance(player.index, cell.index);
-                if (d1 > d2)
-                {
-                    attack(player, canAttack);
-                }
-                else
-                {
-                    attack(ally, canAttack);
+        //    }
+        //    else if (player &&(GridController.Instance.isPlayerAround(GetComponent<GridCell>().index) )&& attack(player, canAttack)) { } 
+        //    else
+        //    {
+        //        //find out the closest one between ally and player and attack
+        //        var d1 = GridController.Instance.distance(ally.index, cell.index);
+        //        var d2 = GridController.Instance.distance(player.index, cell.index);
+        //        if (d1 > d2)
+        //        {
+        //            attack(player, canAttack);
+        //        }
+        //        else
+        //        {
+        //            attack(ally, canAttack);
 
-                }
-            }
+        //        }
+        //    }
 
-        }
+        //}
 
-        if (attackCountDown == 0)
-        {
-            attackCountDown = -info.moveMode;
-        }
-        if (info.stayMode == 0)
-        {
-            getDamage(getAttack);
-        }
-        yield return new WaitForSeconds(GridController.Instance.animTime);
+        //if (attackCountDown == 0)
+        //{
+        //    attackCountDown = -info.moveMode;
+        //}
+        //if (info.stayMode == 0)
+        //{
+        //    getDamage(getAttack);
+        //}
+        //yield return new WaitForSeconds(GridController.Instance.animTime);
 
-        hasAttacked = true;
+        //hasAttacked = true;
     }
 
     private void OnMouseEnter()
@@ -396,67 +397,67 @@ public class EnemyCell : MonoBehaviour
         //    }
         //}
         //else
-        {
-            attackCountDown -= 1;
+        //{
+        //    attackCountDown -= 1;
 
-            if (info.moveMode < 0)
-            {
+        //    if (info.moveMode < 0)
+        //    {
 
-                RulePopupManager.Instance.showRule("foxCountingdown");
-                countDownObject.initCount(attackCountDown);
-            }
+        //        RulePopupManager.Instance.showRule("foxCountingdown");
+        //        countDownObject.initCount(attackCountDown);
+        //    }
 
-            if(info.attackMode == "heal")
-            {
-                //heal enemies
-                foreach (var adjacentCell in GridController.Instance.getAdjacentCells(cell.index))
-                {
-                    if (adjacentCell.GetComponent<EnemyCell>())
-                    {
-                        yield return StartCoroutine( adjacentCell.GetComponent<EnemyCell>().heal(this));
-                    }
-                }
-            }
-            else
-            {
-                bool hasStolen = false;
-                if(info.attackMode == "steal")
-                {
-                    //try steal around
-                    foreach (var adjacentCell in GridController.Instance.getAdjacentCells(cell.index))
-                    {
-                        if (adjacentCell.cellInfo.isSplitable())
-                        {
-                            var nextSplit = GridController.Instance.getNextSplit(adjacentCell);
-                            hasStolen = true;
-                            yield return StartCoroutine(GridController.Instance.removeSplit(adjacentCell, cell.index, nextSplit));
-                            yield return StartCoroutine(heal(this, 1));
-                            break;
-                        }
-                    }
-                }
-                if (!hasStolen)
-                {
-                    if (GridController.Instance.isCharacterAround(GetComponent<GridCell>().index) || attackCountDown == 0)
-                    {
-                        yield return StartCoroutine(activeAttack());
-                    }
-                    else
-                    {
-                        if (info.attackPerStep > 0)
-                        {
+        //    if(info.attackMode == "heal")
+        //    {
+        //        //heal enemies
+        //        foreach (var adjacentCell in GridController.Instance.getAdjacentCells(cell.index))
+        //        {
+        //            if (adjacentCell.GetComponent<EnemyCell>())
+        //            {
+        //                yield return StartCoroutine( adjacentCell.GetComponent<EnemyCell>().heal(this));
+        //            }
+        //        }
+        //    }
+        //    else
+        //    {
+        //        bool hasStolen = false;
+        //        if(info.attackMode == "steal")
+        //        {
+        //            //try steal around
+        //            foreach (var adjacentCell in GridController.Instance.getAdjacentCells(cell.index))
+        //            {
+        //                if (adjacentCell.cellInfo.isSplitable())
+        //                {
+        //                    var nextSplit = GridController.Instance.getNextSplit(adjacentCell);
+        //                    hasStolen = true;
+        //                    yield return StartCoroutine(GridController.Instance.removeSplit(adjacentCell, cell.index, nextSplit));
+        //                    yield return StartCoroutine(heal(this, 1));
+        //                    break;
+        //                }
+        //            }
+        //        }
+        //        if (!hasStolen)
+        //        {
+        //            if (GridController.Instance.isCharacterAround(GetComponent<GridCell>().index) || attackCountDown == 0)
+        //            {
+        //                yield return StartCoroutine(activeAttack());
+        //            }
+        //            else
+        //            {
+        //                if (info.attackPerStep > 0)
+        //                {
 
-                            transform.DOShakeScale(0.2f, 0.2f);
+        //                    transform.DOShakeScale(0.2f, 0.2f);
 
 
-                            //takeResource(info.requireResourcePerStep, info.attackPerStep);
-                        }
-                    }
-                }
+        //                    //takeResource(info.requireResourcePerStep, info.attackPerStep);
+        //                }
+        //            }
+        //        }
 
                 
-            }
-        }
+        //    }
+        //}
 
     }
 
@@ -495,58 +496,58 @@ public class EnemyCell : MonoBehaviour
     public IEnumerator startMove()
     {
         yield return null;
-        if (isDead)
-        {
-            hasBeenAttacked = false;
-            yield break;
-        }
-        if (isFirst)
-        {
-            hasBeenAttacked = false;
-            yield break;
-        }
-        if (isDead)
-        {
-            hasBeenAttacked = false;
-            yield break;
-        }
-        if (hasAttacked)
-        {
+        //if (isDead)
+        //{
+        //    hasBeenAttacked = false;
+        //    yield break;
+        //}
+        //if (isFirst)
+        //{
+        //    hasBeenAttacked = false;
+        //    yield break;
+        //}
+        //if (isDead)
+        //{
+        //    hasBeenAttacked = false;
+        //    yield break;
+        //}
+        //if (hasAttacked)
+        //{
 
-            hasBeenAttacked = false;
-            yield break;
-        }
-
-
-        if (info.moveMode == 1 || info.moveMode == 2)
-        {
-
-            RulePopupManager.Instance.showRule("weaselMove");
-            //should it move and attack? not wait a move?
-            if (GridController.Instance.isCharacterAround(GetComponent<GridCell>().index) || attackCountDown == 0)
-            {
-                yield return StartCoroutine(activeAttack());
-                hasBeenAttacked = false;
-                yield break;
-            }
-            hasAttacked = true;
+        //    hasBeenAttacked = false;
+        //    yield break;
+        //}
 
 
-            //this enemy would chase player, and only attack infront of it.
-            var target = GridController.Instance.getTargetIndexToPlayer(cell.index);
+        //if (info.moveMode == 1 || info.moveMode == 2)
+        //{
 
-            if (!cell || target == null)
-            {
-                Debug.LogError("?");
-            }
-            yield return StartCoroutine(GridController.Instance.exchangeCard(cell, target));
+        //    RulePopupManager.Instance.showRule("weaselMove");
+        //    //should it move and attack? not wait a move?
+        //    if (GridController.Instance.isCharacterAround(GetComponent<GridCell>().index) || attackCountDown == 0)
+        //    {
+        //        yield return StartCoroutine(activeAttack());
+        //        hasBeenAttacked = false;
+        //        yield break;
+        //    }
+        //    hasAttacked = true;
 
 
-        }
+        //    //this enemy would chase player, and only attack infront of it.
+        //    var target = GridController.Instance.getTargetIndexToPlayer(cell.index);
+
+        //    if (!cell || target == null)
+        //    {
+        //        Debug.LogError("?");
+        //    }
+        //    yield return StartCoroutine(GridController.Instance.exchangeCard(cell, target));
+
+
+        //}
 
 
 
-        hasBeenAttacked = false;
+        //hasBeenAttacked = false;
     }
 
 
