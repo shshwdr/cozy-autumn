@@ -12,13 +12,17 @@ public class TetrisShape : MonoBehaviour
 
     List<Vector2> tetrisShapeAfterRotation;
     int rotateTime = 0;
-    bool isDragging = true;
+    bool isDragging = false;
+    bool isUnlocked = false;
     Vector3 dragOriginalPosition;
 
     Vector2 currentFinalPosition;
 
 
-
+    public void getReady()
+    {
+        isUnlocked = true;
+    }
 
     public void init(List<Vector2> shape)
     {
@@ -29,7 +33,7 @@ public class TetrisShape : MonoBehaviour
         {
             var index = tetrisShape[i];
             var card = DeckManager.Instance.drawCard(false);
-            var go = GridGeneration.Instance.generateCell(index, card);
+            var go = GridGeneration.Instance.generateCell(index+(Vector2)transform.position, card);
             go.transform.parent = transform;
             tetrises.Add(go);
         }
@@ -59,19 +63,50 @@ public class TetrisShape : MonoBehaviour
         }
         bool canPlaceCell = canPlace();
 
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonDown(1) && isUnlocked)
         {
             rotate90Degree();
         }
-        if (Input.GetMouseButtonDown(0))
-        {
-            if (canPlaceCell)
-            {
+        //if (Input.GetMouseButtonDown(0))
+        //{
+        //    if (canPlaceCell)
+        //    {
 
-                tryPlace();
-            }
+        //        tryPlace();
+        //    }
+        //}
+    }
+
+    private void OnMouseDown()
+    {
+        if (!isUnlocked)
+        {
+            return;
+        }
+        isDragging = true;
+        dragOriginalPosition = transform.position;
+    }
+    private void OnMouseUp()
+    {
+
+        if (!isUnlocked)
+        {
+            return;
+        }
+        bool canPlaceCell = canPlace();
+
+        if (canPlaceCell)
+        {
+            tryPlace();
+            isUnlocked = false;
+        }
+        else
+        {
+            isDragging = false;
+            transform.position = dragOriginalPosition;
         }
     }
+
 
     Color getColor(bool isValid, bool isEnemy)
     {
@@ -167,4 +202,6 @@ public class TetrisShape : MonoBehaviour
         var y = Mathf.Sin(angle) * (point1.x - point2.x) + Mathf.Cos(angle) * (point1.y - point2.y) + point2.y;
         return new Vector3(x, y);
     }
+
+
 }

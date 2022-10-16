@@ -9,6 +9,7 @@ public class CheatManager : Singleton<CheatManager>
 
 
     public bool isOn = true;
+    public bool wouldMoveCells = true;
 
     public bool wontDie
     {
@@ -38,10 +39,11 @@ public class CheatManager : Singleton<CheatManager>
             //{
             //    ResourceManager.Instance.addResource("stick", 10);
             //}
-            //if (Input.GetKeyDown(KeyCode.I))
-            //{
-            //    ResourceManager.Instance.addResource("stone", 10);
-            //}
+            if (Input.GetKeyDown(KeyCode.I))
+            {
+                wouldMoveCells = !wouldMoveCells;
+            }
+
             if (Input.GetKeyDown(KeyCode.L))
             {
                 _wontDie = true;

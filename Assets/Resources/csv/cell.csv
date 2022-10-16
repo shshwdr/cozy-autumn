@@ -6,8 +6,7 @@ nut,1,resource,0,,,,,,,,,,,,
 stick,1,,0,,,,,,,,,,,,
 trap,1,trap,,,,,,,,,,,,,
 empty,1,,1,,,,,,,,,,,,
-bat,1,,,,,,,,,,,,,,
-birdTrap,1,trap,3,,,,,,,,,,,,1:A trap! You can use it to chase away other animals by moving them on top of it.
+birdTrap,1,trap,5,,,,,,,,,,,,1:A trap! You can use it to chase away other animals by moving them on top of it.
 leaf,1,empty,1,,,,,,,,,,,,
 shop,1,,,,,,,,,,,,,,
 weasel,1,enemy,5,,nut,nut,0,5,0,,,,0,,1:a sneaky weasel! Try not get close to it as it might bite you!
@@ -15,7 +14,7 @@ snake,1,enemy,5,,nut,nut,1,5,,,,,0,,
 bird,1,enemy,2,,stick,stick,0,5,-3,,,changePosition,1,,
 fox,1,enemy,5,,nut,nut,0,3,1,,,,0,,1:a sneaky fox! It would attack every 4 rounds so chase it away before that!
 bear,1,enemy,5,,stone,nut,0,5,0,1,,,0,,
-bat,1,weapon,2,,,,,,,,,,,,
+bat,1,weapon,4,,,,,,,,,,,,
 boulder,1,,,,,,,,,,,,,,
 axe,1,weapon,,,,,,,,,,,,,
 stone,1,,2,,,,,,,,,,,,

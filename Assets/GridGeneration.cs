@@ -6,7 +6,7 @@ using UnityEngine;
 public class GridGeneration : Singleton<GridGeneration>
 {
     public float cellSize = 2.1f;
-    Vector2 playerPosition = new Vector2 (0, 0);
+    Vector2 playerPosition = new Vector2(0, 0);
     [HideInInspector] public GridCell playerCell;
     public Transform mainBoard;
     public GameObject cellPrefab;
@@ -21,6 +21,9 @@ public class GridGeneration : Singleton<GridGeneration>
 
         playerCell = generateCell(playerPosition, "player").GetComponent<GridCell>();
         playerCell.renderer.sprite = Resources.Load<Sprite>("cell/" + CharacterManager.Instance.currentChar);
+
+        TetrisGeneration.Instance.generateATetrisShape();
+
         StartCoroutine(placeCellsAnim(new List<GameObject>() { playerCell.gameObject }));
     }
 
@@ -92,6 +95,7 @@ public class GridGeneration : Singleton<GridGeneration>
     {
         go.transform.DOScale(Vector3.zero, animTime);
         go.transform.DOLocalMoveY(1, animTime);
+        release(go.GetComponent<GridCell>().index);
         yield return new WaitForSeconds(animTime);
         Destroy(go);
     }
@@ -108,13 +112,34 @@ public class GridGeneration : Singleton<GridGeneration>
 
     IEnumerator moveCardAndOccupyAnim(GridCell cell, Vector2 targetPosition)
     {
+        if (!cell)
+        {
+            Debug.LogError("no cell");
+        }
         release(cell.index);
-        
-        occupy(targetPosition,cell);
+
+        occupy(targetPosition, cell);
         yield return StartCoroutine(moveCardAnim(cell, targetPosition));
     }
+    IEnumerator exchangeCardAnim(GridCell cell, GridCell cell2)
+    {
+        var cellIndex = cell.index;
+        var cellIndex2 = cell2.index;
+        if(cellIndex == cellIndex2)
+        {
+            yield break;//hack fix
+        }
+        release(cellIndex);
 
-        IEnumerator combineAround(GridCell cell)
+        release(cellIndex2);
+        StartCoroutine(moveCardAnim(cell, cell2.index));
+        yield return StartCoroutine(moveCardAnim(cell2, cell.index));
+        occupy(cellIndex2, cell);
+        occupy(cellIndex, cell2);
+    }
+
+
+    IEnumerator combineAround(GridCell cell)
     {
         yield return null;
         bool hasCombined = false;
@@ -147,35 +172,43 @@ public class GridGeneration : Singleton<GridGeneration>
                 if (combination.result.ContainsKey("generate1"))
                 {
                     var combinationGenerated = combination.result["generate1"];
-                    if(combinationGenerated == newCell.type)
+                    if (combinationGenerated == newCell.type)
                     {
                         newCell.addAmount();
                     }
                     else
                     {
 
-                        generateCellAndOccupy(newIndex, combinationGenerated);
                         yield return StartCoroutine(destroy(newCell.gameObject));
+
+
+                        generateCellAndOccupy(newIndex, combinationGenerated);
+                        yield return new WaitForSeconds(animTime);
                     }
                 }
             }
         }
         if (hasCombined)
         {
-            yield return StartCoroutine( destroy(cell.gameObject));
-            
+            yield return StartCoroutine(destroy(cell.gameObject));
+
         }
     }
     static int distance(Vector2 index)
     {
         index = Vector2Int.RoundToInt(index);
-        return (int)(Mathf.Abs( index.x) + Mathf.Abs(index.y));
-    } 
+        return (int)(Mathf.Abs(index.x) + Mathf.Abs(index.y));
+    }
     static int SortByDistanceToPlayer(GameObject g1, GameObject g2)
     {
         GridCell gc1 = g1.GetComponent<GridCell>();
         GridCell gc2 = g2.GetComponent<GridCell>();
-        return distance(gc1.index) .CompareTo( distance(gc2.index));
+        return distance(gc1.index).CompareTo(distance(gc2.index));
+    }
+
+    static int SortByDistanceToPlayer(GridCell gc1, GridCell gc2)
+    {
+        return distance(gc1.index).CompareTo(distance(gc2.index));
     }
 
     static int SortByDistanceToPlayer(Vector2 v1, Vector2 v2)
@@ -185,12 +218,22 @@ public class GridGeneration : Singleton<GridGeneration>
 
     Vector2 getDir(Vector2 pos)
     {
-        if(pos == Vector2.zero)
+        if (pos == Vector2.zero)
         {
             return Vector2.zero;
         }
 
         var dir = new Vector2(0, 1);
+        //if (Mathf.Abs(pos.y) == 0)
+        //{
+        //        dir = new Vector2(Mathf.Sign(pos.x), 0);
+
+        //}
+        //else
+        //{
+
+        //    dir = new Vector2( 0, Mathf.Sign(pos.y));
+        //}
         if (Mathf.Abs(pos.x) > Mathf.Abs(pos.y))
         {
             dir = new Vector2(Mathf.Sign(pos.x), 0);
@@ -203,10 +246,237 @@ public class GridGeneration : Singleton<GridGeneration>
         return dir;
     }
 
+    IEnumerator decreaseBothCell(GridCell cell, GridCell enemy, List<Vector2> mightUpdatedPositions)
+    {
+
+        var damage = Mathf.Min(cell.amount, enemy.amount);
+        cell.decreaseAmount(damage);
+        if (cell.amount == 0)
+        {
+            addFarerCellIntoPositions(mightUpdatedPositions, cell.index);
+            yield return StartCoroutine(destroy(cell.gameObject));
+        }
+
+        enemy.decreaseAmount(damage);
+        if (enemy.amount == 0)
+        {
+            addFarerCellIntoPositions(mightUpdatedPositions, enemy.index);
+            yield return StartCoroutine(destroy(enemy.gameObject));
+        }
+        yield return null;
+    }
+
+    void playTrapAttackEffect(GridCell trap)
+    {
+
+        var go = Instantiate(Resources.Load<GameObject>("effect/trapEffect"), trap.index, Quaternion.identity);
+    }
+
+    void playWeaponAttackEffect(GridCell weapon, GridCell enemy)
+    {
+        var go = Instantiate(Resources.Load<GameObject>("effect/attack"), weapon.index, Quaternion.identity);
+        go.transform.DOMove(enemy.index, GridController.Instance.animTime + 0.1f);
+        Destroy(go, 1f);
+
+
+        var go2 = Instantiate(Resources.Load<GameObject>("effect/attack"), weapon.index, Quaternion.identity);
+        go2.transform.DOMove(enemy.index, GridController.Instance.animTime + 0.1f);
+        go2.GetComponentInChildren<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/" + weapon.type);
+        go2.GetComponentInChildren<SpriteRenderer>().sortingOrder = 1;
+        Destroy(go2, 1f);
+    }
+
+    IEnumerator moveEnemies()
+    {
+
+        yield return null;
+        List<GridCell> enemies = new List<GridCell>();
+        foreach (var cell in GameObject.FindObjectsOfType<GridCell>())
+        {
+            if (cell.cellInfo.isEnemy() && !cell.GetComponentInParent<TetrisShape>())
+            {
+                enemies.Add(cell);
+            }
+        }
+        enemies.Sort(SortByDistanceToPlayer);
+        int test2 = 30;
+        while (enemies.Count > 0)
+        {
+            test2--;
+            if (test2 < 0)
+            {
+
+                Debug.LogError("move too many times");
+                break;
+            }
+
+            var enemy = enemies[0];
+            enemies.RemoveAt(0);
+            if (!enemy)
+            {
+                continue;
+            }
+
+            var pos = enemy.index;
+            if (distance(enemy.index) == 1)
+            {
+                //enemy attack
+                enemy.GetComponent<EnemyCell>().attack(playerCell,true);
+                yield return StartCoroutine(destroy(enemy.gameObject));
+
+                if (playerCell.amount <= 0)
+                {
+                    GameManager.Instance.gameover();
+                }
+
+                List<Vector2> mightUpdatedPositions = new List<Vector2>();
+                addFarerCellIntoPositions(mightUpdatedPositions, pos);
+
+                yield return StartCoroutine(movePositions(mightUpdatedPositions));
+                continue;
+
+            }
+
+            var dir = getDir(pos);
+            int test = 30;
+
+            //check if next to weapon, if so, attack
+            foreach(var scell in getSurroundingCells(enemy.index))
+            {
+                if (scell.cellInfo.isWeapon())
+                {
+                    List<Vector2> mightUpdatedPositions = new List<Vector2>();
+                    StartCoroutine(decreaseBothCell(scell, enemy, mightUpdatedPositions));
+
+                    playWeaponAttackEffect(scell, enemy);
+                    yield return new WaitForSeconds(animTime);
+                    yield return StartCoroutine(movePositions(mightUpdatedPositions));
+                }
+            }
+
+            if (!enemy || enemy.amount <= 0)
+            {
+                continue;
+            }
+
+            if (isOccupied(pos - dir))
+            {
+                var cell = getCellOnPosition(pos - dir);
+
+                //check if swap with trap, if so, attack
+                if (cell.cellInfo.isTrap())
+                {
+                    var trapIndex = cell.index;
+                    List<Vector2> mightUpdatedPositions = new List<Vector2>();
+                    yield return StartCoroutine(moveCardAnim(enemy, cell.index));
+                    StartCoroutine(decreaseBothCell(cell, enemy, mightUpdatedPositions));
+                    if (enemy && enemy.amount>0)
+                    {
+                        release(enemy.index);
+                        occupy(trapIndex, enemy);
+                    }
+                    playTrapAttackEffect(cell);
+                    yield return new WaitForSeconds(animTime);
+                    yield return StartCoroutine(movePositions(mightUpdatedPositions));
+                }
+                else
+                {
+                    yield return StartCoroutine(exchangeCardAnim(enemy, cell));
+                }
+            }
+            else
+            {
+                yield return StartCoroutine(moveCardAndOccupyAnim(getCellOnPosition(pos), pos - dir));
+
+                List<Vector2> mightUpdatedPositions = new List<Vector2>();
+                addFarerCellIntoPositions(mightUpdatedPositions, pos);
+
+                yield return StartCoroutine(movePositions(mightUpdatedPositions));
+            }
+
+            enemies.Sort(SortByDistanceToPlayer);
+        }
+    }
+
+    void addFarerCellIntoPositions(List<Vector2> positions, Vector2 pos)
+    {
+        var surroundingCells = getSurroundingCells(pos);
+        foreach (var scell in surroundingCells)
+        {
+            if (distance(scell.index) > distance(pos))
+            {
+                positions.Add(scell.index);
+            }
+        }
+    }
+
+    IEnumerator movePositions(List<Vector2> positions)
+    {
+        yield return null;
+        positions.Sort(SortByDistanceToPlayer);
+        int test2 = 30;
+        while (positions.Count > 0)
+        {
+            test2--;
+            if (test2 < 0)
+            {
+
+                Debug.LogError("move too many times");
+                break;
+            }
+            //get cell
+            var pos = positions[0];
+            positions.RemoveAt(0);
+            var cell = getCellOnPosition(pos);
+            if (cell == null)
+            {
+                //Debug.LogError("cell is null");
+                continue;
+            }
+
+            //move cell to bottom
+            var dir = getDir(pos);
+            int test = 30;
+
+
+            if (CheatManager.Instance.wouldMoveCells)
+            {
+                while (!isOccupied(pos - dir))
+                {
+                    test--;
+                    if (test <= 0)
+                    {
+                        Debug.LogError("move too many times");
+                        break;
+                    }
+                    yield return StartCoroutine(moveCardAndOccupyAnim(getCellOnPosition(pos), pos - dir));
+
+                    addFarerCellIntoPositions(positions, pos);
+
+                    pos = pos - dir;
+                    dir = getDir(pos);
+                }
+            }
+
+
+            yield return StartCoroutine(combineAround(cell.GetComponent<GridCell>()));
+
+            if (CheatManager.Instance.wouldMoveCells)
+            {
+                if (!isOccupied(pos))
+                {
+                    //if the cell is destroyed after combien, find cells that might be affected and add to positions
+                    addFarerCellIntoPositions(positions, pos);
+                }
+            }
+            positions.Sort(SortByDistanceToPlayer);
+        }
+    }
+
     IEnumerator placeCellsAnim(List<GameObject> cells)
     {
         //
-        foreach(var cell in cells)
+        foreach (var cell in cells)
         {
             occupy(cell.GetComponent<GridCell>().index, cell.GetComponent<GridCell>());
             foreach (var spriteRenderer in cell.GetComponentsInChildren<SpriteRenderer>())
@@ -216,63 +486,23 @@ public class GridGeneration : Singleton<GridGeneration>
         }
         yield return null;
 
-        //sort cells
-        cells.Sort(SortByDistanceToPlayer);
 
 
         List<Vector2> positions = new List<Vector2>();
-
-        List<int> combinedCells = new List<int>();
         //find combinations from current to previous
         foreach (var cell in cells)
         {
-            if(cell == null)
+            if (cell == null)
             {
                 Debug.Log("cell is null");
             }
             positions.Add(cell.GetComponent<GridCell>().index);
-            yield return StartCoroutine(combineAround(cell.GetComponent<GridCell>()));
         }
 
-        
 
-        for (int i = 0; i < positions.Count; i++)
-        {
-            var pos = positions[i];
-            var dir = getDir(pos);
-            int test = 30;
-            if (!isOccupied(positions[i]))
-            {
-                while (isOccupied(pos + dir))
-                {
-                    test--;
-                    if (test <= 0)
-                    {
-                        Debug.LogError("move too many times");
-                        break;
-                    }
-                    yield return StartCoroutine(moveCardAndOccupyAnim(getCellOnPosition(pos + dir), pos));
 
-                    pos = pos + dir;
-                }
-            }
-            else
-            {
-                while(!isOccupied(pos - dir))
-                {
-                    test--;
-                    if (test <= 0)
-                    {
-                        Debug.LogError("move too many times");
-                        break;
-                    }
-                    yield return StartCoroutine(moveCardAndOccupyAnim(getCellOnPosition(pos), pos-dir));
-
-                    pos = pos - dir;
-                    dir = getDir(pos);
-                }
-            }
-        }
+        yield return StartCoroutine(movePositions(positions));
+        yield return StartCoroutine(moveEnemies());
 
 
         TetrisGeneration.Instance.generateATetrisShape();
@@ -326,6 +556,6 @@ public class GridGeneration : Singleton<GridGeneration>
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 }

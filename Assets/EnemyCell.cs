@@ -243,7 +243,7 @@ public class EnemyCell : MonoBehaviour
         yield return new WaitForSeconds(GridController.Instance.animTime);
     }
 
-        bool attack(GridCell attackee, bool canAttack)
+    public    bool attack(GridCell attackee, bool canAttack)
     {
         if (canAttack && !isDead)
         {
@@ -334,15 +334,15 @@ public class EnemyCell : MonoBehaviour
         //    return;
         //}
 
-        if (explainPanel)
-        {
-            //if (!hasUpdatedDescription)
-            //{
-            //    hasUpdatedDescription = true;
-            //    updateDescription();
-            //}
-            DOTween.To(() => explainPanel.alpha, x => explainPanel.alpha = x, 1, 0.3f);
-        }
+        //if (explainPanel)
+        //{
+        //    //if (!hasUpdatedDescription)
+        //    //{
+        //    //    hasUpdatedDescription = true;
+        //    //    updateDescription();
+        //    //}
+        //    DOTween.To(() => explainPanel.alpha, x => explainPanel.alpha = x, 1, 0.3f);
+        //}
 
         //explainPanel.alpha = 1;
 
