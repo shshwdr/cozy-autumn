@@ -23,6 +23,7 @@ public class GridCell : MonoBehaviour
     public Text equipementDamageLabel;
     public SpriteRenderer equipRenderer;
     public GameObject ice;
+    public GameObject highlightOB;
 
     public GameObject newRuleAlert;
     public CanvasGroup descriptionCanvas;
@@ -31,8 +32,16 @@ public class GridCell : MonoBehaviour
     public Text amountLabel;
     public int amount;
 
-    public Image HPBK;
+    public GameObject HPBK;
 
+    public Collider2D collider;
+
+    private void Awake()
+    {
+        collider = GetComponent<Collider2D>();
+
+        highlightOB.SetActive(false);
+    }
 
     public void freeze()
     {
@@ -56,6 +65,27 @@ public class GridCell : MonoBehaviour
         ice.SetActive(false);
     }
 
+    void updateBackground()
+    {
+        if(type == "player")
+        {
+
+            bk.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/blank/hero");
+            HPBK.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/blank/alternative-1-corner-left");
+        }
+        else if (cellInfo.isEnemy())
+        {
+
+            bk.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/blank/enemy");
+            HPBK.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/blank/enemy-corner-left");
+        }
+        else
+        {
+            bk.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/blank/default");
+            HPBK.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/blank/alternative-2-corner-left");
+        }
+
+    }
 
     public  void init(string _type,Vector2 i,int _amount)
     {
@@ -115,18 +145,19 @@ public class GridCell : MonoBehaviour
             equipRenderer.sprite = Resources.Load<Sprite>("cell/" + "empty");
         }
 
-        if (cellInfo.isEnemy())
-        {
-            HPBK.gameObject.SetActive(true);
-        }else
-        {
-            if (HPBK)
-            {
-                HPBK.gameObject.SetActive(false);
+        //if (cellInfo.isEnemy())
+        //{
+        //    HPBK.gameObject.SetActive(true);
+        //}else
+        //{
+        //    if (HPBK)
+        //    {
+        //        HPBK.gameObject.SetActive(false);
 
-            }
+        //    }
 
-        }
+        //}
+        updateBackground();
     }
 
 
@@ -137,14 +168,14 @@ public class GridCell : MonoBehaviour
         {
             return;
         }
-        if (amount > 1)
+        //if (amount > 1)
         {
             amountLabel.text = amount.ToString();
         }
-        else
-        {
-            amountLabel.text = "";
-        }
+        //else
+        //{
+        //    amountLabel.text = "";
+        //}
     }
 
     public void setAmount(int x)
@@ -232,11 +263,53 @@ public class GridCell : MonoBehaviour
     {
     }
 
+    GridCell willSwapCell;
+
+    bool pointHovered(Vector2 point)
+    {
+        return collider.OverlapPoint(point);
+       // return collider.bounds.Contains(point);
+    }
+
+    public void select()
+    {
+        highlightOB.SetActive(true);
+    }
+    public void unselect()
+    {
+        highlightOB.SetActive(false);
+    }
+
     // Update is called once per frame
     void Update()
     {
 
         EventPool.OptIn("moveAStep", step);
+
+        if (isMouseDown)
+        {
+
+            Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+            if(willSwapCell && willSwapCell.pointHovered(mousePosition))
+            {
+                return;
+            }
+            if (willSwapCell)
+            {
+                willSwapCell.unselect();
+                willSwapCell = null;
+            }
+            //check if neighbour contains point
+            foreach(var neigh in GridGeneration.Instance.getSurroundingCells(index))
+            {
+                if (neigh.pointHovered(mousePosition)){
+                    neigh.select();
+                    willSwapCell = neigh;
+                    break;
+                }
+            }
+        }
     }
 
     public virtual void step()
@@ -264,30 +337,37 @@ public class GridCell : MonoBehaviour
     float longPressTime = 0.3f;
     public virtual void OnMouseUp()
     {
-        return;
         if (!isMouseDown)
         {
             return;
         }
-            Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-
-        if (GetComponent<Collider2D>().OverlapPoint(mousePosition))
+        if (willSwapCell)
         {
-            if (Time.time - mouseDownTime > longPressTime)
-            {
+            willSwapCell.unselect();
 
-                //GridController.Instance.exploreCell(this);
-                GridController.Instance.moveCell(this,true);
+            StartCoroutine(GridGeneration.Instance.swap(willSwapCell, this));
 
-                GridController.Instance.playerCell.decreaseAmount(1);
-                //ResourceManager.Instance.consumeResource("nut", 1, transform.position);
-            }
-            else
-            {
-
-                GridController.Instance.moveCell(this,false);
-            }
+            willSwapCell = null;
         }
+        //Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+        //if (GetComponent<Collider2D>().OverlapPoint(mousePosition))
+        //{
+        //    if (Time.time - mouseDownTime > longPressTime)
+        //    {
+
+        //        //GridController.Instance.exploreCell(this);
+        //        GridController.Instance.moveCell(this,true);
+
+        //        GridController.Instance.playerCell.decreaseAmount(1);
+        //        //ResourceManager.Instance.consumeResource("nut", 1, transform.position);
+        //    }
+        //    else
+        //    {
+
+        //        GridController.Instance.moveCell(this,false);
+        //    }
+        //}
 
 
 
@@ -297,8 +377,8 @@ public class GridCell : MonoBehaviour
 
         isMouseDown = false;
 
-        ExploreHoldText.text = "";
-        progressBar.fillAmount = 0;
+        //ExploreHoldText.text = "";
+        //progressBar.fillAmount = 0;
     }
 
     public Image progressBar;
@@ -312,32 +392,37 @@ public class GridCell : MonoBehaviour
         if (isMouseDown)
         {
             
-            progressBar.fillAmount = (Time.time - mouseDownTime) / longPressTime;
-            if (progressBar.fillAmount >= 1)
-            {
-                progressBar.color = Color.black;
-            }
-            else
-            {
+            //progressBar.fillAmount = (Time.time - mouseDownTime) / longPressTime;
+            //if (progressBar.fillAmount >= 1)
+            //{
+            //    progressBar.color = Color.black;
+            //}
+            //else
+            //{
 
-                progressBar.color = Color.green;
-            }
-            Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            if (!GetComponent<Collider2D>().OverlapPoint(mousePosition))
-            {
+            //    progressBar.color = Color.green;
+            //}
+            //Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            //if (!GetComponent<Collider2D>().OverlapPoint(mousePosition))
+            //{
 
-                ExploreHoldText.text = "Cancel";
-               // progressBar.fillAmount = 0;
-                return;
-            }
+            //    ExploreHoldText.text = "Cancel";
+            //   // progressBar.fillAmount = 0;
+            //    return;
+            //}
 
             //update progress bar
+
+           
         }
     }
 
     public virtual void OnMouseDown()
     {
-        return;
+        if (!GridGeneration.Instance.canSwap())
+        {
+            return;
+        }
         if (!EventSystem.current.IsPointerOverGameObject())
         {
 
@@ -360,7 +445,7 @@ public class GridCell : MonoBehaviour
             }
             isMouseDown = true;
             mouseDownTime = Time.time;
-            ExploreHoldText.text = "Move";
+            //ExploreHoldText.text = "Move";
             //index = GridController.Instance.moveCellToEmpty(this);
             //  if(index == -1)
             //  {

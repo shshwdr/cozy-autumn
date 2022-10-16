@@ -36,6 +36,7 @@ public class TetrisShape : MonoBehaviour
             var go = GridGeneration.Instance.generateCell(index+(Vector2)transform.position, card);
             go.transform.parent = transform;
             tetrises.Add(go);
+            go.GetComponent<GridCell>().collider.enabled = false;
         }
     }
 
@@ -79,6 +80,11 @@ public class TetrisShape : MonoBehaviour
 
     private void OnMouseDown()
     {
+
+        if (!GridGeneration.Instance.canMoveCell())
+        {
+            return;
+        }
         if (!isUnlocked)
         {
             return;
@@ -110,18 +116,15 @@ public class TetrisShape : MonoBehaviour
 
     Color getColor(bool isValid, bool isEnemy)
     {
+        if(!isUnlocked || !isDragging)
+        {
+
+            return Color.white;
+        }
         if (isValid)
         {
-            if (isEnemy)
-            {
 
-                return new Color(255, 188, 129);
-            }
-            else
-            {
-
-                return new Color(255, 216, 169);
-            }
+            return Color.white;
         }
         else
         {
@@ -171,7 +174,6 @@ public class TetrisShape : MonoBehaviour
             go.GetComponent<GridCell>().index = tetrisShapeAfterRotation[i] +currentFinalPosition;
             go.transform.localPosition = tetrisShapeAfterRotation[i];
             go.transform.parent = null;
-            
         }
 
 

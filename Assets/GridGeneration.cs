@@ -1,4 +1,5 @@
 using DG.Tweening;
+using Pool;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,13 +7,17 @@ using UnityEngine;
 public class GridGeneration : Singleton<GridGeneration>
 {
     public float cellSize = 2.1f;
-    Vector2 playerPosition = new Vector2(0, 0);
+    Vector2 playerPosition { get { return playerCell.index; } }
     [HideInInspector] public GridCell playerCell;
     public Transform mainBoard;
     public GameObject cellPrefab;
     public float animTime = 0.3f;
 
     Dictionary<Vector2, GridCell> indexToCell = new Dictionary<Vector2, GridCell>();
+
+    public int swapTime = 1;
+    public int currentSwapTime = 0;
+    bool isMoving = false;
 
     Vector2[] dirs = new Vector2[] { new Vector2(0, 1), new Vector2(0, -1), new Vector2(1, 0), new Vector2(-1, 0) };
     // Start is called before the first frame update
@@ -26,7 +31,37 @@ public class GridGeneration : Singleton<GridGeneration>
 
         StartCoroutine(placeCellsAnim(new List<GameObject>() { playerCell.gameObject }));
     }
+    public bool canSwap()
+    {
+        return currentSwapTime < swapTime &&!isMoving;
+    }
+    public bool canMoveCell()
+    {
+        return !isMoving;
+    }
 
+    public IEnumerator swap(GridCell cell1, GridCell cell2)
+    {
+        currentSwapTime++;
+        EventPool.Trigger("updateSwap");
+        isMoving = true;
+        yield return StartCoroutine( exchangeCardAnim(cell1, cell2));
+
+
+        List<Vector2> mightUpdatedPositions = new List<Vector2>();
+        addFarerCellIntoPositions(mightUpdatedPositions, cell1.index);
+        addFarerCellIntoPositions(mightUpdatedPositions, cell2.index);
+
+        yield return StartCoroutine(movePositions(mightUpdatedPositions));
+
+        isMoving = false;
+
+    }
+    void resetSwap()
+    {
+        currentSwapTime = 0;
+        EventPool.Trigger("updateSwap");
+    }
     public bool isOccupied(Vector2 index)
     {
         Vector2Int ind = Vector2Int.RoundToInt(index);
@@ -174,7 +209,7 @@ public class GridGeneration : Singleton<GridGeneration>
                     var combinationGenerated = combination.result["generate1"];
                     if (combinationGenerated == newCell.type)
                     {
-                        newCell.addAmount();
+                        newCell.addAmount(cell.amount);
                     }
                     else
                     {
@@ -318,7 +353,7 @@ public class GridGeneration : Singleton<GridGeneration>
             }
 
             var pos = enemy.index;
-            if (distance(enemy.index) == 1)
+            if (distance(enemy.index - playerPosition) == 1)
             {
                 //enemy attack
                 enemy.GetComponent<EnemyCell>().attack(playerCell,true);
@@ -337,7 +372,7 @@ public class GridGeneration : Singleton<GridGeneration>
 
             }
 
-            var dir = getDir(pos);
+            var dir = getDir(pos - playerPosition);
             int test = 30;
 
             //check if next to weapon, if so, attack
@@ -351,6 +386,10 @@ public class GridGeneration : Singleton<GridGeneration>
                     playWeaponAttackEffect(scell, enemy);
                     yield return new WaitForSeconds(animTime);
                     yield return StartCoroutine(movePositions(mightUpdatedPositions));
+                    if (enemy.amount <= 0)
+                    {
+                        break;
+                    }
                 }
             }
 
@@ -405,7 +444,10 @@ public class GridGeneration : Singleton<GridGeneration>
         {
             if (distance(scell.index) > distance(pos))
             {
-                positions.Add(scell.index);
+                if (!positions.Contains(scell.index))
+                {
+                    positions.Add(scell.index);
+                }
             }
         }
     }
@@ -475,9 +517,11 @@ public class GridGeneration : Singleton<GridGeneration>
 
     IEnumerator placeCellsAnim(List<GameObject> cells)
     {
+        isMoving = true;
         //
         foreach (var cell in cells)
         {
+            cell.GetComponent<GridCell>().collider.enabled = true; 
             occupy(cell.GetComponent<GridCell>().index, cell.GetComponent<GridCell>());
             foreach (var spriteRenderer in cell.GetComponentsInChildren<SpriteRenderer>())
             {
@@ -504,6 +548,8 @@ public class GridGeneration : Singleton<GridGeneration>
         yield return StartCoroutine(movePositions(positions));
         yield return StartCoroutine(moveEnemies());
 
+        isMoving = false;
+        resetSwap();
 
         TetrisGeneration.Instance.generateATetrisShape();
 

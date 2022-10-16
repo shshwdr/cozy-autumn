@@ -20874,12 +20874,14 @@ MonoBehaviour:
   equipementDamageLabel: {fileID: 0}
   equipRenderer: {fileID: 1863671512}
   ice: {fileID: 1213093012}
+  highlightOB: {fileID: 0}
   newRuleAlert: {fileID: 0}
   descriptionCanvas: {fileID: 0}
   isFreezed: 0
   amountLabel: {fileID: 0}
   amount: 0
   HPBK: {fileID: 0}
+  collider: {fileID: 0}
   progressBar: {fileID: 0}
   ExploreHoldText: {fileID: 0}
 --- !u!224 &494672637 stripped
@@ -20940,7 +20942,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 4
+  orthographic size: 4.5
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -34012,7 +34014,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -50297,12 +50299,14 @@ MonoBehaviour:
   equipementDamageLabel: {fileID: 0}
   equipRenderer: {fileID: 2073926364}
   ice: {fileID: 39756146}
+  highlightOB: {fileID: 0}
   newRuleAlert: {fileID: 0}
   descriptionCanvas: {fileID: 0}
   isFreezed: 0
   amountLabel: {fileID: 0}
   amount: 0
   HPBK: {fileID: 0}
+  collider: {fileID: 0}
   progressBar: {fileID: 0}
   ExploreHoldText: {fileID: 0}
 --- !u!224 &1317315377 stripped
@@ -50944,7 +50948,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 10
-  m_Sprite: {fileID: 21300000, guid: 407013c82491c2e40ac15515ea79c456, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 4f6284bbc864d544d9a52bc4e91bea7d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -50963,8 +50967,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1438938894}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.55, y: 0.38, z: 10}
-  m_LocalScale: {x: 0.7, y: 0.7, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 10}
+  m_LocalScale: {x: 0.9, y: 0.9, z: 1}
   m_Children:
   - {fileID: 1860404811}
   - {fileID: 1253888418}
@@ -67193,6 +67197,98 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1683484668}
   m_CullTransparentMesh: 1
+--- !u!1 &1702837119
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1702837120}
+  - component: {fileID: 1702837122}
+  - component: {fileID: 1702837121}
+  - component: {fileID: 1702837123}
+  m_Layer: 5
+  m_Name: swap
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &1702837120
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1702837119}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 2025966767}
+  m_RootOrder: 12
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 80, y: -15}
+  m_SizeDelta: {x: 160, y: 30}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1702837121
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1702837119}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 12800000, guid: 82cf6d32e08414b42b7ca95fa7e32b2b, type: 3}
+    m_FontSize: 20
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 2
+    m_MaxSize: 40
+    m_Alignment: 0
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: Swap:1
+--- !u!222 &1702837122
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1702837119}
+  m_CullTransparentMesh: 1
+--- !u!114 &1702837123
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1702837119}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 061e061c0fe71f5409504f096a22059a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1709716170
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -67635,7 +67731,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -73934,12 +74030,14 @@ MonoBehaviour:
   equipementDamageLabel: {fileID: 0}
   equipRenderer: {fileID: 1534818026}
   ice: {fileID: 1618634564}
+  highlightOB: {fileID: 0}
   newRuleAlert: {fileID: 0}
   descriptionCanvas: {fileID: 0}
   isFreezed: 0
   amountLabel: {fileID: 0}
   amount: 0
   HPBK: {fileID: 0}
+  collider: {fileID: 0}
   progressBar: {fileID: 0}
   ExploreHoldText: {fileID: 0}
 --- !u!1 &1976897154
@@ -84302,6 +84400,7 @@ RectTransform:
   - {fileID: 1710214902}
   - {fileID: 1231130751}
   - {fileID: 531516361}
+  - {fileID: 1702837120}
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -84781,6 +84880,8 @@ MonoBehaviour:
   mainBoard: {fileID: 1378126795}
   cellPrefab: {fileID: 1766114458741427111, guid: 9e29a52581a5504438790bc45ef5d55b, type: 3}
   animTime: 0.5
+  swapTime: 1
+  currentSwapTime: 0
 --- !u!1 &2064428219
 GameObject:
   m_ObjectHideFlags: 0
@@ -95130,7 +95231,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2143746176
 Transform:
   m_ObjectHideFlags: 0
@@ -95363,12 +95464,14 @@ MonoBehaviour:
   equipementDamageLabel: {fileID: 0}
   equipRenderer: {fileID: 0}
   ice: {fileID: 0}
+  highlightOB: {fileID: 0}
   newRuleAlert: {fileID: 0}
   descriptionCanvas: {fileID: 0}
   isFreezed: 0
   amountLabel: {fileID: 0}
   amount: 0
   HPBK: {fileID: 0}
+  collider: {fileID: 0}
   progressBar: {fileID: 0}
   ExploreHoldText: {fileID: 0}
 --- !u!1001 &6404396777929343268
