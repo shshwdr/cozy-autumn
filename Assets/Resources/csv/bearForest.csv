@@ -2,7 +2,7 @@
 nutOnTree:2,0,,
 branch:2,1,,3
 weasel_3:1,2,,2
-weasel_4:1|nutOnTree:1,3,,3
+weasel_4:1|hawthorn:1,3,,3
 hedgehogEnemy_3:1|branch:1,4,,3
 weasel_5:1|nutOnTree:1,5,,1
 hedgehogEnemy_4:1|branch:1,6,,2

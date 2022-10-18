@@ -1,3 +1,4 @@
+using Pool;
 using Sinbad;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ public class StageInfo
     public string displayName;
     public string leafName;
     public int stopRound;
+    public string unlockByAchievement;
 }
 
 public class StageManager : Singleton<StageManager>
@@ -16,6 +18,8 @@ public class StageManager : Singleton<StageManager>
 
     public string currentStage = "bearForest";
     Dictionary<string, StageInfo> stageInfoDict = new Dictionary<string, StageInfo>();
+    List<string> unlockedStage = new List<string>();
+    List<string> lockedStage = new List<string>();
 
     // Start is called before the first frame update
     void Start()
@@ -25,6 +29,32 @@ public class StageManager : Singleton<StageManager>
         foreach (var info in combinationInfos)
         {
             stageInfoDict[info.stageName] = info;
+            if(info.unlockByAchievement == null || info.unlockByAchievement == "")
+            {
+                unlockedStage.Add(info.stageName);
+            }
+            else
+            {
+                lockedStage.Add(info.stageName);
+            }
+        }
+        EventPool.OptIn("unlockAchievement",updateStageUnlock);
+    }
+    public bool hasUnlocked(string str)
+    {
+        return unlockedStage.Contains(str);
+    }
+    void updateStageUnlock()
+    {
+        foreach(var stage in new List<string>( lockedStage))
+        {
+            var stageInfo = getStageInfo(stage);
+            if (AchievementManager.Instance.hasUnlocked(stageInfo.unlockByAchievement))
+            {
+                lockedStage.Remove(stage);
+                unlockedStage.Add(stage);
+                EventPool.Trigger("unlockStage");
+            }
         }
     }
 
@@ -40,6 +70,7 @@ public class StageManager : Singleton<StageManager>
         }
         return stageInfoDict[name];
     }
+
 
     public StageInfo getCurrentInfo()
     {

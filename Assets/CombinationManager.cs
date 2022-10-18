@@ -13,6 +13,7 @@ public class CombinationInfo
 
     public int addValue1;
     public int addValue2;
+    public int reverse;
 
 }
 
@@ -77,6 +78,18 @@ public class CombinationManager : Singleton<CombinationManager>
         foreach(var info in combinationDict[type1])
         {
             if(info.type2 == type2)
+            {
+                return info;
+            }
+        }
+
+        if (!combinationDict.ContainsKey(type2))
+        {
+            return null;
+        }
+        foreach (var info in combinationDict[type2])
+        {
+            if(info.reverse == 1 && info.type2 == type1)
             {
                 return info;
             }

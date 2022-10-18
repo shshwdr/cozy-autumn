@@ -39,8 +39,11 @@ public class GridCell : MonoBehaviour
     private void Awake()
     {
         collider = GetComponent<Collider2D>();
+        if (highlightOB)
+        {
 
-        highlightOB.SetActive(false);
+            highlightOB.SetActive(false);
+        }
     }
 
     public void freeze()
@@ -87,7 +90,7 @@ public class GridCell : MonoBehaviour
 
     }
 
-    public  void init(string _type,Vector2 i,int _amount)
+    public virtual  void init(string _type,Vector2 i,int _amount)
     {
         CellManager.Instance.showCell(_type);
         type = _type;
@@ -130,7 +133,7 @@ public class GridCell : MonoBehaviour
         if (cellInfo.isEnemy())
         {
             gameObject.AddComponent<EnemyCell>().init(type);
-            bk.GetComponent<SpriteRenderer>().color = Color.red;
+           // bk.GetComponent<SpriteRenderer>().color = Color.red;
         }
 
         updateAmount();
@@ -183,7 +186,7 @@ public class GridCell : MonoBehaviour
         amount = x;
         updateAmount();
     }
-    public void addAmount(int x = 1)
+    public virtual void addAmount(int x = 1)
     {
         amount += x;
         updateAmount();
@@ -261,6 +264,7 @@ public class GridCell : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        EventPool.OptIn("moveAStep", step);
     }
 
     GridCell willSwapCell;
@@ -280,11 +284,20 @@ public class GridCell : MonoBehaviour
         highlightOB.SetActive(false);
     }
 
-    // Update is called once per frame
-    void Update()
+    List<GameObject> generatedCombineResult = new List<GameObject>();
+    void clearGeneratedCombineResult()
     {
 
-        EventPool.OptIn("moveAStep", step);
+        foreach (var c in generatedCombineResult)
+        {
+            Destroy(c);
+        }
+        generatedCombineResult.Clear();
+    }
+    // Update is called once per frame
+    virtual public void Update()
+    {
+
 
         if (isMouseDown)
         {
@@ -297,6 +310,7 @@ public class GridCell : MonoBehaviour
             }
             if (willSwapCell)
             {
+                clearGeneratedCombineResult();
                 willSwapCell.unselect();
                 willSwapCell = null;
             }
@@ -304,6 +318,10 @@ public class GridCell : MonoBehaviour
             foreach(var neigh in GridGeneration.Instance.getSurroundingCells(index))
             {
                 if (neigh.pointHovered(mousePosition)){
+
+
+                    StartCoroutine(GridGeneration.Instance.calculateCombinedResult(new List<GridCell>(){ neigh,this} , generatedCombineResult));
+
                     neigh.select();
                     willSwapCell = neigh;
                     break;
@@ -329,6 +347,15 @@ public class GridCell : MonoBehaviour
         {
 
             newRuleAlert.SetActive(false);
+        }
+
+        if(cellInfo!=null && cellInfo.hpMode != 0)
+        {
+            addAmount(cellInfo.hpMode);
+            if (amount <= 0)
+            {
+                StartCoroutine(GridGeneration.Instance.destroy(gameObject));
+            }
         }
     }
 

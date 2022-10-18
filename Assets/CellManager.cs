@@ -11,6 +11,7 @@ public class CellInfo {
     public int maxCount;
     public Dictionary<int, string> textWhenFirstMeet;
     public int showTime = 0;
+    public int hpMode = 0;
 
 
     public bool isCell() { return cellType == 1; }

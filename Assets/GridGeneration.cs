@@ -11,7 +11,10 @@ public class GridGeneration : Singleton<GridGeneration>
     [HideInInspector] public GridCell playerCell;
     public Transform mainBoard;
     public GameObject cellPrefab;
+    public GameObject modifyPrefab;
     public float animTime = 0.3f;
+
+    public int gridSize = 2;
 
     Dictionary<Vector2, GridCell> indexToCell = new Dictionary<Vector2, GridCell>();
 
@@ -23,7 +26,6 @@ public class GridGeneration : Singleton<GridGeneration>
     // Start is called before the first frame update
     void Start()
     {
-
         playerCell = generateCell(playerPosition, "player").GetComponent<GridCell>();
         playerCell.renderer.sprite = Resources.Load<Sprite>("cell/" + CharacterManager.Instance.currentChar);
 
@@ -33,7 +35,7 @@ public class GridGeneration : Singleton<GridGeneration>
     }
     public bool canSwap()
     {
-        return currentSwapTime < swapTime &&!isMoving;
+        return currentSwapTime < swapTime && !isMoving;
     }
     public bool canMoveCell()
     {
@@ -45,7 +47,7 @@ public class GridGeneration : Singleton<GridGeneration>
         currentSwapTime++;
         EventPool.Trigger("updateSwap");
         isMoving = true;
-        yield return StartCoroutine( exchangeCardAnim(cell1, cell2));
+        yield return StartCoroutine(exchangeCardAnim(cell1, cell2));
 
 
         List<Vector2> mightUpdatedPositions = new List<Vector2>();
@@ -126,7 +128,7 @@ public class GridGeneration : Singleton<GridGeneration>
     {
         StartCoroutine(placeCellsAnim(cells));
     }
-    IEnumerator destroy(GameObject go)
+    public IEnumerator destroy(GameObject go)
     {
         go.transform.DOScale(Vector3.zero, animTime);
         go.transform.DOLocalMoveY(1, animTime);
@@ -160,7 +162,7 @@ public class GridGeneration : Singleton<GridGeneration>
     {
         var cellIndex = cell.index;
         var cellIndex2 = cell2.index;
-        if(cellIndex == cellIndex2)
+        if (cellIndex == cellIndex2)
         {
             yield break;//hack fix
         }
@@ -172,6 +174,211 @@ public class GridGeneration : Singleton<GridGeneration>
         occupy(cellIndex2, cell);
         occupy(cellIndex, cell2);
     }
+
+
+    public IEnumerator calculateCombinedResult(List<GridCell> cells, List<GameObject> newCells, bool supportInPosiiton = true)
+    {
+        bool showResult = newCells != null;
+        Dictionary<Vector2, bool> hasCombined = new Dictionary<Vector2, bool>();
+        Dictionary<Vector2, GameObject> positionToCell = new Dictionary<Vector2, GameObject>();
+
+        Dictionary<Vector2, List<Vector2>> visited = new Dictionary<Vector2, List<Vector2>>();
+
+        List<Vector2> currentCellsPositions = new List<Vector2>();
+
+
+        HashSet<GameObject> willDestory = new HashSet<GameObject>();
+        HashSet<GameObject> willOccupy = new HashSet<GameObject>();
+
+        foreach (var cell in cells)
+        {
+            currentCellsPositions.Add(cell.index);
+        }
+
+        foreach (var cell in cells)
+        {
+            var cellIndex = Vector2Int.RoundToInt(cell.index);
+            hasCombined[cellIndex] = false;
+            foreach (var dir in dirs)
+            {
+                var newIndex = Vector2Int.RoundToInt(cell.index + dir);
+                if (!supportInPosiiton && currentCellsPositions.Contains(newIndex))
+                {
+                    continue;
+                }
+                var newCell = getCellOnPosition(newIndex);
+                if (newCell == null)
+                {
+                    foreach (var currentCell in cells)
+                    {
+                        if (currentCell.index == newIndex)
+                        {
+                            newCell = currentCell;//remove duplication
+                        }
+                    }
+
+                }
+                if (!newCell)
+                {
+                    continue;
+                }
+
+                if (visited.ContainsKey(newIndex) && visited[newIndex].Contains(cell.index))
+                {
+                    continue;
+                }
+
+                if (!visited.ContainsKey(cell.index))
+                {
+                    visited[cell.index] = new List<Vector2>();
+                }
+                visited[cell.index].Add(newIndex);
+
+                var combination = CombinationManager.Instance.getCombinationResult(newCell.type, cell.type);
+
+                if (combination != null)
+                {
+
+
+                    if (!showResult)
+                    {
+
+                        var animCell = generateCell(cell.index, cell.type).GetComponent<GridCell>();
+                        animCell.GetComponent<GridCell>().collider.enabled = false;
+                        yield return StartCoroutine(moveCardAnim(animCell, newCell.index));
+                        Destroy(animCell.gameObject);
+                    }
+
+                    // update newCell
+                    hasCombined[cell.index] = true;
+                   // willDestory.Add(combineCell.gameObject);
+
+                    if (combination.result.ContainsKey("generate1"))
+                    {
+
+                        if (positionToCell.ContainsKey(newCell.index))
+                        {
+                            continue;
+                        }
+                        var combinationGenerated = combination.result["generate1"];
+
+                        if (showResult)
+                        {
+                            var animCell = generateCell(newIndex, combinationGenerated).GetComponent<GridCell>();
+                            newCells.Add(animCell.gameObject);
+                            animCell.GetComponent<GridCell>().collider.enabled = false;
+                            animCell.GetComponent<GridCell>().HPBK.SetActive(false);
+                            positionToCell[newCell.index] = animCell.gameObject;
+                        }
+                        else
+                        {
+
+
+                            if (cell == null || cell.gameObject == null)
+                            {
+                                Debug.LogError("???");
+                            }
+
+                            //yield return StartCoroutine(destroy(newCell.gameObject));
+                            //newCell.
+
+                            //only generate, occupy later together
+                            var gCell = generateCell(newIndex, combinationGenerated);
+                            willOccupy.Add(gCell);
+                            yield return new WaitForSeconds(animTime);
+                            //hasCombined[combineNewCell.index] = true;
+
+                            willDestory.Add(newCell.gameObject);
+                        }
+                    }
+                    else if (combination.result.ContainsKey("addHP"))
+                    {
+                        string value = combination.result["addHP"];
+                        var theOneAddValue = value == "1" ? newCell : cell;
+                        var theOneIsValue = value != "1" ? newCell : cell;
+                        if (showResult)
+                        {
+                            if (positionToCell.ContainsKey(newIndex))
+                            {
+
+                                positionToCell[theOneAddValue.index].GetComponent<GridCell>().addAmount(theOneIsValue.amount);
+                            }
+                            else
+                            {
+                                var animCell = generateCell(newIndex, "addHP", theOneIsValue.amount).GetComponent<GridCell>();
+                                newCells.Add(animCell.gameObject);
+                                animCell.GetComponent<GridCell>().collider.enabled = false;
+
+                                positionToCell[newIndex] = animCell.gameObject;
+                            }
+                        }
+                        else
+                        {
+                            theOneAddValue.addAmount(theOneIsValue.amount);
+                            willDestory.Add(theOneIsValue.gameObject);
+                            //yield return StartCoroutine(destroy(cell.gameObject));
+                        }
+                    }
+                }
+            }
+            if (hasCombined[cellIndex])
+            {
+                willDestory.Add(cell.gameObject);
+
+            }
+        }
+
+        foreach (var cell in cells)
+        {
+            if (hasCombined.ContainsKey(cell.index) && hasCombined[cell.index] && !positionToCell.ContainsKey(cell.index))
+            {
+                if (showResult)
+                {
+                    var animCell = generateCell(cell.index, "destroy").GetComponent<GridCell>();
+                    newCells.Add(animCell.gameObject);
+                }
+
+
+            }
+        }
+        if (!showResult)
+        {
+            foreach (var pair in willDestory)
+            {
+                //if(pair.Value == true)
+                {
+
+                    var cell = pair;
+                    if (cell == null || cell.gameObject == null)
+                    {
+                        Debug.LogError("???");
+                    }
+                    yield return StartCoroutine(destroy(cell.gameObject));
+                }
+
+            }
+
+            foreach (var pair in willOccupy)
+            {
+
+                occupy(pair.GetComponent<GridCell>().index, pair.GetComponent<GridCell>());
+            }
+                }
+
+        if (newCells != null)
+        {
+            foreach(var c in newCells)
+            {
+
+                foreach (var render in c.GetComponentsInChildren<SpriteRenderer>())
+                {
+                    render.sortingOrder += 100;
+                }
+            }
+        }
+        yield return null;
+    }
+
 
 
     IEnumerator combineAround(GridCell cell)
@@ -200,6 +407,7 @@ public class GridGeneration : Singleton<GridGeneration>
 
                 hasCombined = true;
                 var animCell = generateCell(cell.index, cell.type).GetComponent<GridCell>();
+                animCell.GetComponent<GridCell>().collider.enabled = false;
                 yield return StartCoroutine(moveCardAnim(animCell, newCell.index));
 
                 Destroy(animCell.gameObject);
@@ -240,10 +448,60 @@ public class GridGeneration : Singleton<GridGeneration>
         GridCell gc2 = g2.GetComponent<GridCell>();
         return distance(gc1.index).CompareTo(distance(gc2.index));
     }
-
-    static int SortByDistanceToPlayer(GridCell gc1, GridCell gc2)
+    List<GridCell> allAttracts = null;
+    int enemyDistance(GridCell gc)
     {
-        return distance(gc1.index).CompareTo(distance(gc2.index));
+        if(allAttracts == null)
+        {
+            allAttracts = new List<GridCell>();
+            foreach(var cell in GameObject.FindObjectsOfType<GridCell>())
+            {
+                if(cell.cellInfo.isTrap() && cell.cellInfo.attackMode == "attract")
+                {
+                    allAttracts.Add(cell);
+                }
+            }
+        }
+        int shortest = distance(gc.index - playerPosition);
+        foreach (var trap in allAttracts)
+        {
+            shortest = Mathf.Min(shortest, distance(gc.index - trap.index));
+        }
+        return shortest;
+    }
+
+    Vector2 enemyDir(GridCell gc)
+    {
+        
+        int shortest = distance(playerPosition - gc.index);
+        var dir = playerPosition - gc.index;
+        if(allAttracts == null)
+        {
+
+            allAttracts = new List<GridCell>();
+            foreach (var cell in GameObject.FindObjectsOfType<GridCell>())
+            {
+                if (cell.cellInfo.isTrap() && cell.cellInfo.attackMode == "attract")
+                {
+                    allAttracts.Add(cell);
+                }
+            }
+        }
+        foreach (var trap in allAttracts)
+        {
+            var newdis = distance( trap.index - gc.index);
+            if (shortest >= newdis)
+            {
+                shortest = newdis;
+                dir = trap.index - gc.index;
+            }
+        }
+        return dir;
+    }
+
+    int SortByDistanceToTarget(GridCell gc1, GridCell gc2)
+    {
+        return enemyDistance(gc1).CompareTo(enemyDistance(gc2));
     }
 
     static int SortByDistanceToPlayer(Vector2 v1, Vector2 v2)
@@ -328,12 +586,12 @@ public class GridGeneration : Singleton<GridGeneration>
         List<GridCell> enemies = new List<GridCell>();
         foreach (var cell in GameObject.FindObjectsOfType<GridCell>())
         {
-            if (cell.cellInfo.isEnemy() && !cell.GetComponentInParent<TetrisShape>())
+            if (cell.cellInfo != null && cell.cellInfo.isEnemy() && !cell.GetComponentInParent<TetrisShape>())
             {
                 enemies.Add(cell);
             }
         }
-        enemies.Sort(SortByDistanceToPlayer);
+        enemies.Sort(SortByDistanceToTarget);
         int test2 = 30;
         while (enemies.Count > 0)
         {
@@ -353,30 +611,14 @@ public class GridGeneration : Singleton<GridGeneration>
             }
 
             var pos = enemy.index;
-            if (distance(enemy.index - playerPosition) == 1)
-            {
-                //enemy attack
-                enemy.GetComponent<EnemyCell>().attack(playerCell,true);
-                yield return StartCoroutine(destroy(enemy.gameObject));
 
-                if (playerCell.amount <= 0)
-                {
-                    GameManager.Instance.gameover();
-                }
 
-                List<Vector2> mightUpdatedPositions = new List<Vector2>();
-                addFarerCellIntoPositions(mightUpdatedPositions, pos);
 
-                yield return StartCoroutine(movePositions(mightUpdatedPositions));
-                continue;
-
-            }
-
-            var dir = getDir(pos - playerPosition);
+            var dir = getDir(enemyDir(enemy));
             int test = 30;
 
             //check if next to weapon, if so, attack
-            foreach(var scell in getSurroundingCells(enemy.index))
+            foreach (var scell in getSurroundingCells(enemy.index))
             {
                 if (scell.cellInfo.isWeapon())
                 {
@@ -398,9 +640,9 @@ public class GridGeneration : Singleton<GridGeneration>
                 continue;
             }
 
-            if (isOccupied(pos - dir))
+            if (isOccupied(pos + dir))
             {
-                var cell = getCellOnPosition(pos - dir);
+                var cell = getCellOnPosition(pos + dir);
 
                 //check if swap with trap, if so, attack
                 if (cell.cellInfo.isTrap())
@@ -409,7 +651,7 @@ public class GridGeneration : Singleton<GridGeneration>
                     List<Vector2> mightUpdatedPositions = new List<Vector2>();
                     yield return StartCoroutine(moveCardAnim(enemy, cell.index));
                     StartCoroutine(decreaseBothCell(cell, enemy, mightUpdatedPositions));
-                    if (enemy && enemy.amount>0)
+                    if (enemy && enemy.amount > 0)
                     {
                         release(enemy.index);
                         occupy(trapIndex, enemy);
@@ -420,12 +662,58 @@ public class GridGeneration : Singleton<GridGeneration>
                 }
                 else
                 {
+                    if (distance(enemy.index - playerPosition) == 1)
+                    {
+                        //enemy attack
+                        enemy.GetComponent<EnemyCell>().attack(playerCell, true);
+                        yield return StartCoroutine(destroy(enemy.gameObject));
+
+                        if (playerCell.amount <= 0)
+                        {
+                            GameManager.Instance.gameover();
+                        }
+
+                        List<Vector2> mightUpdatedPositions = new List<Vector2>();
+                        addFarerCellIntoPositions(mightUpdatedPositions, pos);
+
+                        yield return StartCoroutine(movePositions(mightUpdatedPositions));
+
+                    }
+
+                    if (!enemy || enemy.amount <= 0)
+                    {
+                        continue;
+                    }
+                    foreach (var scell in getSurroundingCells(enemy.index))
+                    {
+                        if (scell.cellInfo.isAlly())
+                        {
+
+                            enemy.GetComponent<EnemyCell>().attack(scell, true);
+                            yield return StartCoroutine(destroy(enemy.gameObject));
+                            if (scell.amount <= 0)
+                            {
+                                yield return StartCoroutine(destroy(scell.gameObject));
+                            }
+
+                            List<Vector2> mightUpdatedPositions = new List<Vector2>();
+                            addFarerCellIntoPositions(mightUpdatedPositions, pos);
+                            addFarerCellIntoPositions(mightUpdatedPositions, scell.index);
+
+                            yield return StartCoroutine(movePositions(mightUpdatedPositions));
+                        }
+                    }
+
+                    if (!enemy || enemy.amount <= 0)
+                    {
+                        continue;
+                    }
                     yield return StartCoroutine(exchangeCardAnim(enemy, cell));
                 }
             }
             else
             {
-                yield return StartCoroutine(moveCardAndOccupyAnim(getCellOnPosition(pos), pos - dir));
+                yield return StartCoroutine(moveCardAndOccupyAnim(getCellOnPosition(pos), pos + dir));
 
                 List<Vector2> mightUpdatedPositions = new List<Vector2>();
                 addFarerCellIntoPositions(mightUpdatedPositions, pos);
@@ -433,7 +721,15 @@ public class GridGeneration : Singleton<GridGeneration>
                 yield return StartCoroutine(movePositions(mightUpdatedPositions));
             }
 
-            enemies.Sort(SortByDistanceToPlayer);
+
+            if (!enemy || enemy.amount <= 0)
+            {
+                continue;
+            }
+
+
+
+            enemies.Sort(SortByDistanceToTarget);
         }
     }
 
@@ -501,7 +797,7 @@ public class GridGeneration : Singleton<GridGeneration>
             }
 
 
-            yield return StartCoroutine(combineAround(cell.GetComponent<GridCell>()));
+            //yield return StartCoroutine(combineAround(cell.GetComponent<GridCell>()));
 
             if (CheatManager.Instance.wouldMoveCells)
             {
@@ -521,7 +817,7 @@ public class GridGeneration : Singleton<GridGeneration>
         //
         foreach (var cell in cells)
         {
-            cell.GetComponent<GridCell>().collider.enabled = true; 
+            cell.GetComponent<GridCell>().collider.enabled = true;
             occupy(cell.GetComponent<GridCell>().index, cell.GetComponent<GridCell>());
             foreach (var spriteRenderer in cell.GetComponentsInChildren<SpriteRenderer>())
             {
@@ -543,13 +839,21 @@ public class GridGeneration : Singleton<GridGeneration>
             positions.Add(cell.GetComponent<GridCell>().index);
         }
 
+        List<GridCell> gridCells = new List<GridCell>();
+        foreach (var cell in cells)
+        {
+            gridCells.Add(cell.GetComponent<GridCell>());
+        }
 
-
-        yield return StartCoroutine(movePositions(positions));
+        yield return StartCoroutine(GridGeneration.Instance.calculateCombinedResult(gridCells, null));
+        //yield return StartCoroutine(movePositions(positions));
         yield return StartCoroutine(moveEnemies());
 
         isMoving = false;
         resetSwap();
+        allAttracts = null;
+
+        EventPool.Trigger("moveAStep");
 
         TetrisGeneration.Instance.generateATetrisShape();
 
@@ -569,6 +873,16 @@ public class GridGeneration : Singleton<GridGeneration>
     {
         Vector2 position = gesCellPosition(index);
         GameObject res;
+        if (type == "addHP")
+        {
+
+            res = Instantiate(modifyPrefab, position, Quaternion.identity, mainBoard);
+        }
+        else if (type == "destroy")
+        {
+            res = Instantiate(modifyPrefab, position, Quaternion.identity, mainBoard);
+        }
+        else
         //if (type == "empty")
         //{
 
