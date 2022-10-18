@@ -22,6 +22,13 @@ public class TetrisShape : MonoBehaviour
     public void getReady()
     {
         isUnlocked = true;
+
+
+        foreach(var tetri in tetrises)
+        {
+            var cell = tetri.GetComponent<GridCell>();
+            NewCellManager.Instance.ShowNewCell(cell.type);
+        }
     }
 
     public void init(List<Vector2> shape)

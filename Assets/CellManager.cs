@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class CellInfo {
     public string type;
+    public string displayName;
+    public string desc;
     public int cellType;
     public string categoryType;
     public List< string> categoryDetail;
@@ -13,6 +15,7 @@ public class CellInfo {
     public int showTime = 0;
     public int hpMode = 0;
 
+    public List<string> specialMode;
 
     public bool isCell() { return cellType == 1; }
     public bool isEnemy() { return categoryType == "enemy"; }
@@ -44,10 +47,11 @@ public class CellInfo {
 public class CellManager : Singleton<CellManager>
 {
     Dictionary<string, CellInfo> cellInfoDict = new Dictionary<string, CellInfo>();
+    public List<CellInfo> combinationInfos;
     void Start()
     {
 
-        var combinationInfos = CsvUtil.LoadObjects<CellInfo>("cell");
+        combinationInfos = CsvUtil.LoadObjects<CellInfo>("cell");
         foreach(var info in combinationInfos)
         {
             cellInfoDict[info.type] = info;

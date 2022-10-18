@@ -11,6 +11,8 @@ public class CheatManager : Singleton<CheatManager>
     public bool isOn = true;
     public bool wouldMoveCells = true;
 
+    public bool unlimitedSwap = false;
+
     public bool wontDie
     {
         get
@@ -32,13 +34,14 @@ public class CheatManager : Singleton<CheatManager>
         {
             if (Input.GetKeyDown(KeyCode.P))
             {
-                GridController.Instance.playerCell.addAmount(10);
+                GridGeneration.Instance.playerCell.addAmount(10);
                 //ResourceManager.Instance.addResource("nut", 10);
             }
-            //if (Input.GetKeyDown(KeyCode.O))
-            //{
-            //    ResourceManager.Instance.addResource("stick", 10);
-            //}
+            if (Input.GetKeyDown(KeyCode.O))
+            {
+                unlimitedSwap = true;
+                //ResourceManager.Instance.addResource("stick", 10);
+            }
             if (Input.GetKeyDown(KeyCode.I))
             {
                 wouldMoveCells = !wouldMoveCells;

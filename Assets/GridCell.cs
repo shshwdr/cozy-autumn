@@ -24,6 +24,9 @@ public class GridCell : MonoBehaviour
     public SpriteRenderer equipRenderer;
     public GameObject ice;
     public GameObject highlightOB;
+    public GameObject enemyTargetOB;
+
+    public Text displayName;
 
     public GameObject newRuleAlert;
     public CanvasGroup descriptionCanvas;
@@ -44,6 +47,16 @@ public class GridCell : MonoBehaviour
 
             highlightOB.SetActive(false);
         }
+    }
+
+    public void showEnemyTarget()
+    {
+        enemyTargetOB.SetActive(true);
+    }
+    public void hideEnemyTarget()
+    {
+        enemyTargetOB.SetActive(false);
+
     }
 
     public void freeze()
@@ -98,8 +111,9 @@ public class GridCell : MonoBehaviour
         renderer.sprite = Resources.Load<Sprite>("cell/" + type);
         index = i;
         bk.SetActive(cellInfo.isCell());
+        displayName.text = cellInfo.displayName;
 
-        if(cellInfo.type == "fire")
+        if (cellInfo.type == "fire")
         {
             gameObject.AddComponent<FireCell>();
             bk.GetComponent<SpriteRenderer>().color = new Color(1,0.5f, 0.5f);
@@ -320,7 +334,8 @@ public class GridCell : MonoBehaviour
                 if (neigh.pointHovered(mousePosition)){
 
 
-                    StartCoroutine(GridGeneration.Instance.calculateCombinedResult(new List<GridCell>(){ neigh,this} , generatedCombineResult));
+
+                    //StartCoroutine(GridGeneration.Instance.calculateCombinedResult(new List<GridCell>(){ neigh,this} , generatedCombineResult));
 
                     neigh.select();
                     willSwapCell = neigh;
@@ -375,6 +390,7 @@ public class GridCell : MonoBehaviour
             StartCoroutine(GridGeneration.Instance.swap(willSwapCell, this));
 
             willSwapCell = null;
+            clearGeneratedCombineResult();
         }
         //Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
@@ -414,8 +430,10 @@ public class GridCell : MonoBehaviour
     
     private void OnMouseOver()
     {
-        return;
-        Debug.Log("just over");
+
+
+
+        //Debug.Log("just over");
         if (isMouseDown)
         {
             
@@ -488,12 +506,26 @@ public class GridCell : MonoBehaviour
         SFXManager.Instance.play("negative");
     }
 
+    GridCell target;
+    GameObject targetOb;
     private void OnMouseEnter()
     {
         if (newRuleAlert.active)
         {
 
             DOTween.To(() => descriptionCanvas.alpha, x => descriptionCanvas.alpha = x, 1, 0.3f);
+        }
+
+
+        if (cellInfo.isEnemy())
+        {
+            //show enemy glow for targets
+            Vector2 nextPosition = GridGeneration.Instance.enemyTargets(this, out target);
+            target.showEnemyTarget();
+
+
+
+            targetOb = GridGeneration.Instance.generateTargetCell(index + GridGeneration.Instance.getDir( nextPosition));
         }
 
         //explainPanel.SetActive(true);
@@ -503,7 +535,12 @@ public class GridCell : MonoBehaviour
     private void OnMouseExit()
     {
         DOTween.To(() => descriptionCanvas.alpha, x => descriptionCanvas.alpha = x, 0, 0.3f);
-
+        if (target)
+        {
+            target.hideEnemyTarget();
+            Destroy(targetOb);
+            targetOb = null;
+        }
         //explainPanel.SetActive(false);
     }
 }

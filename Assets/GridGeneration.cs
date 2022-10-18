@@ -12,6 +12,8 @@ public class GridGeneration : Singleton<GridGeneration>
     public Transform mainBoard;
     public GameObject cellPrefab;
     public GameObject modifyPrefab;
+    public GameObject targetCellPrefab;
+    
     public float animTime = 0.3f;
 
     public int gridSize = 2;
@@ -35,11 +37,37 @@ public class GridGeneration : Singleton<GridGeneration>
     }
     public bool canSwap()
     {
-        return currentSwapTime < swapTime && !isMoving;
+        return (currentSwapTime < swapTime && !isMoving ) || CheatManager.Instance.unlimitedSwap;
     }
     public bool canMoveCell()
     {
         return !isMoving;
+    }
+
+    IEnumerator swapBehavior(GridCell cell1, GridCell cell2)
+    {
+        yield return null;
+        foreach(var special in cell1.cellInfo.specialMode)
+        {
+
+            switch (special)
+            {
+                case "halfSwap":
+                    cell2.decreaseAmount( Mathf.CeilToInt((float)cell2.amount/2f));
+
+                    var go = Instantiate(Resources.Load<GameObject>("effect/spike"), cell1.index, Quaternion.identity);
+                    go.transform.DOMove(cell2.index, GridController.Instance.animTime + 0.1f);
+                    Destroy(go, 1f);
+
+                    if (cell2.amount == 0)
+                    {
+                        yield return StartCoroutine(destroy(cell2.gameObject));
+                    }
+                    break;
+
+            }
+        }
+
     }
 
     public IEnumerator swap(GridCell cell1, GridCell cell2)
@@ -55,6 +83,18 @@ public class GridGeneration : Singleton<GridGeneration>
         addFarerCellIntoPositions(mightUpdatedPositions, cell2.index);
 
         yield return StartCoroutine(movePositions(mightUpdatedPositions));
+
+        if (cell1.cellInfo.specialMode!=null)
+        {
+
+            yield return StartCoroutine(swapBehavior(cell1, cell2));
+        }
+
+        if (cell2.cellInfo.specialMode != null)
+        {
+            yield return StartCoroutine(swapBehavior(cell2, cell1));
+        }
+
 
         isMoving = false;
 
@@ -274,6 +314,8 @@ public class GridGeneration : Singleton<GridGeneration>
                         {
 
 
+                            NewCellManager.Instance.ShowNewCell(combinationGenerated);
+
                             if (cell == null || cell.gameObject == null)
                             {
                                 Debug.LogError("???");
@@ -449,6 +491,8 @@ public class GridGeneration : Singleton<GridGeneration>
         return distance(gc1.index).CompareTo(distance(gc2.index));
     }
     List<GridCell> allAttracts = null;
+
+
     int enemyDistance(GridCell gc)
     {
         if(allAttracts == null)
@@ -499,6 +543,37 @@ public class GridGeneration : Singleton<GridGeneration>
         return dir;
     }
 
+    public Vector2 enemyTargets(GridCell gc,out GridCell target)
+    {
+
+        int shortest = distance(playerPosition - gc.index);
+        var dir = playerPosition - gc.index;
+        target = playerCell;
+        if (allAttracts == null)
+        {
+
+            allAttracts = new List<GridCell>();
+            foreach (var cell in GameObject.FindObjectsOfType<GridCell>())
+            {
+                if (cell.cellInfo.isTrap() && cell.cellInfo.attackMode == "attract")
+                {
+                    allAttracts.Add(cell);
+                }
+            }
+        }
+        foreach (var trap in allAttracts)
+        {
+            var newdis = distance(trap.index - gc.index);
+            if (shortest >= newdis)
+            {
+                shortest = newdis;
+                dir = trap.index - gc.index;
+                target = trap;
+            }
+        }
+        return dir;
+    }
+
     int SortByDistanceToTarget(GridCell gc1, GridCell gc2)
     {
         return enemyDistance(gc1).CompareTo(enemyDistance(gc2));
@@ -509,7 +584,7 @@ public class GridGeneration : Singleton<GridGeneration>
         return distance(v1).CompareTo(distance(v2));
     }
 
-    Vector2 getDir(Vector2 pos)
+    public Vector2 getDir(Vector2 pos)
     {
         if (pos == Vector2.zero)
         {
@@ -869,6 +944,16 @@ public class GridGeneration : Singleton<GridGeneration>
         occupy(index, res.GetComponent<GridCell>());
         return res;
     }
+
+    public GameObject generateTargetCell(Vector2 index)
+    {
+        Vector2 position = gesCellPosition(index);
+
+        GameObject res;
+        res = Instantiate(targetCellPrefab, position, Quaternion.identity, mainBoard);
+        return res;
+    }
+
     public GameObject generateCell(Vector2 index, string type, int amount = -1)
     {
         Vector2 position = gesCellPosition(index);

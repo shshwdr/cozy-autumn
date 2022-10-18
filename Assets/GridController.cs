@@ -55,9 +55,9 @@ public class GridController : Singleton<GridController>
     void Start()
     {
         // initMainBoard();
-        StartCoroutine(test());
+       // StartCoroutine(test());
 
-        AchievementManager.Instance.clearAll();
+       // AchievementManager.Instance.clearAll();
     }
 
     IEnumerator test()
