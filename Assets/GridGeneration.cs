@@ -174,6 +174,13 @@ public class GridGeneration : Singleton<GridGeneration>
         go.transform.DOLocalMoveY(1, animTime);
         release(go.GetComponent<GridCell>().index);
         yield return new WaitForSeconds(animTime);
+
+        if(go.GetComponent<GridCell>() && go.GetComponent<GridCell>().birdItem!=null && go.GetComponent<GridCell>().birdItem.Length>0)
+        {
+            //drop
+            generateCell(go.GetComponent<GridCell>().index, go.GetComponent<GridCell>().birdItem);
+        }
+
         Destroy(go);
     }
     IEnumerator moveCardAnim(GridCell cell, Vector2 targetPosition)
@@ -661,7 +668,7 @@ public class GridGeneration : Singleton<GridGeneration>
         List<GridCell> enemies = new List<GridCell>();
         foreach (var cell in GameObject.FindObjectsOfType<GridCell>())
         {
-            if (cell.cellInfo != null && cell.cellInfo.isEnemy() && !cell.GetComponentInParent<TetrisShape>())
+            if (cell.cellInfo != null && cell.cellInfo.isEnemy() && !cell.GetComponentInParent<TetrisShape>() && cell.GetComponent<EnemyCell>())
             {
                 enemies.Add(cell);
             }
@@ -715,7 +722,15 @@ public class GridGeneration : Singleton<GridGeneration>
                 continue;
             }
 
-            if (isOccupied(pos + dir))
+
+            if (enemy.GetComponent<EnemyCell>().isFirst)
+            {
+                //dont move for the first step
+                enemy.GetComponent<EnemyCell>().isFirst = false;
+                continue;
+            }
+
+                if (isOccupied(pos + dir))
             {
                 var cell = getCellOnPosition(pos + dir);
 
@@ -893,7 +908,62 @@ public class GridGeneration : Singleton<GridGeneration>
         foreach (var cell in cells)
         {
             cell.GetComponent<GridCell>().collider.enabled = true;
+
+
+
+
             occupy(cell.GetComponent<GridCell>().index, cell.GetComponent<GridCell>());
+
+
+
+            if (cell.GetComponent<GridCell>().cellInfo.specialMode!=null && cell.GetComponent<GridCell>().cellInfo.specialMode.Contains("FlyAtPlace"))
+            {
+                //fly to a random position
+                var currentDistanceToCenter = distance(cell.GetComponent<GridCell>().index);
+                List<Vector2> sameDistanceList = new List<Vector2>();
+                List<Vector2> notSameDistanceList = new List<Vector2>();
+                //find position that can swap
+                for (int i = 0; i < 9; i++)
+                {
+                    for (int j = 0; j < 9; j++)
+                    {
+                        var vec = new Vector2(i, j);
+                        var newDistanc = distance(vec);
+                        if (!isOccupied(vec))
+                        {
+
+                            if (newDistanc == currentDistanceToCenter && vec != cell.GetComponent<GridCell>().index)
+                            {
+                                sameDistanceList.Add(vec);
+                            }
+                            else
+                            {
+                                notSameDistanceList.Add(vec);
+                            }
+                        }
+                    }
+                }
+                Vector2 finalIndex = cell.GetComponent<GridCell>().index;
+                if (sameDistanceList.Count > 0)
+                {
+                    finalIndex = Utils.randomList(sameDistanceList);
+                }
+                else if (notSameDistanceList.Count > 0)
+                {
+
+                    finalIndex = Utils.randomList(notSameDistanceList);
+                }
+
+
+                var go = Instantiate(Resources.Load<GameObject>("effect/fly"), cell.GetComponent<GridCell>().index, Quaternion.identity);
+                var dir = finalIndex - cell.GetComponent<GridCell>().index;
+                go.transform.DOMove(dir.normalized+ cell.GetComponent<GridCell>().index, GridController.Instance.animTime + 0.1f);
+                Destroy(go, 1f);
+
+                yield return moveCardAndOccupyAnim(cell.GetComponent<GridCell>(), finalIndex);
+                
+            }
+
             foreach (var spriteRenderer in cell.GetComponentsInChildren<SpriteRenderer>())
             {
                 spriteRenderer.sortingOrder -= 50;

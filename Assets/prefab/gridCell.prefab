@@ -516,6 +516,8 @@ MonoBehaviour:
   amount: 0
   HPBK: {fileID: 8958645734998227682}
   collider: {fileID: 0}
+  birdItemsParent: {fileID: 4931766658440883386}
+  birdItem: 
   progressBar: {fileID: 8224905009038221599}
   ExploreHoldText: {fileID: 2268117965980751691}
 --- !u!61 &-7557795742805977661
@@ -840,7 +842,7 @@ Transform:
   m_GameObject: {fileID: 2109636515030201618}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.168, y: -0.211, z: 0}
-  m_LocalScale: {x: -0.3, y: 0.3, z: 1}
+  m_LocalScale: {x: -0.4, y: 0.4, z: 1}
   m_Children: []
   m_Father: {fileID: 4931766658440883386}
   m_RootOrder: 2
@@ -1735,8 +1737,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5327117537284921237}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.12, y: -0.183, z: 0}
-  m_LocalScale: {x: 0.3, y: -0.3, z: 1}
+  m_LocalPosition: {x: -0.228, y: -0.086, z: 0}
+  m_LocalScale: {x: -0.4, y: 0.4, z: 1}
   m_Children: []
   m_Father: {fileID: 4931766658440883386}
   m_RootOrder: 1
@@ -1974,8 +1976,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6679581909093364249}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.149, y: -0.221, z: 0}
-  m_LocalScale: {x: 0.3, y: 0.3, z: 1}
+  m_LocalPosition: {x: -0.061, y: -0.309, z: 0}
+  m_LocalScale: {x: 0.4, y: 0.4, z: 1}
   m_Children: []
   m_Father: {fileID: 4931766658440883386}
   m_RootOrder: 0

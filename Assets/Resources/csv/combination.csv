@@ -15,10 +15,10 @@ fire,trap,addHot:1,,1,1,1
 ,,,,,,1
 ,,,,,,1
 tumbleweed,empty,generate1:tumbleweed,,1,1,1
-tumbleweed,tumbleweed,generate1:ropeWeapon|destroy2:0,,1,1,1
-tumbleweed,branch,generate1:scarecrow|destroy2:0,,1,1,1
+tumbleweed,tumbleweed,generate1:lasso|destroy2:0,,1,1,1
+tumbleweed,branch,generate1:whip|destroy2:0,,1,1,1
 tumbleweed,nutOnTree,generate1:ropeTrap|destroy2:0,,1,1,1
-pumpkin,tumbleweed,generate1:ropeTrap|destroy2:0,,1,1,1
+pumpkin,tumbleweed,generate1:pumpkinBomb|destroy2:0,,1,1,1
 pumpkin,empty,generate1:pumpkin,,1,1,1
 pumpkin,branch,generate1:pumpkinAxe|destroy2:0,,1,1,1
 hawthorn,branch,generate1:sweets,,,,1

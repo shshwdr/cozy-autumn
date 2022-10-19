@@ -39,6 +39,11 @@ public class GridCell : MonoBehaviour
 
     public Collider2D collider;
 
+
+    public Transform birdItemsParent;
+    public string birdItem;
+
+
     private void Awake()
     {
         collider = GetComponent<Collider2D>();
@@ -162,6 +167,16 @@ public class GridCell : MonoBehaviour
             equipRenderer.sprite = Resources.Load<Sprite>("cell/" + "empty");
         }
 
+
+        if(type == "itemBird")
+        {
+            //
+            var itemDropID = Random.Range(0, birdItemsParent.childCount);
+            var itemDrop = birdItemsParent.GetChild(itemDropID).gameObject;
+            itemDrop.SetActive(true);
+            birdItem = itemDrop.name;
+        }
+
         //if (cellInfo.isEnemy())
         //{
         //    HPBK.gameObject.SetActive(true);
@@ -205,7 +220,7 @@ public class GridCell : MonoBehaviour
         amount += x;
         updateAmount();
     }
-    public void decreaseAmount(int x = 1)
+    public virtual void decreaseAmount(int x = 1)
     {
         amount -= x;
         updateAmount();

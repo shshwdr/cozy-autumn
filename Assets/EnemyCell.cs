@@ -11,12 +11,13 @@ public class EnemyCell : MonoBehaviour
     public bool isDead = false;
     public GridCell cell;
     CellInfo info;
-    bool isFirst = true;
+    public bool isFirst = true;
     bool hasBeenAttacked = false;
     public bool isBoss = false;
     public int hp { get { return cell.amount; } }
     int getAttack { get { return cell.amount; } }
 
+    //bool isChasedAway
 
     int attackCountDown = 10000;
 
