@@ -251,6 +251,15 @@ public class TetrisShape : MonoBehaviour
                // tetrises[i].GetComponent<GridCell>().bk.GetComponent<SpriteRenderer>().color = getColor(false);
             }
         }
+        else
+        {
+            for (int i = 0; i < tetrisShape.Count; i++)
+            {
+
+                updateColor(tetrises[i].GetComponent<GridCell>().transform, true);
+                // tetrises[i].GetComponent<GridCell>().bk.GetComponent<SpriteRenderer>().color = getColor(false);
+            }
+        }
 
 
 

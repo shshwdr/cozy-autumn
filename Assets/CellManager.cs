@@ -24,6 +24,7 @@ public class CellInfo {
     public bool isPlayer() { return categoryType == "player"; }
     public bool isAlly() { return categoryType == "ally"; }
     public bool isResource() { return categoryType == "resource"; }
+    public bool isFood() { return categoryType == "food"; }
     public bool isWeapon() { return categoryType == "weapon"; }
     public bool isTrap() { return categoryType == "trap"; }
     public bool isSplitable() { return categoryType == "splitable"; }

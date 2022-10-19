@@ -23,10 +23,10 @@ pumpkin,empty,generate1:pumpkin,,1,1,1
 pumpkin,branch,generate1:pumpkinAxe|destroy2:0,,1,1,1
 hawthorn,branch,generate1:sweets,,,,1
 player,nutOnTree,addHP:1,,,,
-squirrel,nutOnTree,addHP:1,,,,
+hedgehog,nutOnTree,addHP:1,,,,
 nutOnTree,player,addHP:2,,,,
-nutOnTree,squirrel,addHP:2,,,,
+nutOnTree,hedgehog,addHP:2,,,,
 player,hawthorn,addHP:1,,,,
-squirrel,hawthorn,addHP:1,,,,
+hedgehog,hawthorn,addHP:1,,,,
 hawthorn,player,addHP:2,,,,
-hawthorn,squirrel,addHP:2,,,,
+hawthorn,hedgehog,addHP:2,,,,

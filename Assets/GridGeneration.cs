@@ -385,18 +385,18 @@ public class GridGeneration : Singleton<GridGeneration>
                         var theOneIsValue = value != "1" ? newCell : cell;
                         if (showResult)
                         {
-                            if (positionToCell.ContainsKey(newIndex))
+                            if (positionToCell.ContainsKey(theOneAddValue.index))
                             {
 
                                 positionToCell[theOneAddValue.index].GetComponent<GridCell>().addAmount(theOneIsValue.amount);
                             }
                             else
                             {
-                                var animCell = generateCell(newIndex, "addHP", theOneIsValue.amount).GetComponent<GridCell>();
+                                var animCell = generateCell(theOneAddValue.index, "addHP", theOneIsValue.amount).GetComponent<GridCell>();
                                 newCells.Add(animCell.gameObject);
                                 animCell.GetComponent<GridCell>().collider.enabled = false;
 
-                                positionToCell[newIndex] = animCell.gameObject;
+                                positionToCell[theOneAddValue.index] = animCell.gameObject;
                             }
                         }
                         else
@@ -840,6 +840,15 @@ public class GridGeneration : Singleton<GridGeneration>
         }
     }
 
+    IEnumerator showMoveAnim(GridCell sendCell, GridCell targetCell)
+    {
+
+        var animCell = generateCell(sendCell.index, sendCell.type).GetComponent<GridCell>();
+        animCell.GetComponent<GridCell>().collider.enabled = false;
+        yield return StartCoroutine(moveCardAnim(animCell, targetCell.index));
+        Destroy(animCell.gameObject);
+    }
+
     IEnumerator moveEnemies()
     {
 
@@ -886,12 +895,33 @@ public class GridGeneration : Singleton<GridGeneration>
             }
 
 
+
             if (enemy.GetComponent<EnemyCell>().isFirst)
             {
                 //dont move for the first step
                 enemy.GetComponent<EnemyCell>().isFirst = false;
                 continue;
             }
+
+            if (enemy.cellInfo.attackMode == "steal")
+            {
+                //steal nearby resources
+                foreach (var resource in getSurroundingCells(enemy.index))
+                {
+                    if (resource.cellInfo.isFood())
+                    {
+                        yield return StartCoroutine(showMoveAnim(resource, enemy));
+                        resource.decreaseAmount(1);
+                        enemy.addAmount(1); //show add amount effect
+                        if (resource.amount == 0)
+                        {
+                            yield return StartCoroutine(destroy(resource.gameObject));
+                        }
+
+                    }
+                }
+            }
+
 
             if (isOccupied(pos + dir))
             {

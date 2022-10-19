@@ -100,10 +100,18 @@ public class GridCell : MonoBehaviour
             bk.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/blank/enemy");
             HPBK.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/blank/enemy-corner-left");
         }
+        else if (cellInfo.isTrap() || cellInfo.isWeapon())
+        {
+
+            bk.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/blank/alternative-2");
+            HPBK.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/blank/alternative-2-corner-left");
+        }
+
         else
         {
             bk.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/blank/default");
-            HPBK.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/blank/alternative-2-corner-left");
+            HPBK.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/blank/default-corner-left");
+            amountLabel.color = Color.black;
         }
 
     }
