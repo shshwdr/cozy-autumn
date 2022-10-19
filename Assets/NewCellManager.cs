@@ -55,7 +55,7 @@ public class NewCellManager : Singleton<NewCellManager>
             unvisitedList.Remove(type);
 
             visited.Add(type);
-            EventPool.Trigger("unlockAchievement");
+          //  EventPool.Trigger("unlockAchievement");
         }
     }
 

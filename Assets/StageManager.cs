@@ -40,6 +40,12 @@ public class StageManager : Singleton<StageManager>
         }
         EventPool.OptIn("unlockAchievement",updateStageUnlock);
     }
+
+    public void reopt()
+    {
+
+        EventPool.OptIn("unlockAchievement", updateStageUnlock);
+    }
     public bool hasUnlocked(string str)
     {
         return unlockedStage.Contains(str);

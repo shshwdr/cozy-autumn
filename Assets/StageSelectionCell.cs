@@ -19,6 +19,7 @@ public class StageSelectionCell : MonoBehaviour
         EventPool.OptIn("unlockStage", updateState);
     }
 
+
     void updateState()
     {
         GetComponent<Button>().interactable = StageManager.Instance.hasUnlocked(stageName);

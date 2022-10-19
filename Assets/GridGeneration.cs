@@ -36,6 +36,7 @@ public class GridGeneration : Singleton<GridGeneration>
             MainMenuCanvas.SetActive(false);
             init();
         }
+        StageManager.Instance.reopt();
     }
 
     public void init()

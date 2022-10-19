@@ -7,6 +7,7 @@ public class PlayerSelectionCell : MonoBehaviour
 {
     public string charName;
     public Text nameLabel;
+    public Image currentPlayer;
     // Start is called before the first frame update
     void Start()
     {
@@ -16,7 +17,8 @@ public class PlayerSelectionCell : MonoBehaviour
     public void onClick()
     {
         CharacterManager.Instance.setCurrentChar(charName);
-        GameManager.Instance.restartGame();
+        currentPlayer.sprite = Resources.Load<Sprite>("cell/" + CharacterManager.Instance.currentChar);
+        //GameManager.Instance.restartGame();
     }
 
     // Update is called once per frame
