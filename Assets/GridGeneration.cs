@@ -735,10 +735,10 @@ public class GridGeneration : Singleton<GridGeneration>
             foreach (var c in otherCells)
             {
                 c.decreaseAmount(damage);
-                if (enemy.amount <= 0)
+                if (c.amount <= 0)
                 {
-                    addFarerCellIntoPositions(mightUpdatedPositions, enemy.index);
-                    yield return StartCoroutine(destroy(enemy.gameObject));
+                    addFarerCellIntoPositions(mightUpdatedPositions, c.index);
+                    yield return StartCoroutine(destroy(c.gameObject));
                 }
             }
         }
@@ -755,17 +755,90 @@ public class GridGeneration : Singleton<GridGeneration>
     void playWeaponAttackEffect(GridCell weapon, GridCell enemy)
     {
         var go = Instantiate(Resources.Load<GameObject>("effect/attack"), weapon.index, Quaternion.identity);
-        go.transform.DOMove(enemy.index, GridController.Instance.animTime + 0.1f);
+        go.transform.DOMove(enemy.index, GridController.Instance.animTime );
         Destroy(go, 1f);
 
 
         var go2 = Instantiate(Resources.Load<GameObject>("effect/attack"), weapon.index, Quaternion.identity);
-        go2.transform.DOMove(enemy.index, GridController.Instance.animTime + 0.1f);
+        go2.transform.DOMove(enemy.index, GridController.Instance.animTime );
         go2.GetComponentInChildren<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/" + weapon.type);
         go2.GetComponentInChildren<SpriteRenderer>().sortingOrder = 1;
         Destroy(go2, 1f);
     }
 
+    IEnumerator moveWeapons()
+    {
+
+        yield return null;
+        List<GridCell> weapons = new List<GridCell>();
+        foreach (var cell in GameObject.FindObjectsOfType<GridCell>())
+        {
+            if (cell.cellInfo != null && cell.cellInfo.isWeapon() && !cell.GetComponentInParent<TetrisShape>())
+            {
+                weapons.Add(cell);
+            }
+        }
+
+
+        weapons.Sort(SortByDistanceToTarget);
+
+        foreach(var weapon in weapons)
+        {
+
+            foreach (var enemy in getSurroundingCells(weapon.index))
+            {
+                if (enemy.cellInfo.isEnemy())
+                {
+
+                    if (weapon.cellInfo.attackMode == "exchangePosition")
+                    {
+                        yield return StartCoroutine(exchangeCardAnim(weapon, enemy));
+                    }
+
+
+                    List<Vector2> mightUpdatedPositions = new List<Vector2>();
+
+                    var otherEnemies = new List<GridCell>();
+                    if (weapon.cellInfo.attackMode == "allInDrection")
+                    {
+                        var eDir = enemy.index - weapon.index;
+                        var checkPosition = enemy.index + eDir;
+                        while (isPositionValid(checkPosition))
+                        {
+                            if (isOccupied(checkPosition))
+                            {
+                                var cell = getCellOnPosition(checkPosition);
+                                if (cell.GetComponent<EnemyCell>())
+                                {
+                                    otherEnemies.Add(cell);
+                                    playWeaponAttackEffect(weapon, cell);
+                                }
+                            }
+
+
+                            checkPosition += eDir;
+
+                        }
+                    }
+                    else
+                    {
+                        //playWeaponAttackEffect(scell, enemy);
+                    }
+                    playWeaponAttackEffect(weapon, enemy);
+                    yield return new WaitForSeconds(animTime*2);
+
+                    yield return StartCoroutine(decreaseBothCell(weapon, enemy, mightUpdatedPositions, otherEnemies));
+
+                    // 
+
+
+                    //yield return StartCoroutine(movePositions(mightUpdatedPositions));
+                    
+                }
+            }
+
+        }
+    }
 
     IEnumerator moveEnemies()
     {
@@ -806,60 +879,7 @@ public class GridGeneration : Singleton<GridGeneration>
             int test = 30;
 
             //check if next to weapon, if so, attack
-            foreach (var scell in getSurroundingCells(enemy.index))
-            {
-                if (scell.cellInfo.isWeapon())
-                {
-
-                    if(scell.cellInfo.attackMode == "exchangePosition")
-                    {
-                        yield return StartCoroutine(exchangeCardAnim(scell, enemy));
-                    }
-
-
-                    List<Vector2> mightUpdatedPositions = new List<Vector2>();
-
-                    var otherEnemies = new List<GridCell>();
-                    if (scell.cellInfo.attackMode == "allInDrection")
-                    {
-                        var eDir = enemy.index - scell.index;
-                        var checkPosition = scell.index;
-                        while (isPositionValid(checkPosition))
-                        {
-                            if (isOccupied(checkPosition))
-                            {
-                                var cell = getCellOnPosition(checkPosition);
-                                if (cell.GetComponent<EnemyCell>())
-                                {
-                                    otherEnemies.Add(cell);
-                                    playWeaponAttackEffect(scell, cell);
-                                }
-                            }
-
-
-                                checkPosition += dir;
-
-                        }
-                    }
-                    else
-                    {
-                        //playWeaponAttackEffect(scell, enemy);
-                    }
-                    playWeaponAttackEffect(scell, enemy);
-                    yield return new WaitForSeconds(animTime);
-                    StartCoroutine(decreaseBothCell(scell, enemy, mightUpdatedPositions, otherEnemies));
-
-                   // 
-
-
-                    yield return StartCoroutine(movePositions(mightUpdatedPositions));
-                    if (enemy.amount <= 0)
-                    {
-                        break;
-                    }
-                }
-            }
-
+            
             if (!enemy || enemy.amount <= 0)
             {
                 continue;
@@ -1136,6 +1156,7 @@ public class GridGeneration : Singleton<GridGeneration>
 
         yield return StartCoroutine(GridGeneration.Instance.calculateCombinedResult(gridCells, null));
         //yield return StartCoroutine(movePositions(positions));
+        yield return StartCoroutine(moveWeapons());
         yield return StartCoroutine(moveEnemies());
 
         isMoving = false;

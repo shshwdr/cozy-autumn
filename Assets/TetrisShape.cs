@@ -164,8 +164,8 @@ public class TetrisShape : MonoBehaviour
             isDragging = false;
 
             transform.position = dragOriginalPosition;
-            clearColor();
         }
+        clearColor();
     }
 
     void updateColor(Transform trans, bool isValid)
@@ -217,7 +217,7 @@ public class TetrisShape : MonoBehaviour
             if (Mathf.Abs(index.x )> GridGeneration.Instance.gridSize || Mathf.Abs( index.y) > GridGeneration.Instance.gridSize)
             {
                 outOfBorder = true;
-                updateColor(tetrises[i].GetComponent<GridCell>().transform,false);
+                //updateColor(tetrises[i].GetComponent<GridCell>().transform,false);
                 //tetrises[i].GetComponent<GridCell>().bk.GetComponent<SpriteRenderer>().color = getColor(false);
                 continue;
             }
@@ -227,7 +227,7 @@ public class TetrisShape : MonoBehaviour
             if (GridGeneration.Instance.isOccupied(index))
             {
                 res = false;
-                updateColor(tetrises[i].GetComponent<GridCell>().transform, false);
+                //updateColor(tetrises[i].GetComponent<GridCell>().transform, false);
                 //tetrises[i].GetComponent<GridCell>().bk.GetComponent<SpriteRenderer>().color = getColor(false);
             }
             else
@@ -237,12 +237,12 @@ public class TetrisShape : MonoBehaviour
                     Debug.LogError("???");
                 }
 
-                updateColor(tetrises[i].GetComponent<GridCell>().transform, true);
+                //updateColor(tetrises[i].GetComponent<GridCell>().transform, true);
                 //tetrises[i].GetComponent<GridCell>().bk.GetComponent<SpriteRenderer>().color = getColor(true);
             }
         }
-
-        if (!surroundExistedCell)
+        var finalRes = res && surroundExistedCell && !outOfBorder;
+        if (!finalRes)
         {
             for (int i = 0; i < tetrisShape.Count; i++)
             {
@@ -254,7 +254,7 @@ public class TetrisShape : MonoBehaviour
 
 
 
-        return res && surroundExistedCell && !outOfBorder;
+        return finalRes;
     }
 
     void tryPlace()
