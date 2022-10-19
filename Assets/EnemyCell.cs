@@ -144,7 +144,7 @@ public class EnemyCell : MonoBehaviour
             return;
         }
         Debug.Log("step attack");
-        isFirst = false;
+        //isFirst = false;
     }
 
     void die()
@@ -190,7 +190,7 @@ public class EnemyCell : MonoBehaviour
         }
 
         SFXManager.Instance.play("animalLose");
-        isFirst = false;
+        //isFirst = false;
         hasBeenAttacked = true;
     }
 

@@ -23,11 +23,13 @@ public class DeckManager : Singleton<DeckManager>
     // Start is called before the first frame update
     void Start()
     {
+        if (StageManager.Instance.currentStage != null && StageManager.Instance.currentStage.Length > 0)
+        {
+            stageInfos = CsvUtil.LoadObjects<StageCardInfo>(StageManager.Instance.currentStage);
 
-        stageInfos = CsvUtil.LoadObjects<StageCardInfo>(StageManager.Instance.currentStage);
 
-
-        addCardUntilBoss();
+            addCardUntilBoss();
+        }
     }
     void addCardUntilBoss()
     {

@@ -168,8 +168,16 @@ public class TetrisShape : MonoBehaviour
         }
     }
 
+    void updateColor(Transform trans, bool isValid)
+    {
+        var color = getColor(isValid);
+        foreach(var spriterender in trans.GetComponentsInChildren<SpriteRenderer>())
+        {
+            spriterender.color = color;
+        }
+    }
 
-    Color getColor(bool isValid, bool isEnemy)
+    Color getColor(bool isValid)
     {
         if(!isUnlocked || !isDragging)
         {
@@ -183,7 +191,7 @@ public class TetrisShape : MonoBehaviour
         }
         else
         {
-            return Color.red;
+            return new Color(255, 255, 255, 0.6f);
 
         }
     }
@@ -192,7 +200,7 @@ public class TetrisShape : MonoBehaviour
     {
         foreach(var t in tetrises)
         {
-            t.GetComponent<GridCell>().bk.GetComponent<SpriteRenderer>().color =Color.white;
+            updateColor(t.transform, true);
         }
     }
 
@@ -209,8 +217,8 @@ public class TetrisShape : MonoBehaviour
             if (Mathf.Abs(index.x )> GridGeneration.Instance.gridSize || Mathf.Abs( index.y) > GridGeneration.Instance.gridSize)
             {
                 outOfBorder = true;
-
-                tetrises[i].GetComponent<GridCell>().bk.GetComponent<SpriteRenderer>().color = getColor(false, true);
+                updateColor(tetrises[i].GetComponent<GridCell>().transform,false);
+                //tetrises[i].GetComponent<GridCell>().bk.GetComponent<SpriteRenderer>().color = getColor(false);
                 continue;
             }
 
@@ -219,7 +227,8 @@ public class TetrisShape : MonoBehaviour
             if (GridGeneration.Instance.isOccupied(index))
             {
                 res = false;
-                tetrises[i].GetComponent<GridCell>().bk.GetComponent<SpriteRenderer>().color = getColor(false,true);
+                updateColor(tetrises[i].GetComponent<GridCell>().transform, false);
+                //tetrises[i].GetComponent<GridCell>().bk.GetComponent<SpriteRenderer>().color = getColor(false);
             }
             else
             {
@@ -227,7 +236,9 @@ public class TetrisShape : MonoBehaviour
                 {
                     Debug.LogError("???");
                 }
-                tetrises[i].GetComponent<GridCell>().bk.GetComponent<SpriteRenderer>().color = getColor(true, tetrises[i].GetComponent<GridCell>().cellInfo.isEnemy());
+
+                updateColor(tetrises[i].GetComponent<GridCell>().transform, true);
+                //tetrises[i].GetComponent<GridCell>().bk.GetComponent<SpriteRenderer>().color = getColor(true);
             }
         }
 
@@ -235,7 +246,9 @@ public class TetrisShape : MonoBehaviour
         {
             for (int i = 0; i < tetrisShape.Count; i++)
             {
-                tetrises[i].GetComponent<GridCell>().bk.GetComponent<SpriteRenderer>().color = getColor(false, true);
+
+                updateColor(tetrises[i].GetComponent<GridCell>().transform, false);
+               // tetrises[i].GetComponent<GridCell>().bk.GetComponent<SpriteRenderer>().color = getColor(false);
             }
         }
 
