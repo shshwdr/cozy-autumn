@@ -1,3 +1,4 @@
+using Pool;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -13,6 +14,14 @@ public class PlayerSelectionCell : MonoBehaviour
     {
 
         nameLabel.text = charName;
+        updateState();
+        EventPool.OptIn("unlockStage", updateState);
+    }
+
+
+    void updateState()
+    {
+        GetComponent<Button>().interactable = CharacterManager.Instance.hasUnlocked(charName);
     }
     public void onClick()
     {

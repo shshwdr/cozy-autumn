@@ -1,3 +1,4 @@
+using Pool;
 using Sinbad;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,12 +7,16 @@ public class CharacterInfo
 {
     public string name;
     public string displayName;
-    public int isLocked;
+    public string unlockAchievement;
+    public string unlockHint;
 }
 public class CharacterManager : Singleton<CharacterManager>
 {
     public string currentChar = "squirrel";
     Dictionary<string, CharacterInfo> characterInfoDict = new Dictionary<string, CharacterInfo>();
+    List<string> unlockedStage = new List<string>();
+    List<string> lockedStage = new List<string>();
+
     // Start is called before the first frame update
     void Start()
     {
@@ -20,6 +25,39 @@ public class CharacterManager : Singleton<CharacterManager>
         foreach (var info in combinationInfos)
         {
             characterInfoDict[info.name] = info;
+            if (info.unlockAchievement == null || info.unlockAchievement == "")
+            {
+                unlockedStage.Add(info.name);
+            }
+            else
+            {
+                lockedStage.Add(info.name);
+            }
+        }
+        updateStageUnlock();
+        EventPool.OptIn("unlockAchievement", updateStageUnlock);
+    }
+
+    public void reopt()
+    {
+
+        EventPool.OptIn("unlockAchievement", updateStageUnlock);
+    }
+    public bool hasUnlocked(string str)
+    {
+        return unlockedStage.Contains(str);
+    }
+    void updateStageUnlock()
+    {
+        foreach (var stage in new List<string>(lockedStage))
+        {
+            var stageInfo = getCharInfo(stage);
+            if (AchievementManager.Instance.hasUnlocked(stageInfo.unlockAchievement))
+            {
+                lockedStage.Remove(stage);
+                unlockedStage.Add(stage);
+                EventPool.Trigger("unlockStage");
+            }
         }
     }
     public void setCurrentChar(string na)

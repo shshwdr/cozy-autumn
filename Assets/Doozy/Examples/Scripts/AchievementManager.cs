@@ -63,7 +63,7 @@ public class AchievementManager : Singleton<AchievementManager>
         {
             if (!ruleDict.ContainsKey(type))
             {
-                Debug.LogError("no achievement " + type);
+                //Debug.LogError("no achievement " + type);
                 return false;
             }
             if (ruleDict[type].amount > 0)

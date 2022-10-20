@@ -1,3 +1,3 @@
-﻿name,displayName,isLocked
-squirrel,Squirrel,
-hedgehog,Hedgehog,
+﻿name,displayName,unlockAchievement,unlockHint
+squirrel,Squirrel,,
+hedgehog,Hedgehog,farmlandAlly,Finish Grassland with Hedgehog alive.

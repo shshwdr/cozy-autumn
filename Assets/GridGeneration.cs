@@ -72,7 +72,7 @@ public class GridGeneration : Singleton<GridGeneration>
                     go.transform.DOMove(cell2.index, GridController.Instance.animTime + 0.1f);
                     Destroy(go, 1f);
 
-                    if (cell2.amount == 0)
+                    if (cell2.amount <= 0)
                     {
                         yield return StartCoroutine(destroy(cell2.gameObject));
                     }
@@ -914,7 +914,7 @@ public class GridGeneration : Singleton<GridGeneration>
                         yield return StartCoroutine(showMoveAnim(resource, enemy));
                         resource.decreaseAmount(1);
                         enemy.addAmount(1); //show add amount effect
-                        if (resource.amount == 0)
+                        if (resource.amount <= 0)
                         {
                             yield return StartCoroutine(destroy(resource.gameObject));
                         }
@@ -963,29 +963,29 @@ public class GridGeneration : Singleton<GridGeneration>
                         yield return StartCoroutine(movePositions(mightUpdatedPositions));
 
                     }
+                    else
+                    {
 
-                    if (!enemy || enemy.amount <= 0)
-                    {
-                        continue;
-                    }
-                    foreach (var scell in getSurroundingCells(enemy.index))
-                    {
-                        if (scell.cellInfo.isAlly())
+                        foreach (var scell in getSurroundingCells(enemy.index))
                         {
-
-                            enemy.GetComponent<EnemyCell>().attack(scell, true);
-                            yield return StartCoroutine(destroy(enemy.gameObject));
-                            if (scell.amount <= 0)
+                            if (scell.cellInfo.isAlly())
                             {
-                                yield return StartCoroutine(destroy(scell.gameObject));
+
+                                enemy.GetComponent<EnemyCell>().attack(scell, true);
+                                yield return StartCoroutine(destroy(enemy.gameObject));
+                                if (scell.amount <= 0)
+                                {
+                                    yield return StartCoroutine(destroy(scell.gameObject));
+                                }
+
+                                List<Vector2> mightUpdatedPositions = new List<Vector2>();
+                                addFarerCellIntoPositions(mightUpdatedPositions, pos);
+                                addFarerCellIntoPositions(mightUpdatedPositions, scell.index);
+
+                                yield return StartCoroutine(movePositions(mightUpdatedPositions));
                             }
-
-                            List<Vector2> mightUpdatedPositions = new List<Vector2>();
-                            addFarerCellIntoPositions(mightUpdatedPositions, pos);
-                            addFarerCellIntoPositions(mightUpdatedPositions, scell.index);
-
-                            yield return StartCoroutine(movePositions(mightUpdatedPositions));
                         }
+
                     }
 
                     if (!enemy || enemy.amount <= 0)

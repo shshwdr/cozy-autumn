@@ -63,6 +63,15 @@ public class DeckManager : Singleton<DeckManager>
         if(round> StageManager.Instance.getCurrentInfo().stopRound)
         {
             AchievementManager.Instance.ShowAchievement(StageManager.Instance.getCurrentInfo().stageName + "Finish");
+
+            foreach (var cell in GameObject.FindObjectsOfType<GridCell>())
+            {
+                if (cell.cellInfo.isAlly())
+                {
+
+                    AchievementManager.Instance.ShowAchievement(StageManager.Instance.getCurrentInfo().stageName + "Ally");
+                }
+            }
         }
 
         addDeckByRound();
