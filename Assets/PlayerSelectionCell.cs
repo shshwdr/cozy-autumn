@@ -21,7 +21,7 @@ public class PlayerSelectionCell : MonoBehaviour
 
     void updateState()
     {
-        GetComponent<Button>().interactable = CharacterManager.Instance.hasUnlocked(charName);
+        GetComponent<Button>().interactable =  CharacterManager.Instance.hasUnlocked(charName);
     }
     public void onClick()
     {

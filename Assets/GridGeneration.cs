@@ -26,11 +26,14 @@ public class GridGeneration : Singleton<GridGeneration>
 
     public GameObject mainCanvas; public GameObject MainMenuCanvas;
 
-     Vector2[] dirs = new Vector2[] { new Vector2(0, 1), new Vector2(0, -1), new Vector2(1, 0), new Vector2(-1, 0) };
+    Vector2[] dirs = new Vector2[] { new Vector2(0, 1), new Vector2(0, -1), new Vector2(1, 0), new Vector2(-1, 0) };
+    Vector2[] dirs8 = new Vector2[] { new Vector2(0, 1), new Vector2(0, -1), new Vector2(1, 0), new Vector2(-1, 0) ,
+        new Vector2(1, 1), new Vector2(1, -1), new Vector2(-1, 1), new Vector2(-1, -1) ,
+    };
     // Start is called before the first frame update
     void Start()
     {
-        if (StageManager.Instance.currentStage != null && StageManager.Instance.currentStage.Length>0)
+        if (StageManager.Instance.currentStage != null && StageManager.Instance.currentStage.Length > 0)
         {
             mainCanvas.SetActive(true);
             MainMenuCanvas.SetActive(false);
@@ -57,6 +60,12 @@ public class GridGeneration : Singleton<GridGeneration>
         return !isMoving;
     }
 
+    void minuseHpByHalf(GridCell cell)
+    {
+
+        cell.decreaseAmount(Mathf.CeilToInt((float)cell.amount / 2f));
+    }
+
     IEnumerator swapBehavior(GridCell cell1, GridCell cell2)
     {
         yield return null;
@@ -66,7 +75,7 @@ public class GridGeneration : Singleton<GridGeneration>
             switch (special)
             {
                 case "halfSwap":
-                    cell2.decreaseAmount(Mathf.CeilToInt((float)cell2.amount / 2f));
+                    minuseHpByHalf(cell2);
 
                     var go = Instantiate(Resources.Load<GameObject>("effect/spike"), cell1.index, Quaternion.identity);
                     go.transform.DOMove(cell2.index, GridController.Instance.animTime + 0.1f);
@@ -156,6 +165,21 @@ public class GridGeneration : Singleton<GridGeneration>
             return true;
         }
         return false;
+    }
+
+    public List<GridCell> getSurrounding3x3Cells(Vector2 index)
+    {
+        List<GridCell> cells = new List<GridCell>();
+        foreach (var dir in dirs8)
+        {
+            var newIndex = index + dir;
+            var newCell = getCellOnPosition(newIndex);
+            if (newCell)
+            {
+                cells.Add(newCell);
+            }
+        }
+        return cells;
     }
 
     public List<GridCell> getSurroundingCells(Vector2 index)
@@ -444,7 +468,7 @@ public class GridGeneration : Singleton<GridGeneration>
                     if (willOccupyPosition.Contains(cell.GetComponent<GridCell>().index))
                     {
 
-                       StartCoroutine(destroy(cell.gameObject, false));
+                        StartCoroutine(destroy(cell.gameObject, false));
                     }
                     else
                     {
@@ -550,7 +574,7 @@ public class GridGeneration : Singleton<GridGeneration>
                         theOneAddValue.addAmount(theOneIsValue.amount);
                         willDestory.Add(theOneIsValue.gameObject);
 
-                        
+
                         //yield return StartCoroutine(destroy(cell.gameObject));
                     }
                 }
@@ -722,13 +746,21 @@ public class GridGeneration : Singleton<GridGeneration>
             yield return StartCoroutine(destroy(cell.gameObject));
         }
 
-
-        enemy.decreaseAmount(damage);
-        if (enemy.amount <= 0)
+        if (cell.cellInfo.attackMode == "killOrHeal" && damage < enemy.amount)
         {
-            addFarerCellIntoPositions(mightUpdatedPositions, enemy.index);
-            yield return StartCoroutine(destroy(enemy.gameObject));
+            //heal
+            enemy.addAmount(damage);
         }
+        else
+        {
+            enemy.decreaseAmount(damage);
+            if (enemy.amount <= 0)
+            {
+                addFarerCellIntoPositions(mightUpdatedPositions, enemy.index);
+                yield return StartCoroutine(destroy(enemy.gameObject));
+            }
+        }
+
 
 
         if (otherCells != null)
@@ -747,21 +779,33 @@ public class GridGeneration : Singleton<GridGeneration>
         yield return null;
     }
 
+    void playHealEffect(GridCell healer, GridCell target)
+    {
+        var go = Instantiate(Resources.Load<GameObject>("effect/healEffect"), healer.index, Quaternion.identity);
+        go.transform.DOMove(target.index, GridController.Instance.animTime);
+        Destroy(go, 1f);
+
+    }
     void playTrapAttackEffect(GridCell trap)
     {
 
         var go = Instantiate(Resources.Load<GameObject>("effect/trapEffect"), trap.index, Quaternion.identity);
     }
+    void playStompAttackEffect(GridCell trap)
+    {
+
+        var go = Instantiate(Resources.Load<GameObject>("effect/stomp"), trap.index, Quaternion.identity);
+    }
 
     void playWeaponAttackEffect(GridCell weapon, GridCell enemy)
     {
         var go = Instantiate(Resources.Load<GameObject>("effect/attack"), weapon.index, Quaternion.identity);
-        go.transform.DOMove(enemy.index, GridController.Instance.animTime );
+        go.transform.DOMove(enemy.index, GridController.Instance.animTime);
         Destroy(go, 1f);
 
 
         var go2 = Instantiate(Resources.Load<GameObject>("effect/attack"), weapon.index, Quaternion.identity);
-        go2.transform.DOMove(enemy.index, GridController.Instance.animTime );
+        go2.transform.DOMove(enemy.index, GridController.Instance.animTime);
         go2.GetComponentInChildren<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/" + weapon.type);
         go2.GetComponentInChildren<SpriteRenderer>().sortingOrder = 1;
         Destroy(go2, 1f);
@@ -783,7 +827,7 @@ public class GridGeneration : Singleton<GridGeneration>
 
         weapons.Sort(SortByDistanceToTarget);
 
-        foreach(var weapon in weapons)
+        foreach (var weapon in weapons)
         {
 
             foreach (var enemy in getSurroundingCells(weapon.index))
@@ -826,15 +870,18 @@ public class GridGeneration : Singleton<GridGeneration>
                         //playWeaponAttackEffect(scell, enemy);
                     }
                     playWeaponAttackEffect(weapon, enemy);
-                    yield return new WaitForSeconds(animTime*2);
+                    yield return new WaitForSeconds(animTime * 2);
 
                     yield return StartCoroutine(decreaseBothCell(weapon, enemy, mightUpdatedPositions, otherEnemies));
 
                     // 
-
+                    if (weapon.cellInfo.attackMode == "exchangePosition")
+                    {
+                        break;
+                    }
 
                     //yield return StartCoroutine(movePositions(mightUpdatedPositions));
-                    
+
                 }
             }
 
@@ -889,7 +936,7 @@ public class GridGeneration : Singleton<GridGeneration>
             int test = 30;
 
             //check if next to weapon, if so, attack
-            
+
             if (!enemy || enemy.amount <= 0)
             {
                 continue;
@@ -902,6 +949,21 @@ public class GridGeneration : Singleton<GridGeneration>
                 //dont move for the first step
                 enemy.GetComponent<EnemyCell>().isFirst = false;
                 continue;
+            }
+
+            if (enemy.cellInfo.attackMode == "heal")
+            {
+                //steal nearby resources
+                foreach (var e in getSurroundingCells(enemy.index))
+                {
+                    if (e.cellInfo.isEnemy())
+                    {
+                        e.addAmount(1);
+                        playHealEffect(enemy, e);
+                        yield return new WaitForSeconds(animTime);
+
+                    }
+                }
             }
 
             if (enemy.cellInfo.attackMode == "steal")
@@ -936,13 +998,38 @@ public class GridGeneration : Singleton<GridGeneration>
                     yield return StartCoroutine(moveCardAnim(enemy, cell.index));
                     playTrapAttackEffect(cell);
                     yield return new WaitForSeconds(animTime);
-                    StartCoroutine(decreaseBothCell(cell, enemy, mightUpdatedPositions));
-                    if (enemy && enemy.amount > 0)
+
+                    yield return StartCoroutine(destroy(cell.gameObject));
+
+                    if (cell.cellInfo.attackMode == "3x3")
                     {
-                        release(enemy.index);
-                        occupy(trapIndex, enemy);
+                        foreach (var e in getSurrounding3x3Cells(cell.index))
+                        {
+                            if (e.cellInfo.isEnemy())
+                            {
+                                minuseHpByHalf(e);
+
+
+                                if (e.amount <= 0)
+                                {
+                                    yield return StartCoroutine(destroy(e.gameObject));
+                                }
+                            }
+                        }
                     }
-                    yield return StartCoroutine(movePositions(mightUpdatedPositions));
+                    else
+                    {
+
+                        StartCoroutine(decreaseBothCell(cell, enemy, mightUpdatedPositions));
+                        if (enemy && enemy.amount > 0)
+                        {
+                            release(enemy.index);
+                            occupy(trapIndex, enemy);
+                        }
+                        yield return StartCoroutine(movePositions(mightUpdatedPositions));
+                    }
+
+
                 }
                 else
                 {
@@ -1118,9 +1205,9 @@ public class GridGeneration : Singleton<GridGeneration>
                 List<Vector2> sameDistanceList = new List<Vector2>();
                 List<Vector2> notSameDistanceList = new List<Vector2>();
                 //find position that can swap
-                for (int i = -4; i <=4; i++)
+                for (int i = -4; i <= 4; i++)
                 {
-                    for (int j = -4; j <=4; j++)
+                    for (int j = -4; j <= 4; j++)
                     {
                         var vec = new Vector2(i, j);
                         var newDistanc = distance(vec);
@@ -1158,6 +1245,22 @@ public class GridGeneration : Singleton<GridGeneration>
                 yield return moveCardAndOccupyAnim(cell.GetComponent<GridCell>(), finalIndex);
 
             }
+
+            if (cell.GetComponent<GridCell>().cellInfo.specialMode != null && cell.GetComponent<GridCell>().cellInfo.specialMode.Contains("stomp"))
+            {
+                playStompAttackEffect(cell.GetComponent<GridCell>());
+                yield return new WaitForSeconds(animTime);
+                foreach(var c in getSurrounding3x3Cells(cell.GetComponent<GridCell>().index))
+                {
+                    minuseHpByHalf(c);
+                    if (c.amount <= 0)
+                    {
+                        yield return destroy(c.gameObject);
+                    }
+                }
+            }
+
+                
 
             foreach (var spriteRenderer in cell.GetComponentsInChildren<SpriteRenderer>())
             {
@@ -1254,7 +1357,7 @@ public class GridGeneration : Singleton<GridGeneration>
         //res.transform.DOPunchScale(Vector3.one, animTime);
         var scalex = res.transform.localScale.x;
         res.transform.localScale = new Vector3(0, res.transform.localScale.y, res.transform.localScale.z);
-        res.transform.DOScaleX(scalex,animTime);
+        res.transform.DOScaleX(scalex, animTime);
 
         var typeSplit = type.Split('_');
         if (typeSplit.Length > 1)

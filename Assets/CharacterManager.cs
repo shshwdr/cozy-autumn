@@ -55,7 +55,7 @@ public class CharacterManager : Singleton<CharacterManager>
             if (AchievementManager.Instance.hasUnlocked(stageInfo.unlockAchievement))
             {
                 lockedStage.Remove(stage);
-                unlockedStage.Add(stage);
+                unlockedStage.Add(stage); 
                 EventPool.Trigger("unlockStage");
             }
         }
