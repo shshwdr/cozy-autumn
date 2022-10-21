@@ -27,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 974357809}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 4, y: 4, z: 1}
+  m_LocalScale: {x: 4.5, y: 4.5, z: 1}
   m_Children: []
   m_Father: {fileID: 1766114458741427110}
   m_RootOrder: 10
@@ -518,6 +518,7 @@ MonoBehaviour:
   collider: {fileID: 0}
   birdItemsParent: {fileID: 4931766658440883386}
   birdItem: 
+  mask: {fileID: 974357809}
   progressBar: {fileID: 8224905009038221599}
   ExploreHoldText: {fileID: 2268117965980751691}
 --- !u!61 &-7557795742805977661

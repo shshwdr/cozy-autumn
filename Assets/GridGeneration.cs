@@ -16,7 +16,8 @@ public class GridGeneration : Singleton<GridGeneration>
 
     public float animTime = 0.3f;
 
-    public int gridSize = 2;
+    public int gridSizex = 2;
+    public int gridSizey = 2;
 
     Dictionary<Vector2, GridCell> indexToCell = new Dictionary<Vector2, GridCell>();
 
@@ -40,6 +41,7 @@ public class GridGeneration : Singleton<GridGeneration>
             init();
         }
         StageManager.Instance.reopt();
+        CharacterManager.Instance.reopt();
     }
 
     public void init()
@@ -78,7 +80,7 @@ public class GridGeneration : Singleton<GridGeneration>
                     minuseHpByHalf(cell2);
 
                     var go = Instantiate(Resources.Load<GameObject>("effect/spike"), cell1.index, Quaternion.identity);
-                    go.transform.DOMove(cell2.index, GridController.Instance.animTime + 0.1f);
+                    go.transform.DOMove(getCellPosition(cell2.index), GridController.Instance.animTime + 0.1f);
                     Destroy(go, 1f);
 
                     if (cell2.amount <= 0)
@@ -132,12 +134,11 @@ public class GridGeneration : Singleton<GridGeneration>
         return indexToCell.ContainsKey(ind) && indexToCell[ind] != null;
     }
 
-    int gridCellCount = 4;
     bool isPositionValid(Vector2 index)
     {
 
         Vector2Int ind = Vector2Int.RoundToInt(index);
-        return ind.x <= gridCellCount && ind.x >= -gridCellCount && ind.y <= gridCellCount && ind.y >= -gridCellCount;
+        return ind.x <= gridSizex && ind.x >= -gridSizex && ind.y <= gridSizey && ind.y >= -gridSizey;
     }
     public void occupy(Vector2 index, GridCell cell)
     {
@@ -145,6 +146,7 @@ public class GridGeneration : Singleton<GridGeneration>
 
         indexToCell[ind] = cell;
         cell.index = ind;
+        cell.mask.SetActive(true);
     }
 
     public void release(Vector2 index)
@@ -244,7 +246,7 @@ public class GridGeneration : Singleton<GridGeneration>
         yield return null;
         SFXManager.Instance.play("cardmove");
 
-        cell.transform.DOMove(targetPosition, animTime);
+        cell.transform.DOMove(getCellPosition( targetPosition), animTime);
 
         yield return new WaitForSeconds(animTime);
     }
@@ -782,7 +784,7 @@ public class GridGeneration : Singleton<GridGeneration>
     void playHealEffect(GridCell healer, GridCell target)
     {
         var go = Instantiate(Resources.Load<GameObject>("effect/healEffect"), healer.index, Quaternion.identity);
-        go.transform.DOMove(target.index, GridController.Instance.animTime);
+        go.transform.DOMove(getCellPosition(target.index), GridController.Instance.animTime);
         Destroy(go, 1f);
 
     }
@@ -800,12 +802,12 @@ public class GridGeneration : Singleton<GridGeneration>
     void playWeaponAttackEffect(GridCell weapon, GridCell enemy)
     {
         var go = Instantiate(Resources.Load<GameObject>("effect/attack"), weapon.index, Quaternion.identity);
-        go.transform.DOMove(enemy.index, GridController.Instance.animTime);
+        go.transform.DOMove(getCellPosition(enemy.index), GridController.Instance.animTime);
         Destroy(go, 1f);
 
 
         var go2 = Instantiate(Resources.Load<GameObject>("effect/attack"), weapon.index, Quaternion.identity);
-        go2.transform.DOMove(enemy.index, GridController.Instance.animTime);
+        go2.transform.DOMove(getCellPosition(enemy.index), GridController.Instance.animTime);
         go2.GetComponentInChildren<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/" + weapon.type);
         go2.GetComponentInChildren<SpriteRenderer>().sortingOrder = 1;
         Destroy(go2, 1f);
@@ -1239,7 +1241,7 @@ public class GridGeneration : Singleton<GridGeneration>
 
                 var go = Instantiate(Resources.Load<GameObject>("effect/fly"), cell.GetComponent<GridCell>().index, Quaternion.identity);
                 var dir = finalIndex - cell.GetComponent<GridCell>().index;
-                go.transform.DOMove(dir.normalized + cell.GetComponent<GridCell>().index, GridController.Instance.animTime + 0.1f);
+                go.transform.DOMove(getCellPosition(dir.normalized + cell.GetComponent<GridCell>().index), GridController.Instance.animTime + 0.1f);
                 Destroy(go, 1f);
 
                 yield return moveCardAndOccupyAnim(cell.GetComponent<GridCell>(), finalIndex);
@@ -1303,9 +1305,14 @@ public class GridGeneration : Singleton<GridGeneration>
 
     }
 
-    Vector2 gesCellPosition(Vector2 cellIndex)
+    public Vector2 getIndexFromPosition(Vector2 cellIndex)
     {
-        return cellIndex * cellSize;
+        return Vector2Int.RoundToInt( (cellIndex - (Vector2)mainBoard.position)/cellSize);
+    }
+
+    public Vector2 getCellPosition(Vector2 cellIndex)
+    {
+        return cellIndex * cellSize +(Vector2) mainBoard.position;
     }
     public GameObject generateCellAndOccupy(Vector2 index, string type, int amount = -1)
     {
@@ -1316,16 +1323,20 @@ public class GridGeneration : Singleton<GridGeneration>
 
     public GameObject generateTargetCell(Vector2 index)
     {
-        Vector2 position = gesCellPosition(index);
+        Vector2 position = getCellPosition(index);
 
         GameObject res;
         res = Instantiate(targetCellPrefab, position, Quaternion.identity, mainBoard);
         return res;
     }
 
-    public GameObject generateCell(Vector2 index, string type, int amount = -1)
+    public GameObject generateCell(Vector2 index, string type, int amount = -1, bool asjustBoard = true)
     {
-        Vector2 position = gesCellPosition(index);
+        Vector2 position = getCellPosition(index);
+        if (!asjustBoard)
+        {
+            position -= (Vector2)mainBoard.position;
+        }
         GameObject res;
         if (type == "addHP")
         {

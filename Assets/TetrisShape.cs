@@ -40,8 +40,9 @@ public class TetrisShape : MonoBehaviour
         {
             var index = tetrisShape[i];
             var card = DeckManager.Instance.drawCard(false);
-            var go = GridGeneration.Instance.generateCell(index+(Vector2)transform.position, card);
+            var go = GridGeneration.Instance.generateCell(index+(Vector2)transform.position, card, -1,false);
             go.transform.parent = transform;
+            go.transform.position = transform.position +(Vector3) index * GridGeneration.Instance.cellSize;
             tetrises.Add(go);
             go.GetComponent<GridCell>().collider.enabled = false;
         }
@@ -73,7 +74,11 @@ public class TetrisShape : MonoBehaviour
             if (isDragging)
             {
                 var mousePosition = new Vector3(mousePos.x, mousePos.y, dragOriginalPosition.z);
-                var newFinalPosition = new Vector2(Mathf.Round(mousePosition.x), Mathf.Round(mousePosition.y));
+                mousePosition -= GridGeneration.Instance.mainBoard.position;
+                mousePosition /= GridGeneration.Instance.cellSize;
+                var newFinalPosition = new Vector2(Mathf.Round(mousePosition.x), Mathf.Round(mousePosition.y)); 
+                newFinalPosition *= GridGeneration.Instance.cellSize;
+                newFinalPosition +=(Vector2) GridGeneration.Instance.mainBoard.position;
                 if (currentFinalPosition != newFinalPosition)
                 {
                     currentFinalPosition = newFinalPosition;
@@ -144,10 +149,19 @@ public class TetrisShape : MonoBehaviour
         }
         isDragging = true;
         dragOriginalPosition = transform.position;
+
+        foreach(var cell in tetrises)
+        {
+        cell.GetComponent<GridCell>().mask.SetActive(true);
+        }
     }
     private void OnMouseUp()
     {
 
+        foreach (var cell in tetrises)
+        {
+            cell.GetComponent<GridCell>().mask.SetActive(false);
+        }
         if (!isUnlocked)
         {
             return;
@@ -211,10 +225,10 @@ public class TetrisShape : MonoBehaviour
         bool outOfBorder = false;
         for (int i = 0; i < tetrisShape.Count; i++)
         {
-            var index = tetrisShapeAfterRotation[i] + currentFinalPosition;
+            var index = GridGeneration.Instance. getIndexFromPosition(tetrisShapeAfterRotation[i] + currentFinalPosition);
             tetrises[i].GetComponent<GridCell>().index = index;
 
-            if (Mathf.Abs(index.x )> GridGeneration.Instance.gridSize || Mathf.Abs( index.y) > GridGeneration.Instance.gridSize)
+            if (Mathf.Abs(index.x )> GridGeneration.Instance.gridSizex || Mathf.Abs( index.y) > GridGeneration.Instance.gridSizey)
             {
                 outOfBorder = true;
                 //updateColor(tetrises[i].GetComponent<GridCell>().transform,false);
@@ -273,7 +287,7 @@ public class TetrisShape : MonoBehaviour
         {
             var index = tetrisShape[i];
             var go = tetrises[i];
-            go.GetComponent<GridCell>().index = tetrisShapeAfterRotation[i] +currentFinalPosition;
+            go.GetComponent<GridCell>().index = GridGeneration.Instance.getIndexFromPosition(tetrisShapeAfterRotation[i] +currentFinalPosition);
             go.transform.localPosition = tetrisShapeAfterRotation[i];
             go.transform.parent = null;
         }
@@ -291,7 +305,7 @@ public class TetrisShape : MonoBehaviour
         {
             var index = tetrisShape[i];
             var go = tetrises[i];
-            tetrisShapeAfterRotation[i] = RotatePointAroundPoint(index, Vector2.zero, rotateTime * 90);
+            tetrisShapeAfterRotation[i] = RotatePointAroundPoint(index, Vector2.zero, rotateTime * 90) *GridGeneration.Instance.cellSize;
 
             tetrises[i].GetComponent<GridCell>().index = index;
             go.transform.DOLocalMove(tetrisShapeAfterRotation[i], 0.3f);

@@ -43,6 +43,7 @@ public class GridCell : MonoBehaviour
     public Transform birdItemsParent;
     public string birdItem;
 
+    public GameObject mask;
 
     private void Awake()
     {
