@@ -107,6 +107,12 @@ public class GridCell : MonoBehaviour
             bk.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/blank/enemy");
             HPBK.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/blank/enemy-corner-left");
         }
+        else if (cellInfo.isAlly())
+        {
+
+            bk.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/blank/ally");
+            HPBK.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/blank/ally-corner-left");
+        }
         else if (cellInfo.isTrap() || cellInfo.isWeapon())
         {
 

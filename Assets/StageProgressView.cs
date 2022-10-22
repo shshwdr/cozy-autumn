@@ -11,6 +11,7 @@ public class StageProgressView : MonoBehaviour
     public RectTransform player;
 
     public Image playerRender;
+    public Image preogressFill;
 
     // Start is called before the first frame update
     void Start()
@@ -18,13 +19,14 @@ public class StageProgressView : MonoBehaviour
 
         EventPool.OptIn("updateProgress", updateProgress);
         //EventPool.OptIn("startBossFight", hide);
-        playerRender.sprite = Resources.Load<Sprite>("cell/" + CharacterManager.Instance.currentChar);
+        //playerRender.sprite = Resources.Load<Sprite>("cell/" + CharacterManager.Instance.currentChar);
 
     }
     void updateProgress() { 
     
         var prog =DeckManager.Instance.getProgress();
-        player.transform.position = p1.position* (1 - prog)  + p2.position * prog;
+        //player.transform.position = p1.position* (1 - prog)  + p2.position * prog;
+        preogressFill.fillAmount = prog;
     }
     void hide()
     {
