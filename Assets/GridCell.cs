@@ -95,6 +95,12 @@ public class GridCell : MonoBehaviour
             bk.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/blank/hero");
             HPBK.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/blank/alternative-1-corner-left");
         }
+        else if (cellInfo.isEmpty())
+        {
+            bk.SetActive(false);
+            HPBK.SetActive(false);
+            amountLabel.gameObject.SetActive(false);
+        }
         else if (cellInfo.isEnemy())
         {
 
@@ -342,7 +348,7 @@ public class GridCell : MonoBehaviour
 
             Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
-            if(willSwapCell && willSwapCell.pointHovered(mousePosition))
+            if(willSwapCell && willSwapCell.pointHovered( mousePosition))
             {
                 return;
             }
@@ -540,6 +546,10 @@ public class GridCell : MonoBehaviour
             DOTween.To(() => descriptionCanvas.alpha, x => descriptionCanvas.alpha = x, 1, 0.3f);
         }
 
+        if(cellInfo == null)
+        {
+            Debug.LogError("?");
+        }
 
         if (cellInfo.isEnemy())
         {

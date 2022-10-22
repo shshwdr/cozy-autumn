@@ -12,7 +12,7 @@ shop,,,1,,,,,,,,,,,,,,,,
 weasel,Fox,"Enemy. Walks to player, deals damage equals its hit points.",1,enemy,5,,nut,nut,0,5,0,,,,0,,1:a sneaky weasel! Try not get close to it as it might bite you!,,
 snake,,,1,enemy,5,,nut,nut,1,5,,,,,0,,,,
 itemBird,Sparrow,"Enemy. When chased away, would left an item on the ground.",1,enemy,5,,stick,stick,0,5,0,,,changePosition,1,,,,FlyAtPlace
-bird,Blaumeise,"Enemy. When place it, it would fly to a random position.",1,enemy,3,,stick,stick,0,5,0,,,changePosition,1,,,,FlyAtPlace
+bird,Blaumeise,"Enemy. When there are 2 or more traps and weapons around, would fly away.",1,enemy,3,,stick,stick,0,5,0,,,changePosition,1,,,,FlyAtPlace
 fox,,,1,enemy,5,,nut,nut,0,3,1,,,,0,,1:a sneaky fox! It would attack every 4 rounds so chase it away before that!,,
 bear,,,1,enemy,5,,stone,nut,0,5,0,1,,,0,,,,
 bat,Stick Bat,Deals damage to enemies around it.,1,weapon,4,,,,,,,,,,,,,,

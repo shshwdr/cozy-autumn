@@ -2,6 +2,7 @@ using Pool;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class StageProgressView : MonoBehaviour
 {
@@ -9,12 +10,16 @@ public class StageProgressView : MonoBehaviour
     public RectTransform p2;
     public RectTransform player;
 
+    public Image playerRender;
+
     // Start is called before the first frame update
     void Start()
     {
 
         EventPool.OptIn("updateProgress", updateProgress);
-        EventPool.OptIn("startBossFight", hide);
+        //EventPool.OptIn("startBossFight", hide);
+        playerRender.sprite = Resources.Load<Sprite>("cell/" + CharacterManager.Instance.currentChar);
+
     }
     void updateProgress() { 
     

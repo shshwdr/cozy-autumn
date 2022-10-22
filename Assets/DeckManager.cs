@@ -51,9 +51,11 @@ public class DeckManager : Singleton<DeckManager>
         addDictionaryToDeck(info.cards);
         stageInfos.Remove(info);
     }
+
+    public int placedCardCount = 0;
     public float getProgress()
     {
-        return 1 - ((float)(currentDeck.Count+waitDeck.Count)/ (float)cardInTotal);
+        return  Mathf.Clamp01(((float)placedCardCount / (float)cardInTotal));
     }
     public void createAndShuffleCards()
     {

@@ -28,6 +28,23 @@ public class AchievementCell : MonoBehaviour
         }
     }
 
+    public void initGuide(string type, bool isLocked)
+    {
+        if (isLocked)
+        {
+            lockedGo.SetActive(true);
+        }
+        else
+        {
+
+            lockedGo.SetActive(false);
+            var info = CellManager.Instance.getInfo(type);
+            image.sprite = Resources.Load<Sprite>("cell/" + type);
+            title.text = info.displayName;
+            desc.text = info.desc;
+        }
+    }
+
     // Update is called once per frame
     void Update()
     {

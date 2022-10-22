@@ -288,10 +288,11 @@ public class TetrisShape : MonoBehaviour
             var index = tetrisShape[i];
             var go = tetrises[i];
             go.GetComponent<GridCell>().index = GridGeneration.Instance.getIndexFromPosition(tetrisShapeAfterRotation[i] +currentFinalPosition);
-            go.transform.localPosition = tetrisShapeAfterRotation[i];
             go.transform.parent = null;
+            go.transform.position =GridGeneration.Instance.getCellPosition(go.GetComponent<GridCell>().index );
+            DeckManager.Instance.placedCardCount++;
         }
-
+        //DeckManager.Instance.updatePlacedCard();
 
         GridGeneration.Instance.placeCells(tetrises);
         Destroy(gameObject);
