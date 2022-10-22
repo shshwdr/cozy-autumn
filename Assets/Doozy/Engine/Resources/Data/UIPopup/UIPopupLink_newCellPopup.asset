@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: UIPopupLink_newCellPopup
   m_EditorClassIdentifier: 
   PopupName: newCellPopup
-  Prefab: {fileID: 1868549276534046, guid: 757c8126787858d4b9044ac7b6cdb267, type: 3}
+  Prefab: {fileID: 1868549276534046, guid: 10be1e2f018f9534ab234937bad49864, type: 3}

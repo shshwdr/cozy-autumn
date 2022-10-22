@@ -9,11 +9,13 @@ public class PlayerSelectionCell : MonoBehaviour
     public string charName;
     public Text nameLabel;
     public Image currentPlayer;
+    public Image playerSelection;
     // Start is called before the first frame update
     void Start()
     {
 
         nameLabel.text = charName;
+        playerSelection.sprite = Resources.Load<Sprite>("cell/" + charName);
         updateState();
         EventPool.OptIn("unlockStage", updateState);
     }
