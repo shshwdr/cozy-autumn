@@ -25,11 +25,11 @@ public class TetrisGeneration : Singleton<TetrisGeneration>
         go.GetComponent<TetrisShape>().init(TetrisShapes[Random.Range(0,TetrisShapes.Count)]);
         if (previewTetris)
         {
-            previewTetris.GetComponent<TetrisShape>().getReady();
 
             Vector3 currentPosition = Camera.main.ScreenToWorldPoint(GameObject.Find("currentTetris").transform.position);
             currentPosition.z = 0;
             previewTetris.transform.position = currentPosition;
+            previewTetris.GetComponent<TetrisShape>().getReady();
 
         }
         else

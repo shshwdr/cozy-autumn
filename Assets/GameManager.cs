@@ -44,6 +44,9 @@ public class GameManager : Singleton<GameManager>
         GameObject.FindObjectOfType<TipMenu>(true).gameObject.SetActive(true);
 
         SFXManager.Instance.play("gameover");
+
+
+        AchievementManager.Instance.ShowAchievement("die");
     }
 
     public void win()

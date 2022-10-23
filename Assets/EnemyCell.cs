@@ -28,7 +28,6 @@ public class EnemyCell : MonoBehaviour
     {
         info = CellManager.Instance.getInfo(type);
 
-        SFXManager.Instance.play(type + "show");
         explainPanel = GetComponentInChildren<CanvasGroup>();
         updateDescription();
 
@@ -229,7 +228,7 @@ public class EnemyCell : MonoBehaviour
         var go = Instantiate(Resources.Load<GameObject>("effect/healEffect"), healer.transform.position , Quaternion.identity);
         go.transform.DOMove(transform.position, GridController.Instance.animTime + 0.1f);
         Destroy(go, 1f);
-        SFXManager.Instance.play("scream");
+        //SFXManager.Instance.play("scream");
     }
     public IEnumerator heal(EnemyCell healer)
     {
@@ -238,7 +237,7 @@ public class EnemyCell : MonoBehaviour
 
     public IEnumerator heal(EnemyCell healer, int healAmount)
     {
-        SFXManager.Instance.play("heal");
+        //SFXManager.Instance.play("heal");
         playHealEffect(healer);
         cell.addAmount(healAmount);
         yield return new WaitForSeconds(GridController.Instance.animTime);
@@ -248,7 +247,7 @@ public class EnemyCell : MonoBehaviour
     {
         if (canAttack && !isDead)
         {
-            SFXManager.Instance.play("attack");
+            //SFXManager.Instance.play("attack");
             playAttackEffect(attackee);
             //RulePopupManager.Instance.showRule("playerNextTo" + info.type);
             //Instantiate(Resources.Load("effect/attack"), GridController.Instance.getPlayerTransform().position, Quaternion.identity);

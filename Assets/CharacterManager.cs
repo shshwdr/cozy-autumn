@@ -57,6 +57,11 @@ public class CharacterManager : Singleton<CharacterManager>
                 lockedStage.Remove(stage);
                 unlockedStage.Add(stage); 
                 EventPool.Trigger("unlockStage");
+
+                if(lockedStage.Count == 0)
+                {
+                    AchievementManager.Instance.ShowAchievement("allFriends");
+                }
             }
         }
     }

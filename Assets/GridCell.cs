@@ -269,6 +269,14 @@ public class GridCell : MonoBehaviour
     {
         transform.DOKill();
         descriptionCanvas.DOKill();
+
+
+        if (target)
+        {
+            target.hideEnemyTarget();
+            Destroy(targetOb);
+            targetOb = null;
+        }
     }
 
     void updateEquipmentDamage()
@@ -555,6 +563,7 @@ public class GridCell : MonoBehaviour
         if(cellInfo == null)
         {
             Debug.LogError("?");
+            return;
         }
 
         if (cellInfo.isEnemy())
@@ -571,6 +580,7 @@ public class GridCell : MonoBehaviour
         //explainPanel.SetActive(true);
 
     }
+
 
     private void OnMouseExit()
     {

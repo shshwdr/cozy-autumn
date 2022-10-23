@@ -29,6 +29,7 @@ public class TetrisShape : MonoBehaviour
             var cell = tetri.GetComponent<GridCell>();
             NewCellManager.Instance.ShowNewCell(cell.type);
         }
+        dragOriginalPosition = transform.position;
     }
 
     public void init(List<Vector2> shape)
@@ -291,6 +292,12 @@ public class TetrisShape : MonoBehaviour
             go.transform.parent = null;
             go.transform.position =GridGeneration.Instance.getCellPosition(go.GetComponent<GridCell>().index );
             DeckManager.Instance.placedCardCount++;
+
+            if (go.GetComponent<GridCell>().cellInfo.isEnemy())
+            {
+
+                SFXManager.Instance.play(go.GetComponent<GridCell>().type + "show");
+            }
         }
         //DeckManager.Instance.updatePlacedCard();
 

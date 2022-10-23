@@ -31,6 +31,8 @@ public class GridGeneration : Singleton<GridGeneration>
     Vector2[] dirs8 = new Vector2[] { new Vector2(0, 1), new Vector2(0, -1), new Vector2(1, 0), new Vector2(-1, 0) ,
         new Vector2(1, 1), new Vector2(1, -1), new Vector2(-1, 1), new Vector2(-1, -1) ,
     };
+
+    int round = 0;
     // Start is called before the first frame update
     void Start()
     {
@@ -39,6 +41,9 @@ public class GridGeneration : Singleton<GridGeneration>
             mainCanvas.SetActive(true);
             MainMenuCanvas.SetActive(false);
             init();
+
+            //show tutorial drag
+            NewCellManager.Instance.ShowNewCell("tutorialDrag");
         }
         StageManager.Instance.reopt();
         CharacterManager.Instance.reopt();
@@ -122,11 +127,22 @@ public class GridGeneration : Singleton<GridGeneration>
 
         isMoving = false;
 
+
+        AchievementManager.Instance.ShowAchievement("move");
+        AchievementManager.Instance.clear("notMove");
+
     }
     void resetSwap()
     {
+        if (currentSwapTime == 0)
+        {
+
+            AchievementManager.Instance.clear("move");
+            AchievementManager.Instance.ShowAchievement("notMove");
+        }
         currentSwapTime = 0;
         EventPool.Trigger("updateSwap");
+
     }
     public bool isOccupied(Vector2 index)
     {
@@ -148,6 +164,11 @@ public class GridGeneration : Singleton<GridGeneration>
         cell.index = ind;
         cell.mask.SetActive(true);
         LogManager.Instance.logOccupy(index, cell);
+
+        if (cell.cellInfo.isEnemy())
+        {
+            AchievementManager.Instance.ShowAchievement("tutorialEnemy");
+        }
     }
 
     public void release(Vector2 index)
@@ -156,9 +177,12 @@ public class GridGeneration : Singleton<GridGeneration>
         Vector2Int ind = Vector2Int.RoundToInt(index);
         if (!indexToCell.ContainsKey(ind))
         {
-            Debug.LogError("release not existed index " + ind);
+            Debug.LogWarning("release not existed index " + ind);
         }
-        LogManager.Instance.logRelease(index, indexToCell[ind]);
+        else
+        {
+            LogManager.Instance.logRelease(index, indexToCell[ind]);
+        }
         indexToCell.Remove(ind);
     }
 
@@ -237,7 +261,15 @@ public class GridGeneration : Singleton<GridGeneration>
             //drop
             var cell = generateCell(go.GetComponent<GridCell>().index, go.GetComponent<GridCell>().birdItem);
             occupy(cell.GetComponent<GridCell>().index, cell.GetComponent<GridCell>());
-            yield return StartCoroutine(combineAround(cell.GetComponent<GridCell>()));
+            //yield return StartCoroutine(combineAround(cell.GetComponent<GridCell>()));
+
+            yield return StartCoroutine(calculateCombinedResult(new List<GridCell>() { cell.GetComponent<GridCell>() }, null));
+        }
+
+        if (go.GetComponent<GridCell>())
+        {
+            if(go.GetComponent<GridCell>().cellInfo.isAlly())
+            AchievementManager.Instance.ShowAchievement("killFriend");
         }
 
         Destroy(go);
@@ -284,8 +316,12 @@ public class GridGeneration : Singleton<GridGeneration>
         occupy(cellIndex, cell2);
 
 
-        yield return StartCoroutine(combineAround(cell.GetComponent<GridCell>()));
-        yield return StartCoroutine(combineAround(cell2.GetComponent<GridCell>()));
+
+        yield return StartCoroutine(calculateCombinedResult(new List<GridCell>() { cell.GetComponent<GridCell>(), cell2.GetComponent<GridCell>() }, null));
+
+
+        //yield return StartCoroutine(combineAround(cell.GetComponent<GridCell>()));
+       // yield return StartCoroutine(combineAround(cell2.GetComponent<GridCell>()));
 
         if (cell.cellInfo.isEmpty())
         {
@@ -365,22 +401,22 @@ public class GridGeneration : Singleton<GridGeneration>
                 {
 
 
-                    if (!showResult)
-                    {
-
-                        var animCell = generateCell(cell.index, cell.type).GetComponent<GridCell>();
-                        animCell.GetComponent<GridCell>().collider.enabled = false;
-                        yield return StartCoroutine(moveCardAnim(animCell, newCell.index));
-                        Destroy(animCell.gameObject);
-                    }
-
                     // update newCell
                     // willDestory.Add(combineCell.gameObject);
 
                     if (combination.result.ContainsKey("generate1"))
                     {
 
-                        if (positionToCell.ContainsKey(newCell.index))
+
+                        if (!showResult)
+                        {
+
+                            var animCell = generateCell(cell.index, cell.type).GetComponent<GridCell>();
+                            animCell.GetComponent<GridCell>().collider.enabled = false;
+                            yield return StartCoroutine(moveCardAnim(animCell, newCell.index));
+                            Destroy(animCell.gameObject);
+                        }
+                        if (positionToCell.ContainsKey(newCell.index) || willOccupyPosition.Contains(newCell.index))
                         {
                             continue;
                         }
@@ -409,6 +445,7 @@ public class GridGeneration : Singleton<GridGeneration>
                             //newCell.
 
                             //only generate, occupy later together
+                            SFXManager.Instance.play("craft");
                             var gCell = generateCell(newIndex, combinationGenerated);
                             willOccupy.Add(gCell);
                             yield return new WaitForSeconds(animTime);
@@ -416,6 +453,9 @@ public class GridGeneration : Singleton<GridGeneration>
 
                             willDestory.Add(newCell.gameObject);
                             willDestory.Add(cell.gameObject);
+
+
+                            AchievementManager.Instance.ShowAchievement("craft");
 
                         }
                         willOccupyPosition.Add(newIndex);
@@ -446,6 +486,17 @@ public class GridGeneration : Singleton<GridGeneration>
                         }
                         else
                         {
+
+
+
+                           // if (!showResult)
+                            {
+                                var animCell = generateCell(theOneIsValue.index, theOneIsValue.type).GetComponent<GridCell>();
+                                animCell.GetComponent<GridCell>().collider.enabled = false;
+                                yield return StartCoroutine(moveCardAnim(animCell, theOneAddValue.index));
+                                Destroy(animCell.gameObject);
+                            }
+
                             theOneAddValue.addAmount(theOneIsValue.amount);
                             willDestory.Add(theOneIsValue.gameObject);
 
@@ -509,6 +560,8 @@ public class GridGeneration : Singleton<GridGeneration>
                 if (!willOccupyPosition.Contains(pair))
                 {
                     var animCell = generateCell(pair, StageManager.Instance.getCurrentInfo().leafName).GetComponent<GridCell>();
+
+                    NewCellManager.Instance.ShowNewCell(StageManager.Instance.getCurrentInfo().leafName);
                     willOccupy.Add(animCell.gameObject);
                 }
             }
@@ -527,6 +580,7 @@ public class GridGeneration : Singleton<GridGeneration>
                 if (!willOccupyPosition.Contains(pair))
                 {
                     var animCell = generateCell(pair, StageManager.Instance.getCurrentInfo().leafName).GetComponent<GridCell>();
+                    NewCellManager.Instance.ShowNewCell(StageManager.Instance.getCurrentInfo().leafName);
                     newCells.Add(animCell.gameObject);
                 }
             }
@@ -548,104 +602,104 @@ public class GridGeneration : Singleton<GridGeneration>
 
 
 
-    IEnumerator combineAround(GridCell cell)
-    {
-        yield return null;
-        bool hasCombined = false;
+    //IEnumerator combineAround(GridCell cell)
+    //{
+    //    yield return null;
+    //    bool hasCombined = false;
 
-        HashSet<GameObject> willDestory = new HashSet<GameObject>();
-        foreach (var dir in dirs)
-        {
-            var newIndex = cell.index + dir;
-            var newCell = getCellOnPosition(newIndex);
-            if (newCell == null)
-            {
-                continue;
-            }
-            var combination = CombinationManager.Instance.getCombinationResult(newCell.type, cell.type);
-            if (combination != null)
-            {
-
-
-                //if (!showResult)
-                {
-
-                    var animCell = generateCell(cell.index, cell.type).GetComponent<GridCell>();
-                    animCell.GetComponent<GridCell>().collider.enabled = false;
-                    yield return StartCoroutine(moveCardAnim(animCell, newCell.index));
-                    Destroy(animCell.gameObject);
-                }
-
-                // update newCell
-                // willDestory.Add(combineCell.gameObject);
-
-                if (combination.result.ContainsKey("generate1"))
-                {
-
-                    hasCombined = true;
-                    //if (positionToCell.ContainsKey(newCell.index))
-                    //{
-                    //    continue;
-                    //}
-                    var combinationGenerated = combination.result["generate1"];
-                    {
+    //    HashSet<GameObject> willDestory = new HashSet<GameObject>();
+    //    foreach (var dir in dirs)
+    //    {
+    //        var newIndex = cell.index + dir;
+    //        var newCell = getCellOnPosition(newIndex);
+    //        if (newCell == null)
+    //        {
+    //            continue;
+    //        }
+    //        var combination = CombinationManager.Instance.getCombinationResult(newCell.type, cell.type);
+    //        if (combination != null)
+    //        {
 
 
-                        NewCellManager.Instance.ShowNewCell(combinationGenerated);
+    //            //if (!showResult)
+    //            {
 
-                        if (cell == null || cell.gameObject == null)
-                        {
-                            Debug.LogError("???");
-                        }
+    //                var animCell = generateCell(cell.index, cell.type).GetComponent<GridCell>();
+    //                animCell.GetComponent<GridCell>().collider.enabled = false;
+    //                yield return StartCoroutine(moveCardAnim(animCell, newCell.index));
+    //                Destroy(animCell.gameObject);
+    //            }
 
-                        //yield return StartCoroutine(destroy(newCell.gameObject));
-                        //newCell.
+    //            // update newCell
+    //            // willDestory.Add(combineCell.gameObject);
 
-                        //only generate, occupy later together
-                        var gCell = generateCell(newIndex, combinationGenerated);
-                        //willOccupy.Add(gCell);
-                        yield return new WaitForSeconds(animTime);
-                        //hasCombined[combineNewCell.index] = true;
+    //            if (combination.result.ContainsKey("generate1"))
+    //            {
 
-                        willDestory.Add(newCell.gameObject);
-                        willDestory.Add(cell.gameObject);
-                    }
-                }
-                else if (combination.result.ContainsKey("addHP"))
-                {
-                    string value = combination.result["addHP"];
-                    var theOneAddValue = value == "1" ? newCell : cell;
-                    var theOneIsValue = value != "1" ? newCell : cell;
-                    {
-                        theOneAddValue.addAmount(theOneIsValue.amount);
-                        willDestory.Add(theOneIsValue.gameObject);
+    //                hasCombined = true;
+    //                //if (positionToCell.ContainsKey(newCell.index))
+    //                //{
+    //                //    continue;
+    //                //}
+    //                var combinationGenerated = combination.result["generate1"];
+    //                {
 
 
-                        //yield return StartCoroutine(destroy(cell.gameObject));
-                    }
-                }
-            }
-        }
-        //if (hasCombined)
-        //{
-        //    willDestory.Add(cell.gameObject);
+    //                    NewCellManager.Instance.ShowNewCell(combinationGenerated);
 
-        //}
+    //                    if (cell == null || cell.gameObject == null)
+    //                    {
+    //                        Debug.LogError("???");
+    //                    }
 
-        foreach (var pair in willDestory)
-        {
-            //if(pair.Value == true)
-            {
+    //                    //yield return StartCoroutine(destroy(newCell.gameObject));
+    //                    //newCell.
 
-                if (pair == null || pair.gameObject == null)
-                {
-                    Debug.LogError("???");
-                }
-                yield return StartCoroutine(destroy(pair.gameObject));
-            }
+    //                    //only generate, occupy later together
+    //                    var gCell = generateCell(newIndex, combinationGenerated);
+    //                    //willOccupy.Add(gCell);
+    //                    yield return new WaitForSeconds(animTime);
+    //                    //hasCombined[combineNewCell.index] = true;
 
-        }
-    }
+    //                    willDestory.Add(newCell.gameObject);
+    //                    willDestory.Add(cell.gameObject);
+    //                }
+    //            }
+    //            else if (combination.result.ContainsKey("addHP"))
+    //            {
+    //                string value = combination.result["addHP"];
+    //                var theOneAddValue = value == "1" ? newCell : cell;
+    //                var theOneIsValue = value != "1" ? newCell : cell;
+    //                {
+    //                    theOneAddValue.addAmount(theOneIsValue.amount);
+    //                    willDestory.Add(theOneIsValue.gameObject);
+
+
+    //                    //yield return StartCoroutine(destroy(cell.gameObject));
+    //                }
+    //            }
+    //        }
+    //    }
+    //    //if (hasCombined)
+    //    //{
+    //    //    willDestory.Add(cell.gameObject);
+
+    //    //}
+
+    //    foreach (var pair in willDestory)
+    //    {
+    //        //if(pair.Value == true)
+    //        {
+
+    //            if (pair == null || pair.gameObject == null)
+    //            {
+    //                Debug.LogError("???");
+    //            }
+    //            yield return StartCoroutine(destroy(pair.gameObject));
+    //        }
+
+    //    }
+    //}
     static int distance(Vector2 index)
     {
         index = Vector2Int.RoundToInt(index);
@@ -737,6 +791,10 @@ public class GridGeneration : Singleton<GridGeneration>
                 dir = trap.index - gc.index;
                 target = trap;
             }
+        }
+        if (target.cellInfo.isTrap())
+        {
+            AchievementManager.Instance.ShowAchievement("lure");
         }
         return dir;
     }
@@ -830,12 +888,31 @@ public class GridGeneration : Singleton<GridGeneration>
         var go = Instantiate(Resources.Load<GameObject>("effect/healEffect"), getCellPosition(healer.index), Quaternion.identity);
         go.transform.DOMove(getCellPosition(target.index), GridController.Instance.animTime);
         Destroy(go, 1f);
+        SFXManager.Instance.play("heal");
 
     }
-    void playTrapAttackEffect(GridCell trap)
+
+    
+        void playExplodeAttackEffect(GridCell trap)
     {
 
+        var go = Instantiate(Resources.Load<GameObject>("effect/explode"), getCellPosition(trap.index), Quaternion.identity);
+        AchievementManager.Instance.ShowAchievement("trap");
+        SFXManager.Instance.play("shortburn");
+    }
+
+        void playTrapAttackEffect(GridCell trap)
+    {
+
+        SFXManager.Instance.play("birdTrap");
         var go = Instantiate(Resources.Load<GameObject>("effect/trapEffect"), getCellPosition(trap.index), Quaternion.identity);
+
+        AchievementManager.Instance.ShowAchievement("trap");
+        if(trap.cellInfo!=null && trap.cellInfo.attackMode == "attract")
+        {
+
+            AchievementManager.Instance.ShowAchievement("lureDeath");
+        }
     }
     void playStompAttackEffect(GridCell trap)
     {
@@ -855,6 +932,10 @@ public class GridGeneration : Singleton<GridGeneration>
         go2.GetComponentInChildren<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/" + weapon.type);
         go2.GetComponentInChildren<SpriteRenderer>().sortingOrder = 1;
         Destroy(go2, 1f);
+
+        SFXManager.Instance.play("attack");
+
+        AchievementManager.Instance.ShowAchievement("weapon");
     }
 
     IEnumerator moveWeapons()
@@ -1014,6 +1095,9 @@ public class GridGeneration : Singleton<GridGeneration>
 
 
                     var go = Instantiate(Resources.Load<GameObject>("effect/fly"), getCellPosition(enemy.GetComponent<GridCell>().index), Quaternion.identity);
+
+
+                    SFXManager.Instance.play("birdflap");
                     var d = finalIndex - enemy.GetComponent<GridCell>().index;
                     go.transform.DOMove(getCellPosition(d.normalized + enemy.GetComponent<GridCell>().index), GridController.Instance.animTime + 0.1f);
                     Destroy(go, 1f);
@@ -1142,13 +1226,22 @@ public class GridGeneration : Singleton<GridGeneration>
                     var trapIndex = cell.index;
                     List<Vector2> mightUpdatedPositions = new List<Vector2>();
                     yield return StartCoroutine(moveCardAnim(enemy, cell.index));
-                    playTrapAttackEffect(cell);
+                    if (cell.cellInfo.attackMode == "3x3")
+                    {
+
+                        playExplodeAttackEffect(cell);
+                    }
+                    else
+                    {
+                        playTrapAttackEffect(cell);
+                    }
                     yield return new WaitForSeconds(animTime);
 
-                    yield return StartCoroutine(destroy(cell.gameObject));
+                    //yield return StartCoroutine(destroy(cell.gameObject));
 
                     if (cell.cellInfo.attackMode == "3x3")
                     {
+                        yield return StartCoroutine(destroy(cell.gameObject));
                         foreach (var e in getSurrounding3x3Cells(cell.index))
                         {
                             if (e.cellInfo.isEnemy())
@@ -1167,11 +1260,11 @@ public class GridGeneration : Singleton<GridGeneration>
                     {
 
                         StartCoroutine(decreaseBothCell(cell, enemy, mightUpdatedPositions));
-                        if (enemy && enemy.amount > 0)
-                        {
-                            release(enemy.index);
-                            occupy(trapIndex, enemy);
-                        }
+                        //if (enemy && enemy.amount > 0)
+                        //{
+                        //    release(enemy.index);
+                        //    occupy(trapIndex, enemy);
+                        //}
                         yield return StartCoroutine(movePositions(mightUpdatedPositions));
                     }
 
@@ -1443,6 +1536,20 @@ public class GridGeneration : Singleton<GridGeneration>
         isMoving = false;
         resetSwap();
         allAttracts = null;
+        round++;
+        AchievementManager.Instance.clear("round");
+        if (round >= 1)
+        {
+
+            //show tutorial drag
+            NewCellManager.Instance.ShowNewCell("tutorialRotate");
+        }
+        if (round > 2)
+        {
+            //show tutorial drag
+            NewCellManager.Instance.ShowNewCell("tutorialSwap");
+
+        }
 
         EventPool.Trigger("moveAStep");
 
@@ -1525,6 +1632,7 @@ public class GridGeneration : Singleton<GridGeneration>
         }
 
         res.GetComponent<GridCell>().init(type, index, amount);
+
         return res;
     }
 

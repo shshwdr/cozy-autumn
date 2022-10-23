@@ -15,6 +15,8 @@ public class AchievementInfo
     public int amount;
     public int currentAmount;
     public string clearReason;
+    public string category;
+    public int isLocked;
 
 }
 public class AchievementManager : Singleton<AchievementManager>
@@ -25,11 +27,14 @@ public class AchievementManager : Singleton<AchievementManager>
 
     private UIPopup m_popup;
 
-    HashSet<string> visited = new HashSet<string>();
+    // HashSet<string> visited = new HashSet<string>();
     public List<string> visitedList = new List<string>();
     public List<string> unvisitedList = new List<string>();
     Dictionary<string, AchievementInfo> ruleDict = new Dictionary<string, AchievementInfo>();
     public List<AchievementInfo> ruleList = new List<AchievementInfo>();
+
+    public Dictionary<string, List<AchievementInfo>> categoryToInfos = new Dictionary<string, List<AchievementInfo>>();
+
     // Start is called before the first frame update
     void Start()
     {
@@ -37,14 +42,27 @@ public class AchievementManager : Singleton<AchievementManager>
         ruleList = CsvUtil.LoadObjects<AchievementInfo>("achievement");
         foreach (var info in ruleList)
         {
-            unvisitedList.Add(info.type);
-            ruleDict[info.type] = info;
+            if (info.isLocked == 0)
+            {
+                unvisitedList.Add(info.type);
+                ruleDict[info.type] = info;
+
+                if (info.category != null && info.category != "")
+                {
+                    if (!categoryToInfos.ContainsKey(info.category))
+                    {
+                        categoryToInfos[info.category] = new List<AchievementInfo>();
+                    }
+
+                    categoryToInfos[info.category].Add(info);
+                }
+            }
         }
     }
 
     public bool hasUnlocked(string str)
     {
-        return visited.Contains(str);
+        return visitedList.Contains(str);
     }
     public void unlockAll()
     {
@@ -57,39 +75,54 @@ public class AchievementManager : Singleton<AchievementManager>
     {
         return ruleDict.ContainsKey(type);
     }
-    public bool addAchievement(string type)
+    public void addAchievement(string type)
     {
-        if (!visited.Contains(type))
+        if (categoryToInfos.ContainsKey(type))
+        {
+            foreach (var t in categoryToInfos[type])
+            {
+                addAchievement(t.type);
+            }
+
+            return;
+        }
+
+
+        if (!visitedList.Contains(type))
         {
             if (!ruleDict.ContainsKey(type))
             {
                 //Debug.LogError("no achievement " + type);
-                return false;
+                return;
             }
             if (ruleDict[type].amount > 0)
             {
                 ruleDict[type].currentAmount++;
                 if (ruleDict[type].currentAmount < ruleDict[type].amount)
                 {
-                    return false;
+                    return;
                 }
             }
 
+            if(type == "trapped4InARound")
+            {
+                Debug.Log("interesting");
+            }
 
             visitedList.Add(type);
             unvisitedList.Remove(type);
 
-            visited.Add(type);
+            //visited.Add(type);
             EventPool.Trigger("unlockAchievement");
+            ShowAchievementInternally(type);
         }
-        return true;
     }
 
     public void clear(string reason)
     {
         foreach (var info in ruleList)
         {
-            if (!visited.Contains(info.type) && info.clearReason == reason)
+            if (info.clearReason == reason)
             {
                 info.currentAmount = 0;
             }
@@ -101,7 +134,7 @@ public class AchievementManager : Singleton<AchievementManager>
 
         foreach (var info in ruleList)
         {
-            if (!visited.Contains(info.type) && info.amount > 0)
+            if (info.amount > 0)
             {
                 info.currentAmount = 0;
             }
@@ -110,7 +143,7 @@ public class AchievementManager : Singleton<AchievementManager>
 
     public bool isUnlocked(string type)
     {
-        return visited.Contains(type);
+        return visitedList.Contains(type);
     }
     public AchievementInfo getInfo(string type)
     {
@@ -124,14 +157,16 @@ public class AchievementManager : Singleton<AchievementManager>
 
     public void ShowAchievement(string achievementType)
     {
-        if (visited.Contains(achievementType))
+        if (visitedList.Contains(achievementType))
         {
             return;
         }
-        if (!addAchievement(achievementType))
-        {
-            return;
-        }
+        addAchievement(achievementType);
+
+    }
+
+    void ShowAchievementInternally(string achievementType)
+    {
         //get the achievement from the list
         AchievementInfo achievement = ruleDict[achievementType];
 
@@ -147,6 +182,11 @@ public class AchievementManager : Singleton<AchievementManager>
 
         //set the achievement icon
         var icon = Resources.Load<Sprite>("achievement/" + achievement.type);
+        if (!icon)
+        {
+            //Debug.LogError("no icon for " + achievement.type);
+            icon = Resources.Load<Sprite>("achievement/" + achievement.category);
+        }
         if (!icon)
         {
             Debug.LogError("no icon for " + achievement.type);

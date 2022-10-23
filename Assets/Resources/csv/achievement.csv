@@ -1,44 +1,61 @@
-﻿type,description,title,amount,clearReason,lock
-die,Killed by enemies...,Better Next Time,,,
-trapped,Hit the enemy with a trap,Trapped!,,,
-trapped2withOneTrap,Hit 2 enemies with one trap in a round,Go on and on,,,
-trapped10InTotal,Hit 10 enemies with trap,Advanced Hunter,,,
-trapped4InARound,Hit 4 enemies with trap in a round,"
-Trap Feast",,,
-lure,Use Candy to lure 5 enemies at a time,Lure,,,
-lureDeath,Use Candy to lure and damage 10 enemies in total,Fatal temptation,,,
-slash,Hit the enemy with a weapon,Slash!,,,
-slash2,Hit 2 enemy with one weapon in a round,One stone two bird,,,
-melt,The bonfire melts ice,Melting,,,1
-melt2,The bonfire melts 2 ice in one day,Global Warming,2,round,1
-spring,Survive the game!,Spring is coming,,,1
-winter,It's getting harder to survive…,Winter is coming,,,1
-allFurniture,Collected all funitures,Cozy Home,,,1
-allRules,Collected all rules,Omniscient,,,
-notMoving,Haven't moved in sequence for 10 rounds,Couch potato,10,move,
-,,,,,
-harvest,Collect 20 items at home,Harvest,20,,1
-slash2,hit 2 enemies with one weapon in a round,whirl!,2,round,
-slash3,hit 3 enemies with one weapon in a round,whirl!,2,round,
-freezeMove,Failed to move because of freezing,Freeze!,,,1
-freezeToDeath,Frozen to death…,White Walkers,,,1
-lotsOfAnimals,Get 5 animals on the board,Animal Party,5,,
-happyBear,You helped Mother Bear and she is happy,Happy Mom,,,1
-deadmotherBear,You killed the Big Bear,Bear Killer,,,1
-deadbabyBear,You monster! You killed this cute little baby bear!,Baby Bear Killer,,,1
-bearForestFinish,You Finished Hedgehog Forest! Grassland is unlocked!,Finished Hedgehog Forest!,,,
-grasslandFinish,You Finished Grassland! Farmland is unlocked!,Finished Grassland!,,,
-farmlandFinish,You Finished Farmland! Swamp Jungle is unlocked!,Finished Farmland!,,,
-grasslandAlly,Hedgehog survived! You can use it as players.,Hedgehog Friend,,,
-swampFinish,You Finished Swamp Jungle! End of the game(for now)!,Finished Swamp Jungle!,,,
-craft4InARound,Craft 4 items in a round,Material saving,,,
-craft6InARound,Craft 6 items in a round,Material Master,,,
-craft8InARound,Craft 8 items in a round,Material Legendary,,,
-craft4InAItem,Craft 4 items with one item,Make the best use,,,
-craftLearner,Craft 10 items in total,Craft Learner,,,
-craftLearner2,Craft 50 items in total,Craft Master,,,
-craftLearner3,Craft 200 items in total,Craft Legendary,,,
-ADHD,Move cards continuously for 5 rounds,ADHD,,,
-allAchievement,Unlock all achievements,Platinum,,,
-allFriends,get all characters,All Friends,,,
-killFriend,Let ally being killed by enemy,Selfish,,,
+﻿type,description,category,title,amount,clearReason,isLocked
+die,Killed by enemies...,,Look after your hp!,,,
+trapped,Hit the enemy with a trap,trap,Trapped!,,,
+trapped2withOneTrap,Hit 2 enemies with one trap in a round,trap,Go on and on,2,trap,1
+trapped10InTotal,Hit 10 enemies with trap,trap,Advanced Hunter,10,,
+trapped4InARound,Hit 4 enemies with trap in a round,trap,Trap Feast,4,round,
+lure1InRound,Use Candy to lure an enemy,lure,Lure,,,
+lure5InRound,Use Candy to lure 5 enemies in a round,lure,Lure,5,round,
+lureDeath,Use Candy to lure and hit 10 enemies in total,,Fatal temptation,10,,
+slash,Hit the enemy with a weapon,weapon,Slash!,,,
+slash2,Hit 2 enemies with one weapon in a round,weapon,One stone two bird,2,weapon,1
+slash3,Hit 3 enemies with one weapon in a round,weapon,whirl!,2,weapon,1
+slash10InTotal,Hit 10 enemies with a weapon in total,weapon,Weapon Learner,10,,
+slash50InTotal,Hit 50 enemies with a weapon in total,weapon,Weapon Master,50,,
+slash200InTotal,Hit 200 enemies with a weapon in total,weapon,Weapon Legendary,200,,
+slash5InRound,Hit 5 enemies with a weapon in a round,weapon,PentaKill,5,round,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+allRules,Collected all rules,,Omniscient,,,
+notMove,Haven't moved in sequence for 10 rounds,,Couch potato,10,move,
+,,,,,,
+,,,,,,
+,,,,,,
+,,,,,,
+lotsOfAnimals,Get 5 animals on the board,,Animal Party,5,,
+,,,,,,
+,,,,,,
+,,,,,,
+bearForestFinish,You Finished Hedgehog Forest! Grassland is unlocked!,,Finished Hedgehog Forest!,,,
+grasslandFinish,You Finished Grassland! Farmland is unlocked!,,Finished Grassland!,,,
+farmlandFinish,You Finished Farmland! Swamp Jungle is unlocked!,,Finished Farmland!,,,
+grasslandAlly,Hedgehog survived! You can use it as players.,,Hedgehog Friend,,,
+swampFinish,You Finished Swamp Jungle! End of the game(for now)!,,Finished Swamp Jungle!,,,
+craft4InARound,Craft 4 items in a round,craft,Material saving,4,round,
+craft6InARound,Craft 6 items in a round,craft,Material Master,6,round,
+craft8InARound,Craft 8 items in a round,craft,Material Legendary,8,round,
+craft4InAItem,Craft 4 items with one item,craft,Make the best use,4,item,1
+craftLearner,Craft 10 items in total,craft,Craft Learner,10,,
+craftLearner2,Craft 50 items in total,craft,Craft Master,50,,
+craftLearner3,Craft 200 items in total,craft,Craft Legendary,200,,
+move,Move cards continuously for 5 rounds,,ADHD,5,notMove,
+allAchievement,Unlock all achievements,,Platinum,,,
+allFriends,get all characters,,All Friends,,,
+killFriend,Let ally being killed by enemy,,Selfish,,,
+,,,,,,
+,,,,,,
+melt,The bonfire melts ice,,Melting,,,1
+melt2,The bonfire melts 2 ice in one day,,Global Warming,2,round,1
+spring,Survive the game!,,Spring is coming,,,1
+winter,It's getting harder to survive…,,Winter is coming,,,1
+allFurniture,Collected all funitures,,Cozy Home,,,1
+harvest,Collect 20 items at home,,Harvest,20,,1
+freezeMove,Failed to move because of freezing,,Freeze!,,,1
+freezeToDeath,Frozen to death…,,White Walkers,,,1
+happyBear,You helped Mother Bear and she is happy,,Happy Mom,,,1
+deadmotherBear,You killed the Big Bear,,Bear Killer,,,1
+deadbabyBear,You monster! You killed this cute little baby bear!,,Baby Bear Killer,,,1
+stompOnLeaves,stompOnLeaves,,stompOnLeaves,,,1
