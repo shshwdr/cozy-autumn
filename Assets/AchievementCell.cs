@@ -22,7 +22,13 @@ public class AchievementCell : MonoBehaviour
 
             lockedGo.SetActive(false);
             var info = AchievementManager.Instance.getInfo(type);
-            image.sprite = Resources.Load<Sprite>("achievement/" + type);
+            var icon = Resources.Load<Sprite>("achievement/" + type);
+            if (!icon)
+            {
+                //Debug.LogError("no icon for " + achievement.type);
+                icon = Resources.Load<Sprite>("achievement/" + AchievementManager.Instance.getInfo(type).category);
+            }
+            image.sprite = icon;
             title.text = info.title;
             desc.text = info.description;
         }

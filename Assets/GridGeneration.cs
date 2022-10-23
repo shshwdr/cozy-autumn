@@ -158,11 +158,15 @@ public class GridGeneration : Singleton<GridGeneration>
     }
     public void occupy(Vector2 index, GridCell cell)
     {
+        
         Vector2Int ind = Vector2Int.RoundToInt(index);
 
         indexToCell[ind] = cell;
         cell.index = ind;
-        cell.mask.SetActive(true);
+        if (cell.mask)
+        {
+            cell.mask.SetActive(true);
+        }
         LogManager.Instance.logOccupy(index, cell);
 
         if (cell.cellInfo.isEnemy())
@@ -182,8 +186,8 @@ public class GridGeneration : Singleton<GridGeneration>
         else
         {
             LogManager.Instance.logRelease(index, indexToCell[ind]);
+            indexToCell.Remove(ind);
         }
-        indexToCell.Remove(ind);
     }
 
     public bool isNextToOccupiedCells(Vector2 index)

@@ -57,11 +57,15 @@ public class GridCell : MonoBehaviour
 
     public void showEnemyTarget()
     {
-        enemyTargetOB.SetActive(true);
+        if (enemyTargetOB)
+        {
+            enemyTargetOB.SetActive(true);
+        }
     }
     public void hideEnemyTarget()
     {
-        enemyTargetOB.SetActive(false);
+        if (enemyTargetOB)
+            enemyTargetOB.SetActive(false);
 
     }
 
