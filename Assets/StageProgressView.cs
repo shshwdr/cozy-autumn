@@ -25,8 +25,22 @@ public class StageProgressView : MonoBehaviour
     void updateProgress() { 
     
         var prog =DeckManager.Instance.getProgress();
-        //player.transform.position = p1.position* (1 - prog)  + p2.position * prog;
+        player.transform.position = p1.position* (1 - prog)  + p2.position * prog;
         preogressFill.fillAmount = prog;
+
+        if (prog >= 1)
+        {
+            AchievementManager.Instance.ShowAchievement(StageManager.Instance.getCurrentInfo().stageName + "Finish");
+
+            foreach (var cell in GameObject.FindObjectsOfType<GridCell>())
+            {
+                if (cell.cellInfo.isAlly())
+                {
+
+                    AchievementManager.Instance.ShowAchievement(StageManager.Instance.getCurrentInfo().stageName + "Ally");
+                }
+            }
+        }
     }
     void hide()
     {

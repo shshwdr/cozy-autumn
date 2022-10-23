@@ -128,7 +128,9 @@ public class GridCell : MonoBehaviour
         {
             bk.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/blank/default");
             HPBK.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("cell/blank/default-corner-left");
-            amountLabel.color = Color.black;
+            var color = Color.black;
+            ColorUtility.TryParseHtmlString("#6c7680", out color);
+            amountLabel.color = color;
         }
 
     }

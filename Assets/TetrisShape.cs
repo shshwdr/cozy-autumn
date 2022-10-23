@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class TetrisShape : MonoBehaviour
 {
@@ -189,6 +190,10 @@ public class TetrisShape : MonoBehaviour
         foreach(var spriterender in trans.GetComponentsInChildren<SpriteRenderer>())
         {
             spriterender.color = color;
+        }
+        foreach(var test in trans.GetComponentsInChildren<Text>())
+        {
+            test.color = new Color(test.color.r, test.color.g, test.color.b, color.a);
         }
     }
 

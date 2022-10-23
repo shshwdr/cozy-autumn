@@ -37,32 +37,32 @@ public class CheatManager : Singleton<CheatManager>
                 GridGeneration.Instance.playerCell.addAmount(10);
                 //ResourceManager.Instance.addResource("nut", 10);
             }
-            if (Input.GetKeyDown(KeyCode.O))
-            {
-                unlimitedSwap = true;
-                //ResourceManager.Instance.addResource("stick", 10);
-            }
-            if (Input.GetKeyDown(KeyCode.I))
-            {
-                wouldMoveCells = !wouldMoveCells;
-            }
+            //if (Input.GetKeyDown(KeyCode.O))
+            //{
+            //    unlimitedSwap = true;
+            //    //ResourceManager.Instance.addResource("stick", 10);
+            //}
+            //if (Input.GetKeyDown(KeyCode.I))
+            //{
+            //    wouldMoveCells = !wouldMoveCells;
+            //}
 
-            if (Input.GetKeyDown(KeyCode.L))
-            {
-                _wontDie = true;
-            }
-            if (Input.GetKeyDown(KeyCode.K))
-            {
-                RuleManager.Instance.unlockAll();
-            }
+            //if (Input.GetKeyDown(KeyCode.L))
+            //{
+            //    _wontDie = true;
+            //}
+            //if (Input.GetKeyDown(KeyCode.K))
+            //{
+            //    RuleManager.Instance.unlockAll();
+            //}
             if (Input.GetKeyDown(KeyCode.J))
             {
                 AchievementManager.Instance.unlockAll();
             }
-            if (Input.GetKeyDown(KeyCode.M))
-            {
-                ShopManager.Instance.purchaseAll();
-            }
+            //if (Input.GetKeyDown(KeyCode.M))
+            //{
+            //    ShopManager.Instance.purchaseAll();
+            //}
 
 
             if (Input.GetKeyDown(KeyCode.B))

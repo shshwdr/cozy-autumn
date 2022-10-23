@@ -45,49 +45,49 @@ public class EnemyCell : MonoBehaviour
     }
     void updateDescription()
     {
-        HintCell.generateHintText(explainPanel.transform.Find("attackWhenNext"), "Steal " + info.attack + " [" + info.requireResource + "] if next to [player]");
-        if (info.stayMode == 0)
-        {
+        //HintCell.generateHintText(explainPanel.transform.Find("attackWhenNext"), "Steal " + info.attack + " [" + info.requireResource + "] if next to [player]");
+        //if (info.stayMode == 0)
+        //{
 
-            HintCell.generateHintText(explainPanel.transform.Find("Move2"), "Run away after attack.");
-        }
-        if (info.attackPerStep > 0)
-        {
-            HintCell.generateHintText(explainPanel.transform.Find("attackPerRound"), "Otherwise steal " + info.attackPerStep + " [" + info.requireResourcePerStep + "] per round");
-        }
-        else
-        {
-            explainPanel.transform.Find("attackPerRound").gameObject.SetActive(false);
-        }
+        //    HintCell.generateHintText(explainPanel.transform.Find("Move2"), "Run away after attack.");
+        //}
+        //if (info.attackPerStep > 0)
+        //{
+        //    HintCell.generateHintText(explainPanel.transform.Find("attackPerRound"), "Otherwise steal " + info.attackPerStep + " [" + info.requireResourcePerStep + "] per round");
+        //}
+        //else
+        //{
+        //    explainPanel.transform.Find("attackPerRound").gameObject.SetActive(false);
+        //}
 
-        if (info.moveMode < 0)
-        {
+        //if (info.moveMode < 0)
+        //{
 
-            HintCell.generateHintText(explainPanel.transform.Find("Move"), "Attack every " + (-info.moveMode) + " round");
-            HintCell.generateHintText(explainPanel.transform.Find("Move2"), "Won't run away after attack.");
-        }
+        //    HintCell.generateHintText(explainPanel.transform.Find("Move"), "Attack every " + (-info.moveMode) + " round");
+        //    HintCell.generateHintText(explainPanel.transform.Find("Move2"), "Won't run away after attack.");
+        //}
 
-        if (info.requireResource != "nut")
-        {
+        //if (info.requireResource != "nut")
+        //{
 
-            HintCell.generateHintText(explainPanel.transform.Find("notNut"), "If [" + info.requireResourcePerStep + "] is not enough, steal 2x [nut]");
-        }
-        else
-        {
+        //    HintCell.generateHintText(explainPanel.transform.Find("notNut"), "If [" + info.requireResourcePerStep + "] is not enough, steal 2x [nut]");
+        //}
+        //else
+        //{
 
-            explainPanel.transform.Find("notNut").gameObject.SetActive(false);
-        }
+        //    explainPanel.transform.Find("notNut").gameObject.SetActive(false);
+        //}
 
-        if (info.moveMode > 0)
-        {
-            HintCell.generateHintText(explainPanel.transform.Find("Move"), "Move to [player]");
-        }
-        if (info.moveMode == 0)
-        {
-            explainPanel.transform.Find("Move").gameObject.SetActive(false);
-        }
+        //if (info.moveMode > 0)
+        //{
+        //    HintCell.generateHintText(explainPanel.transform.Find("Move"), "Move to [player]");
+        //}
+        //if (info.moveMode == 0)
+        //{
+        //    explainPanel.transform.Find("Move").gameObject.SetActive(false);
+        //}
 
-        StartCoroutine(test());
+        //StartCoroutine(test());
     }
 
     IEnumerator test()

@@ -15,7 +15,7 @@ public class StageInfo
 
 public class StageManager : Singleton<StageManager>
 {
-
+    public Transform bks;
     public string currentStage = "bearForest";
     Dictionary<string, StageInfo> stageInfoDict = new Dictionary<string, StageInfo>();
     List<string> unlockedStage = new List<string>();
@@ -67,6 +67,17 @@ public class StageManager : Singleton<StageManager>
     public void setCurrentStage(string na)
     {
         currentStage = na;
+        
+        for (int i = 0; i < bks.childCount; i++)
+        {
+            bks.GetChild(i).gameObject.SetActive(false);
+        }
+        var stageBK = bks.Find(na);
+        if (!stageBK)
+        {
+            stageBK = bks.Find("bearForest");
+        }
+        stageBK.gameObject.SetActive(true);
     }
     public StageInfo getStageInfo(string name)
     {

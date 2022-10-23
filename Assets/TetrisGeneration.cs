@@ -6,6 +6,7 @@ public class TetrisGeneration : Singleton<TetrisGeneration>
 {
     public GameObject tetrisShapePrefab;
     public GameObject previewTetris;
+    int count = 0;
     public List<List<Vector2>> TetrisShapes = new List<List<Vector2>>()
     {
         new List<Vector2>(){new Vector2(0,0),new Vector2(0,1),new Vector2(1,0)  },
@@ -22,7 +23,16 @@ public class TetrisGeneration : Singleton<TetrisGeneration>
         Vector3 previewPosition = Camera.main.ScreenToWorldPoint(GameObject.Find("previewTetris").transform.position);
         previewPosition.z = 0;
         var go = Instantiate(tetrisShapePrefab, previewPosition, Quaternion.identity);
-        go.GetComponent<TetrisShape>().init(TetrisShapes[Random.Range(0,TetrisShapes.Count)]);
+        var tetrisShape = TetrisShapes[Random.Range(0, TetrisShapes.Count)];
+        //if(count == 0)
+        //{
+        //    tetrisShape = new List<Vector2>() { new Vector2(0, 0) };
+        //}else if(count == 1)
+        //{
+        //    tetrisShape = new List<Vector2>(){ new Vector2(0, 0),new Vector2(0, 1)  };
+
+        //}
+        go.GetComponent<TetrisShape>().init(tetrisShape);
         if (previewTetris)
         {
 
@@ -36,6 +46,7 @@ public class TetrisGeneration : Singleton<TetrisGeneration>
         {
         }
         previewTetris = go;
+        count++;
         
     }
 

@@ -10,6 +10,15 @@ public class LogManager : Singleton<LogManager>
     {
 
     }
+
+    public void log(string str)
+    {
+
+        if (isLogging)
+        {
+            Debug.Log(str);
+        }
+        }
     public void logOccupy(Vector2 index, GridCell cell)
     {
         if (isLogging)

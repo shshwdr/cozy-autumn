@@ -103,16 +103,18 @@ public class GridGeneration : Singleton<GridGeneration>
     {
         currentSwapTime++;
         EventPool.Trigger("updateSwap");
+        LogManager.Instance.log("swap set is moving to true");
         isMoving = true;
         yield return StartCoroutine(exchangeCardAnim(cell1, cell2));
 
 
         List<Vector2> mightUpdatedPositions = new List<Vector2>();
-        addFarerCellIntoPositions(mightUpdatedPositions, cell1.index);
-        addFarerCellIntoPositions(mightUpdatedPositions, cell2.index);
+        // addFarerCellIntoPositions(mightUpdatedPositions, cell1.index);
+        // addFarerCellIntoPositions(mightUpdatedPositions, cell2.index);
 
-        yield return StartCoroutine(movePositions(mightUpdatedPositions));
+        // yield return StartCoroutine(movePositions(mightUpdatedPositions));
 
+        LogManager.Instance.log("swap finish exchange");
         if (cell1 && cell2 && cell1.amount > 0 && cell2.amount > 0 && cell1.cellInfo.specialMode != null)
         {
 
@@ -127,6 +129,7 @@ public class GridGeneration : Singleton<GridGeneration>
 
         isMoving = false;
 
+        LogManager.Instance.log("swap set is moving to false");
 
         AchievementManager.Instance.ShowAchievement("move");
         AchievementManager.Instance.clear("notMove");
@@ -246,13 +249,16 @@ public class GridGeneration : Singleton<GridGeneration>
     }
     public IEnumerator destroy(GameObject go, bool showAnim = true)
     {
+        testTime = 0;
         release(go.GetComponent<GridCell>().index);
+        go.GetComponent<GridCell>().decreaseAmount(go.GetComponent<GridCell>().amount);
         if (showAnim)
         {
 
             go.transform.DOScale(Vector3.zero, animTime);
             go.transform.DOLocalMoveY(1, animTime);
             yield return new WaitForSeconds(animTime);
+            testTime = 0;
         }
         else
         {
@@ -260,6 +266,7 @@ public class GridGeneration : Singleton<GridGeneration>
             yield return null;
         }
 
+        LogManager.Instance.log("middle of destroy");
         if (go.GetComponent<GridCell>() && go.GetComponent<GridCell>().birdItem != null && go.GetComponent<GridCell>().birdItem.Length > 0)
         {
             //drop
@@ -280,19 +287,27 @@ public class GridGeneration : Singleton<GridGeneration>
     }
     IEnumerator moveCardAnim(GridCell cell, Vector2 targetPosition)
     {
-
-        yield return null;
+        testTime = 0;
+        if (!cell)
+        {
+            Debug.Log("???"); 
+            yield return null;
+            yield break;
+        }
         SFXManager.Instance.play("cardmove");
 
         cell.transform.DOMove(getCellPosition(targetPosition), animTime);
 
         yield return new WaitForSeconds(animTime);
+        testTime = 0;
 
         LogManager.Instance.logMove(targetPosition, cell);
+        yield return null;
     }
 
     IEnumerator moveCardAndOccupyAnim(GridCell cell, Vector2 targetPosition)
     {
+        testTime = 0;
         if (!cell)
         {
             Debug.LogError("no cell");
@@ -301,9 +316,12 @@ public class GridGeneration : Singleton<GridGeneration>
 
         occupy(targetPosition, cell);
         yield return StartCoroutine(moveCardAnim(cell, targetPosition));
+
+        testTime = 0;
     }
     IEnumerator exchangeCardAnim(GridCell cell, GridCell cell2)
     {
+        testTime = 0;
         LogManager.Instance.logExchange(cell, cell2);
         var cellIndex = cell.index;
         var cellIndex2 = cell2.index;
@@ -320,26 +338,44 @@ public class GridGeneration : Singleton<GridGeneration>
         occupy(cellIndex, cell2);
 
 
-
+        if(!cell || !cell2)
+        {
+            yield break;
+        }
         yield return StartCoroutine(calculateCombinedResult(new List<GridCell>() { cell.GetComponent<GridCell>(), cell2.GetComponent<GridCell>() }, null));
 
 
-        //yield return StartCoroutine(combineAround(cell.GetComponent<GridCell>()));
-       // yield return StartCoroutine(combineAround(cell2.GetComponent<GridCell>()));
 
+        if (!cell || !cell2)
+        {
+            yield break;
+        }
+        //yield return StartCoroutine(combineAround(cell.GetComponent<GridCell>()));
+        // yield return StartCoroutine(combineAround(cell2.GetComponent<GridCell>()));
+
+        LogManager.Instance.log("exchangeCardAnim start destory");
         if (cell.cellInfo.isEmpty())
         {
             yield return StartCoroutine(destroy(cell.gameObject));
+        }
+
+        LogManager.Instance.log("exchangeCardAnim finish destory");
+
+        if (!cell || !cell2)
+        {
+            yield break;
         }
         if (cell2.cellInfo.isEmpty())
         {
             yield return StartCoroutine(destroy(cell2.gameObject));
         }
+        testTime = 0;
     }
 
 
     public IEnumerator calculateCombinedResult(List<GridCell> cells, List<GameObject> newCells, bool supportInPosiiton = true)
     {
+        testTime = 0;
         bool showResult = newCells != null;
         Dictionary<Vector2, bool> hasCombined = new Dictionary<Vector2, bool>();
         Dictionary<Vector2, GameObject> positionToCell = new Dictionary<Vector2, GameObject>();
@@ -453,6 +489,7 @@ public class GridGeneration : Singleton<GridGeneration>
                             var gCell = generateCell(newIndex, combinationGenerated);
                             willOccupy.Add(gCell);
                             yield return new WaitForSeconds(animTime);
+                            testTime = 0;
                             //hasCombined[combineNewCell.index] = true;
 
                             willDestory.Add(newCell.gameObject);
@@ -846,11 +883,12 @@ public class GridGeneration : Singleton<GridGeneration>
     IEnumerator decreaseBothCell(GridCell cell, GridCell enemy, List<Vector2> mightUpdatedPositions, List<GridCell> otherCells = null)
     {
 
+        testTime = 0;
         var damage = Mathf.Min(cell.amount, enemy.amount);
         cell.decreaseAmount(damage);
         if (cell.amount <= 0)
         {
-            addFarerCellIntoPositions(mightUpdatedPositions, cell.index);
+          //  addFarerCellIntoPositions(mightUpdatedPositions, cell.index);
             yield return StartCoroutine(destroy(cell.gameObject));
         }
 
@@ -864,7 +902,7 @@ public class GridGeneration : Singleton<GridGeneration>
             enemy.decreaseAmount(damage);
             if (enemy.amount <= 0)
             {
-                addFarerCellIntoPositions(mightUpdatedPositions, enemy.index);
+               // addFarerCellIntoPositions(mightUpdatedPositions, enemy.index);
                 yield return StartCoroutine(destroy(enemy.gameObject));
             }
         }
@@ -878,13 +916,15 @@ public class GridGeneration : Singleton<GridGeneration>
                 c.decreaseAmount(damage);
                 if (c.amount <= 0)
                 {
-                    addFarerCellIntoPositions(mightUpdatedPositions, c.index);
+                  //  addFarerCellIntoPositions(mightUpdatedPositions, c.index);
                     yield return StartCoroutine(destroy(c.gameObject));
                 }
             }
         }
 
         yield return null;
+
+        testTime = 0;
     }
 
     void playHealEffect(GridCell healer, GridCell target)
@@ -945,6 +985,7 @@ public class GridGeneration : Singleton<GridGeneration>
     IEnumerator moveWeapons()
     {
 
+        testTime = 0;
         yield return null;
         List<GridCell> weapons = new List<GridCell>();
         foreach (var cell in GameObject.FindObjectsOfType<GridCell>())
@@ -1017,6 +1058,8 @@ public class GridGeneration : Singleton<GridGeneration>
             }
 
         }
+
+        testTime = 0;
     }
 
     IEnumerator showMoveAnim(GridCell sendCell, GridCell targetCell)
@@ -1269,7 +1312,7 @@ public class GridGeneration : Singleton<GridGeneration>
                         //    release(enemy.index);
                         //    occupy(trapIndex, enemy);
                         //}
-                        yield return StartCoroutine(movePositions(mightUpdatedPositions));
+                       // yield return StartCoroutine(movePositions(mightUpdatedPositions));
                     }
 
 
@@ -1288,9 +1331,9 @@ public class GridGeneration : Singleton<GridGeneration>
                         }
 
                         List<Vector2> mightUpdatedPositions = new List<Vector2>();
-                        addFarerCellIntoPositions(mightUpdatedPositions, pos);
+                        //addFarerCellIntoPositions(mightUpdatedPositions, pos);
 
-                        yield return StartCoroutine(movePositions(mightUpdatedPositions));
+                       // yield return StartCoroutine(movePositions(mightUpdatedPositions));
 
                     }
                     else
@@ -1309,10 +1352,10 @@ public class GridGeneration : Singleton<GridGeneration>
                                 }
 
                                 List<Vector2> mightUpdatedPositions = new List<Vector2>();
-                                addFarerCellIntoPositions(mightUpdatedPositions, pos);
-                                addFarerCellIntoPositions(mightUpdatedPositions, scell.index);
+                                //addFarerCellIntoPositions(mightUpdatedPositions, pos);
+                               // addFarerCellIntoPositions(mightUpdatedPositions, scell.index);
 
-                                yield return StartCoroutine(movePositions(mightUpdatedPositions));
+                                //yield return StartCoroutine(movePositions(mightUpdatedPositions));
                             }
                         }
 
@@ -1331,9 +1374,9 @@ public class GridGeneration : Singleton<GridGeneration>
                 yield return StartCoroutine(moveCardAndOccupyAnim(getCellOnPosition(pos), pos + dir));
 
                 List<Vector2> mightUpdatedPositions = new List<Vector2>();
-                addFarerCellIntoPositions(mightUpdatedPositions, pos);
+                //addFarerCellIntoPositions(mightUpdatedPositions, pos);
 
-                yield return StartCoroutine(movePositions(mightUpdatedPositions));
+                //yield return StartCoroutine(movePositions(mightUpdatedPositions));
             }
 
 
@@ -1348,86 +1391,88 @@ public class GridGeneration : Singleton<GridGeneration>
         }
     }
 
-    void addFarerCellIntoPositions(List<Vector2> positions, Vector2 pos)
-    {
-        var surroundingCells = getSurroundingCells(pos);
-        foreach (var scell in surroundingCells)
-        {
-            if (distance(scell.index) > distance(pos))
-            {
-                if (!positions.Contains(scell.index))
-                {
-                    positions.Add(scell.index);
-                }
-            }
-        }
-    }
+    //void addFarerCellIntoPositions(List<Vector2> positions, Vector2 pos)
+    //{
+    //    var surroundingCells = getSurroundingCells(pos);
+    //    foreach (var scell in surroundingCells)
+    //    {
+    //        if (distance(scell.index) > distance(pos))
+    //        {
+    //            if (!positions.Contains(scell.index))
+    //            {
+    //                positions.Add(scell.index);
+    //            }
+    //        }
+    //    }
+    //}
 
-    IEnumerator movePositions(List<Vector2> positions)
-    {
-        yield return null;
-        positions.Sort(SortByDistanceToPlayer);
-        int test2 = 30;
-        while (positions.Count > 0)
-        {
-            test2--;
-            if (test2 < 0)
-            {
+    //IEnumerator movePositions(List<Vector2> positions)
+    //{
+    //    yield return null;
+    //    positions.Sort(SortByDistanceToPlayer);
+    //    int test2 = 30;
+    //    while (positions.Count > 0)
+    //    {
+    //        test2--;
+    //        if (test2 < 0)
+    //        {
 
-                Debug.LogError("move too many times");
-                break;
-            }
-            //get cell
-            var pos = positions[0];
-            positions.RemoveAt(0);
-            var cell = getCellOnPosition(pos);
-            if (cell == null)
-            {
-                //Debug.LogError("cell is null");
-                continue;
-            }
+    //            Debug.LogError("move too many times");
+    //            break;
+    //        }
+    //        //get cell
+    //        var pos = positions[0];
+    //        positions.RemoveAt(0);
+    //        var cell = getCellOnPosition(pos);
+    //        if (cell == null)
+    //        {
+    //            //Debug.LogError("cell is null");
+    //            continue;
+    //        }
 
-            //move cell to bottom
-            var dir = getDir(pos);
-            int test = 30;
-
-
-            if (CheatManager.Instance.wouldMoveCells)
-            {
-                while (!isOccupied(pos - dir))
-                {
-                    test--;
-                    if (test <= 0)
-                    {
-                        Debug.LogError("move too many times");
-                        break;
-                    }
-                    yield return StartCoroutine(moveCardAndOccupyAnim(getCellOnPosition(pos), pos - dir));
-
-                    addFarerCellIntoPositions(positions, pos);
-
-                    pos = pos - dir;
-                    dir = getDir(pos);
-                }
-            }
+    //        //move cell to bottom
+    //        var dir = getDir(pos);
+    //        int test = 30;
 
 
-            //yield return StartCoroutine(combineAround(cell.GetComponent<GridCell>()));
+    //        if (CheatManager.Instance.wouldMoveCells)
+    //        {
+    //            while (!isOccupied(pos - dir))
+    //            {
+    //                test--;
+    //                if (test <= 0)
+    //                {
+    //                    Debug.LogError("move too many times");
+    //                    break;
+    //                }
+    //                yield return StartCoroutine(moveCardAndOccupyAnim(getCellOnPosition(pos), pos - dir));
 
-            if (CheatManager.Instance.wouldMoveCells)
-            {
-                if (!isOccupied(pos))
-                {
-                    //if the cell is destroyed after combien, find cells that might be affected and add to positions
-                    addFarerCellIntoPositions(positions, pos);
-                }
-            }
-            positions.Sort(SortByDistanceToPlayer);
-        }
-    }
+    //               // addFarerCellIntoPositions(positions, pos);
+
+    //                pos = pos - dir;
+    //                dir = getDir(pos);
+    //            }
+    //        }
+
+
+    //        //yield return StartCoroutine(combineAround(cell.GetComponent<GridCell>()));
+
+    //        //if (CheatManager.Instance.wouldMoveCells)
+    //        //{
+    //        //    if (!isOccupied(pos))
+    //        //    {
+    //        //        //if the cell is destroyed after combien, find cells that might be affected and add to positions
+    //        //        addFarerCellIntoPositions(positions, pos);
+    //        //    }
+    //        //}
+    //        positions.Sort(SortByDistanceToPlayer);
+    //    }
+    //}
 
     IEnumerator placeCellsAnim(List<GameObject> cells)
     {
+
+        LogManager.Instance.log("placeCellsAnim set is moving to true");
         isMoving = true;
         //
         foreach (var cell in cells)
@@ -1537,6 +1582,8 @@ public class GridGeneration : Singleton<GridGeneration>
         yield return StartCoroutine(moveWeapons());
         yield return StartCoroutine(moveEnemies());
 
+        yield return new WaitForSeconds(0.1f);
+        LogManager.Instance.log("placeCellsAnim set is moving to false");
         isMoving = false;
         resetSwap();
         allAttracts = null;
@@ -1640,9 +1687,24 @@ public class GridGeneration : Singleton<GridGeneration>
         return res;
     }
 
+    float testTime = 0;
+    float testMaxTime = 2f;
     // Update is called once per frame
     void Update()
     {
+        if(isMoving)
+        {
+            testTime+=Time.deltaTime;
+            if (testTime >= testMaxTime)
+            {
+                testTime = 0;
+                isMoving = false;
+            }
+        }
+        else
+        {
 
+            testTime = 0;
+        }
     }
 }
