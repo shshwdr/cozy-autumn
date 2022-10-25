@@ -24,14 +24,15 @@ public class TetrisGeneration : Singleton<TetrisGeneration>
         previewPosition.z = 0;
         var go = Instantiate(tetrisShapePrefab, previewPosition, Quaternion.identity);
         var tetrisShape = TetrisShapes[Random.Range(0, TetrisShapes.Count)];
-        //if(count == 0)
-        //{
-        //    tetrisShape = new List<Vector2>() { new Vector2(0, 0) };
-        //}else if(count == 1)
-        //{
-        //    tetrisShape = new List<Vector2>(){ new Vector2(0, 0),new Vector2(0, 1)  };
+        if (count == 0)
+        {
+            tetrisShape = new List<Vector2>() { new Vector2(0, 0) };
+        }
+        else if (count == 1)
+        {
+            tetrisShape = new List<Vector2>() { new Vector2(0, 0), new Vector2(0, 1) };
 
-        //}
+        }
         go.GetComponent<TetrisShape>().init(tetrisShape);
         if (previewTetris)
         {

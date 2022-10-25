@@ -20,6 +20,7 @@ public class GridGeneration : Singleton<GridGeneration>
     public int gridSizey = 2;
 
     Dictionary<Vector2, GridCell> indexToCell = new Dictionary<Vector2, GridCell>();
+    Dictionary<Vector2, GameObject> indexToTestCell = new Dictionary<Vector2, GameObject>();
 
     public int swapTime = 1;
     public int currentSwapTime = 0;
@@ -44,6 +45,12 @@ public class GridGeneration : Singleton<GridGeneration>
 
             //show tutorial drag
             NewCellManager.Instance.ShowNewCell("tutorialDrag");
+        }
+        else
+        {
+
+            mainCanvas.SetActive(false);
+            MainMenuCanvas.SetActive(true);
         }
         StageManager.Instance.reopt();
         CharacterManager.Instance.reopt();
@@ -159,6 +166,8 @@ public class GridGeneration : Singleton<GridGeneration>
         Vector2Int ind = Vector2Int.RoundToInt(index);
         return ind.x <= gridSizex && ind.x >= -gridSizex && ind.y <= gridSizey && ind.y >= -gridSizey;
     }
+
+    bool test = true;
     public void occupy(Vector2 index, GridCell cell)
     {
         
@@ -174,8 +183,16 @@ public class GridGeneration : Singleton<GridGeneration>
 
         if (cell.cellInfo.isEnemy())
         {
-            AchievementManager.Instance.ShowAchievement("tutorialEnemy");
+            NewCellManager.Instance.ShowNewCell("tutorialEnemy");
         }
+        if (test)
+        {
+
+            var testCell = Instantiate(Resources.Load<GameObject>("testCell"), getCellPosition(cell.index), Quaternion.identity);
+            indexToTestCell[ind] = testCell;
+        }
+
+
     }
 
     public void release(Vector2 index)
@@ -190,6 +207,12 @@ public class GridGeneration : Singleton<GridGeneration>
         {
             LogManager.Instance.logRelease(index, indexToCell[ind]);
             indexToCell.Remove(ind);
+        }
+        if (test)
+        {
+
+            Destroy(indexToTestCell[ind]);
+            indexToTestCell[ind] = null;
         }
     }
 
@@ -279,8 +302,13 @@ public class GridGeneration : Singleton<GridGeneration>
 
         if (go.GetComponent<GridCell>())
         {
-            if(go.GetComponent<GridCell>().cellInfo.isAlly())
-            AchievementManager.Instance.ShowAchievement("killFriend");
+            if (go.GetComponent<GridCell>().cellInfo.isAlly())
+            {
+
+                AchievementManager.Instance.ShowAchievement("killFriend");
+                SFXManager.Instance.play("allydie");
+            }
+
         }
 
         Destroy(go);
@@ -977,7 +1005,16 @@ public class GridGeneration : Singleton<GridGeneration>
         go2.GetComponentInChildren<SpriteRenderer>().sortingOrder = 1;
         Destroy(go2, 1f);
 
-        SFXManager.Instance.play("attack");
+        if(weapon.cellInfo.type == "whipe"|| weapon.cellInfo.type == "lasso")
+        {
+
+            SFXManager.Instance.play("whip");
+        }
+        else
+        {
+
+            SFXManager.Instance.play("attack");
+        }
 
         AchievementManager.Instance.ShowAchievement("weapon");
     }
@@ -1250,6 +1287,7 @@ public class GridGeneration : Singleton<GridGeneration>
                 {
                     if (resource.cellInfo.isFood())
                     {
+                        SFXManager.Instance.play("steal");
                         yield return StartCoroutine(showMoveAnim(resource, enemy));
                         resource.decreaseAmount(1);
                         enemy.addAmount(1); //show add amount effect
@@ -1589,16 +1627,22 @@ public class GridGeneration : Singleton<GridGeneration>
         allAttracts = null;
         round++;
         AchievementManager.Instance.clear("round");
-        if (round >= 1)
+        if (round >= 2)
         {
 
             //show tutorial drag
             NewCellManager.Instance.ShowNewCell("tutorialRotate");
         }
-        if (round > 2)
+        if (round > 3)
         {
             //show tutorial drag
             NewCellManager.Instance.ShowNewCell("tutorialSwap");
+
+        }
+        if (round > 6)
+        {
+            //show tutorial drag
+            NewCellManager.Instance.ShowNewCell("tutorialRightClick");
 
         }
 

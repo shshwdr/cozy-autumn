@@ -24,8 +24,9 @@ public class AchievementMenu : MonoBehaviour
         }
         for (; i < AchievementManager.Instance.visitedList.Count; i++)
         {
-            var ruleCell = hintCells[i];
-            ruleCell.init(AchievementManager.Instance.visitedList[i],false);
+            var index = AchievementManager.Instance.visitedList.Count - i - 1;
+            var ruleCell = hintCells[index];
+            ruleCell.init(AchievementManager.Instance.visitedList[index],false);
             ruleCell.gameObject.SetActive(true);
         }
         for (; i < AchievementManager.Instance.unvisitedList.Count+ AchievementManager.Instance.visitedList.Count; i++)

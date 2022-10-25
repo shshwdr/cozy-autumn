@@ -24,7 +24,7 @@ public class NewCellManager : Singleton<NewCellManager>
 
         foreach (var info in CellManager.Instance.combinationInfos)
         {
-            if(info.desc!=null && info.desc.Length > 0)
+            if(info.desc!=null && info.desc !="" && info.desc.Length > 0)
             {
                 unvisitedList.Add(info.type);
             }
@@ -59,19 +59,21 @@ public class NewCellManager : Singleton<NewCellManager>
         }
     }
 
-    
+    public bool isQueueEmpty()
+    {
+        return UIPopupManager.QueueSize() == 0;
+    }
     public bool isUnlocked(string type)
     {
         return visited.Contains(type);
     }
-    public void ShowNewCell(string achievementType)
+
+    public void showCellInfo(string achievementType)
     {
-        if (visited.Contains(achievementType))
+        if (!visited.Contains(achievementType))
         {
             return;
         }
-        unlock(achievementType);
-
         var cell = CellManager.Instance.getInfo(achievementType);
 
         //get a clone of the UIPopup, with the given PopupName, from the UIPopup Database 
@@ -85,14 +87,33 @@ public class NewCellManager : Singleton<NewCellManager>
         var icon = Resources.Load<Sprite>("cell/" + cell.type);
         if (!icon)
         {
-            Debug.LogError("no icon for " + cell.type);
+            icon = Resources.Load<Sprite>("cell/" + "tutorialDrag");
+            //Debug.LogError("no icon for " + cell.type);
         }
         m_popup.Data.SetImagesSprites(icon);
         //set the achievement title and message
         m_popup.Data.SetLabelsTexts(cell.displayName, cell.desc);
+        if (cell.displayName == "" || cell.desc == "")
+        {
 
+            Debug.LogError("no icon for " + cell.type);
+        }
         //show the popup
         UIPopupManager.ShowPopup(m_popup, m_popup.AddToPopupQueue, false);
+    }
+    public void ShowNewCell(string achievementType)
+    {
+        if (visited.Contains(achievementType))
+        {
+            return;
+        }
+        if(!unvisitedList.Contains(achievementType))
+        {
+            return;
+        }
+        unlock(achievementType);
+
+        showCellInfo(achievementType);
     }
 
     public void ClearPopupQueue()

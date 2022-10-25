@@ -73,7 +73,7 @@ public class StageManager : Singleton<StageManager>
             bks.GetChild(i).gameObject.SetActive(false);
         }
         var stageBK = bks.Find(na);
-        if (!stageBK)
+        if (!stageBK || stageBK == bks)
         {
             stageBK = bks.Find("bearForest");
         }

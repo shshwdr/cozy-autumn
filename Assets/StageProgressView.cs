@@ -25,7 +25,7 @@ public class StageProgressView : MonoBehaviour
     void updateProgress() { 
     
         var prog =DeckManager.Instance.getProgress();
-        player.transform.position = p1.position* (1 - prog)  + p2.position * prog;
+        playerRender.transform.position = p1.position* (1 - prog)  + p2.position * prog;
         preogressFill.fillAmount = prog;
 
         if (prog >= 1)

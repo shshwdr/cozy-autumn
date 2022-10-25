@@ -42,7 +42,7 @@ public class AchievementManager : Singleton<AchievementManager>
         ruleList = CsvUtil.LoadObjects<AchievementInfo>("achievement");
         foreach (var info in ruleList)
         {
-            if (info.isLocked == 0)
+            if (info.isLocked == 0 && info.type!=null && info.type!="")
             {
                 unvisitedList.Add(info.type);
                 ruleDict[info.type] = info;
@@ -88,7 +88,7 @@ public class AchievementManager : Singleton<AchievementManager>
         }
 
 
-        if (!visitedList.Contains(type))
+        if (!visitedList.Contains(type) && unvisitedList.Contains(type))
         {
             if (!ruleDict.ContainsKey(type))
             {
@@ -180,6 +180,13 @@ public class AchievementManager : Singleton<AchievementManager>
         if (m_popup == null)
             return;
 
+
+        if (achievement.title == "" || achievement.description == "")
+        {
+
+            Debug.LogError("no icon for " + achievement.type);
+        }
+
         //set the achievement icon
         var icon = Resources.Load<Sprite>("achievement/" + achievement.type);
         if (!icon)
@@ -194,7 +201,6 @@ public class AchievementManager : Singleton<AchievementManager>
         m_popup.Data.SetImagesSprites(icon);
         //set the achievement title and message
         m_popup.Data.SetLabelsTexts(achievement.title, achievement.description);
-
         //show the popup
         UIPopupManager.ShowPopup(m_popup, m_popup.AddToPopupQueue, false);
     }

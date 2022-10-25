@@ -117,7 +117,10 @@ namespace Doozy.Engine.UI
         #endregion
 
         #region Static Methods
-
+        public static int  QueueSize()
+        {
+            return PopupQueue.Count;
+        }
         /// <summary> Add the passed UIPopup to the PopupQueue </summary>
         /// <param name="popup"> Target UIPopup to be added to the PopupQueue </param>
         /// <param name="instantAction"> When shown, should the popup animate instantly? (in zero seconds) </param>

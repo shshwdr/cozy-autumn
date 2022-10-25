@@ -10,12 +10,13 @@ public class PlayerSelectionCell : MonoBehaviour
     public Text nameLabel;
     public Image currentPlayer;
     public Image playerSelection;
+    public Sprite lockedSprite;
     // Start is called before the first frame update
     void Start()
     {
 
         nameLabel.text = charName;
-        playerSelection.sprite = Resources.Load<Sprite>("cell/" + charName);
+        //playerSelection.sprite = Resources.Load<Sprite>("cell/" + charName);
         updateState();
         EventPool.OptIn("unlockStage", updateState);
     }
@@ -23,7 +24,9 @@ public class PlayerSelectionCell : MonoBehaviour
 
     void updateState()
     {
-        GetComponent<Button>().interactable =  CharacterManager.Instance.hasUnlocked(charName);
+        bool hasUnlocked = CharacterManager.Instance.hasUnlocked(charName);
+        GetComponent<Button>().interactable = hasUnlocked;
+        playerSelection.sprite = hasUnlocked?Resources.Load<Sprite>("cell/" + charName):lockedSprite;
     }
     public void onClick()
     {

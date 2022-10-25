@@ -8,13 +8,15 @@ public class StageSelectionCell : MonoBehaviour
 {
     public string stageName;
     public Text nameLabel;
+    public Sprite lockedSprite;
+    Sprite originalSprite;
     // Start is called before the first frame update
     void Start()
     {
 
         nameLabel.text = stageName;
 
-
+        originalSprite = GetComponent<Image>().sprite;
         updateState();
         EventPool.OptIn("unlockStage", updateState);
     }
@@ -22,7 +24,10 @@ public class StageSelectionCell : MonoBehaviour
 
     void updateState()
     {
-        GetComponent<Button>().interactable = StageManager.Instance.hasUnlocked(stageName);
+        bool hasUnlocked = StageManager.Instance.hasUnlocked(stageName);
+        GetComponent<Button>().interactable = hasUnlocked;
+        GetComponent<Image>().sprite = hasUnlocked ? originalSprite : lockedSprite;
+       // GetComponent<Button>().interactable = StageManager.Instance.hasUnlocked(stageName);
     }
 
     public void onClick()
