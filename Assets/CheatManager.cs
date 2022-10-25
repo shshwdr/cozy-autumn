@@ -12,7 +12,7 @@ public class CheatManager : Singleton<CheatManager>
     public bool wouldMoveCells = true;
 
     public bool unlimitedSwap = false;
-
+    public bool showOccupyInfo = false;
     public bool wontDie
     {
         get
@@ -36,6 +36,15 @@ public class CheatManager : Singleton<CheatManager>
             {
                 GridGeneration.Instance.playerCell.addAmount(10);
                 //ResourceManager.Instance.addResource("nut", 10);
+            }
+
+            if (Input.GetKeyDown(KeyCode.I))
+            {
+                showOccupyInfo = !showOccupyInfo;
+                foreach(var testCell in GameObject.FindGameObjectsWithTag("test"))
+                {
+                    testCell.GetComponentInChildren<SpriteRenderer>().color = showOccupyInfo ? Color.black : new Color(0, 0, 0, 0);
+                }
             }
             //if (Input.GetKeyDown(KeyCode.O))
             //{

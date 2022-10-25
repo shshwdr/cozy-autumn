@@ -167,7 +167,6 @@ public class GridGeneration : Singleton<GridGeneration>
         return ind.x <= gridSizex && ind.x >= -gridSizex && ind.y <= gridSizey && ind.y >= -gridSizey;
     }
 
-    bool test = true;
     public void occupy(Vector2 index, GridCell cell)
     {
         
@@ -185,11 +184,12 @@ public class GridGeneration : Singleton<GridGeneration>
         {
             NewCellManager.Instance.ShowNewCell("tutorialEnemy");
         }
-        if (test)
+        
         {
 
             var testCell = Instantiate(Resources.Load<GameObject>("testCell"), getCellPosition(cell.index), Quaternion.identity);
             indexToTestCell[ind] = testCell;
+            testCell.GetComponentInChildren<SpriteRenderer>().color = CheatManager.Instance. showOccupyInfo ? Color.black : new Color(0, 0, 0, 0);
         }
 
 
@@ -208,11 +208,12 @@ public class GridGeneration : Singleton<GridGeneration>
             LogManager.Instance.logRelease(index, indexToCell[ind]);
             indexToCell.Remove(ind);
         }
-        if (test)
+        //if (test)
         {
 
             Destroy(indexToTestCell[ind]);
             indexToTestCell[ind] = null;
+
         }
     }
 
@@ -339,6 +340,7 @@ public class GridGeneration : Singleton<GridGeneration>
         if (!cell)
         {
             Debug.LogError("no cell");
+            yield break;
         }
         release(cell.index);
 
@@ -1041,6 +1043,12 @@ public class GridGeneration : Singleton<GridGeneration>
 
             foreach (var enemy in getSurroundingCells(weapon.index))
             {
+
+                if (weapon.amount <= 0)
+                {
+                    break;
+                }
+
                 if (enemy.cellInfo.isEnemy())
                 {
 
@@ -1088,6 +1096,7 @@ public class GridGeneration : Singleton<GridGeneration>
                     {
                         break;
                     }
+
 
                     //yield return StartCoroutine(movePositions(mightUpdatedPositions));
 
@@ -1310,6 +1319,8 @@ public class GridGeneration : Singleton<GridGeneration>
                 {
                     var trapIndex = cell.index;
                     List<Vector2> mightUpdatedPositions = new List<Vector2>();
+
+                    release(enemy.index);
                     yield return StartCoroutine(moveCardAnim(enemy, cell.index));
                     if (cell.cellInfo.attackMode == "3x3")
                     {
@@ -1338,6 +1349,10 @@ public class GridGeneration : Singleton<GridGeneration>
                                 {
                                     yield return StartCoroutine(destroy(e.gameObject));
                                 }
+                                else
+                                {
+
+                                }
                             }
                         }
                     }
@@ -1353,7 +1368,11 @@ public class GridGeneration : Singleton<GridGeneration>
                        // yield return StartCoroutine(movePositions(mightUpdatedPositions));
                     }
 
-
+                    if(enemy && enemy.amount > 0)
+                    {
+                        enemy.index = trapIndex;
+                        occupy(enemy.index,enemy);
+                    }
                 }
                 else
                 {

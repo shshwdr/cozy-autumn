@@ -25,7 +25,7 @@ public class AchievementMenu : MonoBehaviour
         for (; i < AchievementManager.Instance.visitedList.Count; i++)
         {
             var index = AchievementManager.Instance.visitedList.Count - i - 1;
-            var ruleCell = hintCells[index];
+            var ruleCell = hintCells[i];
             ruleCell.init(AchievementManager.Instance.visitedList[index],false);
             ruleCell.gameObject.SetActive(true);
         }

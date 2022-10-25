@@ -24,7 +24,7 @@ public class GuideBookMenu : MonoBehaviour
         }
         for (; i < NewCellManager.Instance.visitedList.Count; i++)
         {
-            var ruleCell = hintCells[NewCellManager.Instance.visitedList.Count - i-1];
+            var ruleCell = hintCells[i];
             ruleCell.initGuide(NewCellManager.Instance.visitedList[NewCellManager.Instance.visitedList.Count - i-1], false);
             ruleCell.gameObject.SetActive(true);
         }

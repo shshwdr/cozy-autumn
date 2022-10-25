@@ -23,6 +23,7 @@ public class TetrisGeneration : Singleton<TetrisGeneration>
         Vector3 previewPosition = Camera.main.ScreenToWorldPoint(GameObject.Find("previewTetris").transform.position);
         previewPosition.z = 0;
         var go = Instantiate(tetrisShapePrefab, previewPosition, Quaternion.identity);
+       // go.transform.localScale = new Vector3(0.7f, 0.7f, 1f);
         var tetrisShape = TetrisShapes[Random.Range(0, TetrisShapes.Count)];
         if (count == 0)
         {
@@ -41,6 +42,9 @@ public class TetrisGeneration : Singleton<TetrisGeneration>
             currentPosition.z = 0;
             previewTetris.transform.position = currentPosition;
             previewTetris.GetComponent<TetrisShape>().getReady();
+
+            previewTetris.transform.localScale = Vector3.one;
+            go.transform.localScale = Vector3.one*0.7f;
 
         }
         else

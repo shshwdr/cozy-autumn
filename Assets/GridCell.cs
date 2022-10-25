@@ -395,13 +395,13 @@ public class GridCell : MonoBehaviour
         }
         else
         {
-            if (Input.GetMouseButtonDown(1))
-            {
-                if (NewCellManager.Instance.isQueueEmpty())
-                {
-                    NewCellManager.Instance.showCellInfo(type);
-                }
-            }
+            //if (Input.GetMouseButtonDown(1))
+            //{
+            //    if (NewCellManager.Instance.isQueueEmpty())
+            //    {
+            //        NewCellManager.Instance.showCellInfo(type);
+            //    }
+            //}
         }
 
 
