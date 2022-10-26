@@ -98,26 +98,28 @@ public class TetrisShape : MonoBehaviour
                     }
                 }
 
-            }
-        }
-        
 
-        if (Input.GetMouseButtonDown(1) && isUnlocked)
-        {
-            rotate90Degree();
-            if (isDragging)
-            {
-                if (generatedCombineResult.Count != 0)
-                {
-                    clearGeneratedCombineResult();
-                }
-                bool canPlaceCell = canPlace();
-                if (canPlaceCell)
-                {
-                    //show how nearby cells would update
 
-                    StartCoroutine(GridGeneration.Instance.calculateCombinedResult(allCells(), generatedCombineResult));
+
+                if (Input.GetMouseButtonDown(1) && isUnlocked)
+                {
+                    rotate90Degree();
+                    if (isDragging)
+                    {
+                        if (generatedCombineResult.Count != 0)
+                        {
+                            clearGeneratedCombineResult();
+                        }
+                        bool canPlaceCell = canPlace();
+                        if (canPlaceCell)
+                        {
+                            //show how nearby cells would update
+
+                            StartCoroutine(GridGeneration.Instance.calculateCombinedResult(allCells(), generatedCombineResult));
+                        }
+                    }
                 }
+
             }
         }
         //if (Input.GetMouseButtonDown(0))

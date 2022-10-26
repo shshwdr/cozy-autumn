@@ -19,6 +19,7 @@ public class PlayerSelectionCell : MonoBehaviour
         //playerSelection.sprite = Resources.Load<Sprite>("cell/" + charName);
         updateState();
         EventPool.OptIn("unlockStage", updateState);
+        updateButton();
     }
 
 
@@ -28,11 +29,39 @@ public class PlayerSelectionCell : MonoBehaviour
         GetComponent<Button>().interactable = hasUnlocked;
         playerSelection.sprite = hasUnlocked?Resources.Load<Sprite>("cell/" + charName):lockedSprite;
     }
+    public void updateButton()
+    {
+        if (CharacterManager.Instance.currentChar == "")
+        {
+            CharacterManager.Instance.currentChar = "squirrel";
+        }
+        if (charName == CharacterManager.Instance.currentChar)
+        {
+            transform.parent.localScale = Vector3.one * 1.3f;
+        }
+        else
+        {
+
+            transform.parent.localScale = Vector3.one;
+        }
+    }
     public void onClick()
     {
+
+
+
         CharacterManager.Instance.setCurrentChar(charName);
-        currentPlayer.sprite = Resources.Load<Sprite>("cell/" + CharacterManager.Instance.currentChar);
+       // currentPlayer.sprite = Resources.Load<Sprite>("cell/" + CharacterManager.Instance.currentChar);
         //GameManager.Instance.restartGame();
+
+
+        foreach (var b in transform.parent.parent.GetComponentsInChildren<PlayerSelectionCell>())
+        {
+            //if (b != this)
+            {
+                b.updateButton();
+            }
+        }
     }
 
     // Update is called once per frame

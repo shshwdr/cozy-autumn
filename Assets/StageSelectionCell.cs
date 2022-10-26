@@ -18,9 +18,26 @@ public class StageSelectionCell : MonoBehaviour
 
         originalSprite = GetComponent<Image>().sprite;
         updateState();
+        updateButton();
         EventPool.OptIn("unlockStage", updateState);
     }
 
+    public void updateButton()
+    {
+        if (StageManager.Instance.currentStage == "")
+        {
+            StageManager.Instance.currentStage = "bearForest";
+        }
+        if(stageName == StageManager.Instance.currentStage)
+        {
+            transform.parent.localScale = Vector3.one * 1.3f;
+        }
+        else
+        {
+
+            transform.parent.localScale = Vector3.one;
+        }
+    }
 
     void updateState()
     {
@@ -32,8 +49,18 @@ public class StageSelectionCell : MonoBehaviour
 
     public void onClick()
     {
+
+
         StageManager.Instance.setCurrentStage(stageName);
-        GameManager.Instance.restartGame();
+
+
+        foreach (var b in transform.parent.parent.GetComponentsInChildren<StageSelectionCell>())
+        {
+            //if (b != this)
+            {
+                b.updateButton();
+            }
+        }
     }
 
     

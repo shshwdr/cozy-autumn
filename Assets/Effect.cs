@@ -10,6 +10,7 @@ public class Effect : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        duration = GridGeneration.Instance.animTime;
         transform.DOPunchScale(new Vector3(scaleValue, scaleValue, scaleValue), duration,1);
         if (moveUp>0)
         {

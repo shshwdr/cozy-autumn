@@ -251,6 +251,7 @@ public class GridCell : MonoBehaviour
     {
         amount -= x;
         updateAmount();
+
     }
 
     public void equip(string e, int am)
@@ -395,13 +396,19 @@ public class GridCell : MonoBehaviour
         }
         else
         {
-            //if (Input.GetMouseButtonDown(1))
-            //{
-            //    if (NewCellManager.Instance.isQueueEmpty())
-            //    {
-            //        NewCellManager.Instance.showCellInfo(type);
-            //    }
-            //}
+            if (Input.GetMouseButtonDown(1))
+            {
+                if (NewCellManager.Instance.isQueueEmpty())
+                {
+
+                    Vector2 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+                    if (pointHovered(mousePosition))
+                    {
+                        NewCellManager.Instance.showCellInfo(type);
+                    }
+                }
+            }
         }
 
 
