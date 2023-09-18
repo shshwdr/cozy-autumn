@@ -3089,7 +3089,7 @@ MonoBehaviour:
   AutoSelectButtonAfterShow: 0
   AutoSelectPreviouslySelectedButtonAfterHide: 1
   BlockBackButton: 1
-  CanvasName: MasterCanvas
+  CanvasName: MainCanvas
   Container:
     Canvas: {fileID: 223448670934807800}
     CanvasGroup: {fileID: 225178113360435484}
@@ -3112,7 +3112,7 @@ MonoBehaviour:
     - {fileID: 1981334143906176}
     - {fileID: 1039621550546118}
   DestroyAfterHide: 1
-  DisplayTarget: 0
+  DisplayTarget: 1
   HideBehavior:
     Animation:
       AnimationType: 2
