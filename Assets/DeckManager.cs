@@ -106,6 +106,8 @@ public class DeckManager : Singleton<DeckManager>
             }
         }
     }
+    
+    
 
     string drawCardInternal(bool canDrawWaitingDeck, bool isBoss = false)
     {

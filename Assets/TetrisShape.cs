@@ -37,11 +37,22 @@ public class TetrisShape : MonoBehaviour
     {
         tetrisShape = new List<Vector2>(shape);
 
+        var randomEmpty = Random.Range(0, shape.Count);
+        
         tetrisShapeAfterRotation = new List<Vector2>(shape);
         for (int i = 0; i < tetrisShape.Count; i++)
         {
             var index = tetrisShape[i];
-            var card = DeckManager.Instance.drawCard(false);
+            string card = "empty";
+            if (randomEmpty == i)
+            {
+                
+            }
+            else
+            {
+                card = DeckManager.Instance.drawCard(false);
+            }
+            
             var go = GridGeneration.Instance.generateCell(index+(Vector2)transform.position, card, -1,false);
             go.transform.parent = transform;
             go.transform.position = transform.position +(Vector3) index * GridGeneration.Instance.cellSize;
@@ -266,7 +277,11 @@ public class TetrisShape : MonoBehaviour
                 //tetrises[i].GetComponent<GridCell>().bk.GetComponent<SpriteRenderer>().color = getColor(true);
             }
         }
-        var finalRes = res && surroundExistedCell && !outOfBorder;
+
+        bool isAdjacentToAnyExistedTile = true;
+        
+        
+        var finalRes = res && surroundExistedCell && !outOfBorder && isAdjacentToAnyExistedTile;
         if (!finalRes)
         {
             for (int i = 0; i < tetrisShape.Count; i++)

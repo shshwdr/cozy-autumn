@@ -45,6 +45,8 @@ public class GridCell : MonoBehaviour
 
     public GameObject mask;
 
+    public bool isTarget = false;
+
     private void Awake()
     {
         collider = GetComponent<Collider2D>();
